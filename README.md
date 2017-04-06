@@ -6,7 +6,7 @@
 ### How do I get set up? ###
 
 The master firmware uses the [ipbb](https://github.com/ipbus/ipbb) build tool, and requires the ipbus system firmware.
-The following example procedure should build a board image for testing of the timing FMC. Note that a reasonable up-to-date
+The following example procedure should build a board image for testing of the timing FMC. Note that a reasonably up-to-date
 operating system (e.g. Centos7) is required.
 
 mkdir work
