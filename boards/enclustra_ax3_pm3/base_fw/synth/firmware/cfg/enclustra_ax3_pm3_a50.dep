@@ -7,5 +7,5 @@
 setup settings_v7.tcl
 src top_enclustra_ax3_pm3.vhd
 include enclustra_ax3_pm3_infra.dep
-src -c ipbus_firmware:components/ipbus_core ipbus_package.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
 src --cd ../ucf enclustra_ax3_pm3.tcl
