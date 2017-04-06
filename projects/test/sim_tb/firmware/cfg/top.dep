@@ -1,5 +1,5 @@
 src txrx.vhd
-include -c components pdts_fmc_io.dep
+include -c components/pdts pdts_fmc_io.dep
 include tb_tx.dep
 include tb_rx.dep
 src ipbus_decode_top.vhd

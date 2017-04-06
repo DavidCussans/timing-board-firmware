@@ -1,5 +1,5 @@
 src fmc_mirror.vhd prbs7_ser.vhd prbs7_chk.vhd
-src -c components pdts_synchro.vhd
+src -c components/pdts pdts_synchro.vhd
 include -c components/opencores_i2c
 src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd
 src -c components/mp7_ttc freq_ctr.vhd freq_ctr_div.vhd
