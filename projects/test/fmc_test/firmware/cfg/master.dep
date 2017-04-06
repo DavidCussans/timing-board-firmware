@@ -1,6 +1,6 @@
 src fmc_master.vhd prbs7_ser.vhd prbs7_chk.vhd
-src -c projects/pdts/components pdts_synchro.vhd
-include -c projects/pdts/components pdts_fmc_io.dep
+src -c components pdts_synchro.vhd
+include -c components pdts_fmc_io.dep
 src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
 src ipbus_decode_top.vhd
