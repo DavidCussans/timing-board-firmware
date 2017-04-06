@@ -1,0 +1,14 @@
+<node id="trig_gen" description="internal trigger generator" fwinfo="endpoint">
+	<node id="gen0" address="0x0" fwinfo="endpoint;width=0">
+		<node id="en" mask="0x1"/>
+		<node id="patt" mask="0x2"/>
+		<node id="type" mask="0xf0"/>
+		<node id="rate_div" mask="0x1f00"/>
+	</node>
+	<node id="gen1" address="0x1" fwinfo="endpoint;width=0">
+		<node id="en" mask="0x1"/>
+		<node id="patt" mask="0x2"/>
+		<node id="type" mask="0xf0"/>
+		<node id="rate_div" mask="0x1f00"/>
+	</node>
+</node>
