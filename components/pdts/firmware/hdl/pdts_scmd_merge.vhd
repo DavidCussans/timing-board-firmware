@@ -9,6 +9,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
+use work.ipbus_reg_types.all;
+
 entity pdts_scmd_merge is
 	generic(
 		N_SRC: positive := 1
@@ -34,9 +36,9 @@ end pdts_scmd_merge;
 
 architecture rtl of pdts_scmd_merge is
 
-	signal p, pa: std_logic_vector(3 downto 0);
+	signal p, pa: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
 	signal sctr: unsigned(3 downto 0);
-	signal ip, ipa: integer range 15 downto 0 := 0;
+	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
 	signal go, active, l: std_logic;
 
 begin
