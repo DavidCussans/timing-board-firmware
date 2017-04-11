@@ -1,0 +1,6 @@
+<node id="TOP">
+		<node id="global" address="0x0" module="file://pdts_global.xml"/>
+    <node id="trig_gen" address="0x20" module="file://pdts_trig_gen.xml"/>
+    <node id="async" address="0x40" module="file://pdts_async.xml"/>
+		<node id="partition" address="0x80" module="file://pdts_partition.xml"/>
+</node>
