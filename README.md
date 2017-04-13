@@ -17,7 +17,7 @@ operating system (e.g. Centos7) is required.
 	cd build
 	ipbb add git https://github.com/ipbus/ipbus-firmware.git -b ipbus_2_0_v1
 	ipbb add git https://:@gitlab.cern.ch:8443/protoDUNE-SP-DAQ/timing-board-firmware.git -b v0
-	ipbb proj create vivado fmc_test pdts:projects/test/fmc_test -t top_master_a35.dep
+	ipbb proj create vivado fmc_test timing-board-firmware:projects/test/fmc_test -t top_master_a35.dep
 	cd proj/fmc_test
 	ipbb vivado project
 	ipbb vivado impl

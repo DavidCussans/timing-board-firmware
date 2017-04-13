@@ -16,8 +16,9 @@ entity pdts_ts_gen is
 		clk: in std_logic;
 		rst: in std_logic;
 		clr: in std_logic;
+		trig: in std_logic;
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-		evtctr: in std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
+		evtctr: out std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 		div: in std_logic_vector(4 downto 0);		
 		d: out std_logic_vector(7 downto 0);
 		v: out std_logic;
@@ -31,6 +32,7 @@ end pdts_ts_gen;
 architecture rtl of pdts_ts_gen is
 
 	signal t: unsigned(8 * TSTAMP_WDS - 1 downto 0);
+	signal ectr: unsigned(8 * EVTCTR_WDS - 1 downto 0);
 	signal cap: std_logic_vector(8 * (TSTAMP_WDS + EVTCTR_WDS + 1) - 1 downto 0);
 	signal ctr: unsigned(3 downto 0);
 	signal sync, go, s, done: std_logic;
@@ -51,6 +53,23 @@ begin
 	end process;
 
 	tstamp <= std_logic_vector(t);
+	
+-- Event counter
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				ectr <= (others => '0');
+			else
+				if trig = '1' then
+					ectr <= ectr + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	evtctr <= std_logic_vector(ectr);
 	
 -- Sending packet
 

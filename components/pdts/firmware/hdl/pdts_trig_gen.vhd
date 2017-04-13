@@ -24,6 +24,7 @@ entity pdts_trig_gen is
 		ipb_out: out ipb_rbus;		
 		clk: in std_logic;
 		rst: in std_logic;
+		trig: out std_logic;
 		d: out std_logic_vector(7 downto 0);
 		v: out std_logic;
 		last: out std_logic;
@@ -151,4 +152,8 @@ begin
 	v <= v_g(si);
 	last <= last_g(si);
 
+-- Trigger output
+
+	trig <= '0';
+	
 end rtl;

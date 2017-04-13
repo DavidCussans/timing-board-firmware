@@ -1,6 +1,0 @@
-<node id="trig_gen_chan" description="trigger generator channel" fwinfo="endpoint;width=0">
-	<node id="en" mask="0x1"/>
-	<node id="patt" mask="0x2"/>
-	<node id="type" mask="0xff00"/>
-	<node id="rate_div" mask="0x1f0000"/>
-</node>

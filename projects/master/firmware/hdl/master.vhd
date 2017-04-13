@@ -20,7 +20,9 @@ entity master is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		mclk: in std_logic;
-		rst: in std_logic;
+		locked: in std_logic;
+		clk: in std_logic;
+		stb: in std_logic;
 		q: out std_logic
 	);
 		
@@ -32,12 +34,13 @@ architecture rtl of master is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_mmcm_rst, ctrl_en, ctrl_clr: std_logic;
-	signal clr, clkfbout, clkfbin, clki, phase_locked, clk, rsti, rstl: std_logic;
-	signal sctr: unsigned(3 downto 0) := X"0";
-	signal stb, en, tx_err, tx_last, tx_ack, tx_rdy, tx_s_v, tx_stb, k: std_logic;
-	signal tx_d, tx_s_d: std_logic_vector(7 downto 0);
-	signal d: std_logic_vector(7 downto 0);
+	signal ctrl_en, ctrl_clr: std_logic;
+	signal clr, locked, clk, rsti, rstl, stb, en: std_logic;
+	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
+	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
+	signal ts_gen_v, ts_gen_last, ts_gen_ack, trig_gen_v, trig_gen_last, trig_gen_ack: std_logic;
+	signal ts_gen_d, trig_gen_d, async_d, sync_d, tx_d: std_logic_vector(7 downto 0);
+	signal tx_err, async_last, async_ack, sync_rdy, sync_v, sync_ren, tx_stb, tx_k: std_logic;
 	
 begin
 
@@ -55,7 +58,19 @@ begin
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
+    
+-- Global registers
 
+	global: entity work.master_global
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_GLOBAL),
+			ipb_out => ipbr(N_SLV_GLOBAL),
+			clk => clk,
+			???
+		);
+    
 -- CSR
 
 	csr: entity work.ipbus_syncreg_v
@@ -73,21 +88,21 @@ begin
 			q => ctrl
 		);
 
-	stat(0) <= X"0000000" & "00" & tx_err & phase_locked;
+	stat(0) <= X"0000000" & "00" & tx_err & locked;
 	ctrl_en <= ctrl(0)(0);
 	ctrl_clr <= ctrl(0)(1);
 		
--- Clock divider
+-- Clock divider and reset CDC
 
-	clkgen: entity work.pdts_rx_div_mmcm
+	clkgen: entity work.master_clk
 		port map(
-			sclk => mclk,
+			mclk => mclk,
+			locked => locked,
 			clk => clk,
-			phase_rst => '0',
-			phase_locked => phase_locked
+			stb => stb
 		);
 
-	rstl <= rst or not phase_locked;
+	rstl <= rst or not locked;
 	
 	synchro: entity work.pdts_synchro
 		generic map(
@@ -104,44 +119,78 @@ begin
 			q(2) => clr
 		);
 
--- Strobe gen
-
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			if sctr = (10 / SCLK_RATIO) - 1 then
-				sctr <= X"0";
-			else
-				sctr <= sctr + 1;
-			end if;
-		end if;
-	end process;
-	
-	stb <= '1' when sctr = 0 else '0';
-
 -- Pattern gen
 
 	idle: entity work.pdts_idle_gen
 		port map(
 			clk => clk,
 			rst => rsti,
-			d => tx_d,
-			last => tx_last,
-			ack => tx_ack
+			d => async_d,
+			last => async_last,
+			ack => async_ack
 		);
+
+-- Timestamp tx
 		
-	sync: entity work.pdts_sync_gen
+	sync: entity work.pdts_ts_gen			
 		port map(
-			ipb_in => ipbw(N_SLV_CTRS),
-			ipb_out => ipbr(N_SLV_CTRS),
-			en => en,
 			clk => clk,
-			rst => rsti,
-			clr => clr,
+			rst => rst,
+			clr => '0',
+			trig => trig,
+			tstamp => tstamp,
+			evtctr => evtctr,
+			div => "00110",
+			d => ts_d,
+			v => ts_v,
+			last => ts_last,
+			ack => ts_ack,
+			ren => sync_ren
+		);
+
+-- Command gen
+
+	gen: entity work.pdts_trig_gen
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TRIG_GEN),
+			ipb_out => ipbr(N_SLV_TRIG_GEN),
+			clk => clk,
+			rst => rst,
+			trig => trig,
+			d => trig_gen_d,
+			v => trig_gen_v,
+			last => trig_gen_last,
+			ack => trig_gen_ack,
+			ren => sync_ren
+		);
+
+-- Merge
+
+	merge: entity work.pdts_scmd_merge
+		generic map(
+			N_SRC => 2
+		)
+		port map(
+			clk => clk,
+			rst => rst,
 			stb => stb,
-			d => tx_s_d,
-			v => tx_s_v,
-			rdy => tx_rdy
+			rdy => sync_rdy,
+			d(7 downto 0) => trig_gen_d,
+			d(15 downto 8) => ts_gen_d,
+			dv(0) => trig_gen_v,
+			dv(1) => ts_gen_v,
+			last(0) => trig_gen_last,
+			last(1) => ts_gen_last,
+			ack(0) => trig_gen_ack,
+			ack(1) => ts_gen_ack,
+			ren => sync_ren,
+			typ => open,
+			tv => open,
+			grp => X"F",
+			q => sync_d,
+			v => sync_v
 		);
 		
 -- Tx
@@ -152,28 +201,28 @@ begin
 			rst => rsti,
 			stb => stb,
 			addr => X"AA",
-			s_d => tx_s_d,
-			s_valid => tx_s_v,
-			s_rdy => tx_rdy,
-			a_d => tx_d,
-			a_last => tx_last,
-			a_ack => tx_ack,
-			q => d,
-			k => k,
+			s_d => sync_d,
+			s_valid => sync_v,
+			s_rdy => sync_rdy,
+			a_d => async_d,
+			a_last => async_last,
+			a_ack => async_ack,
+			q => tx_d,
+			k => tx_k,
 			stbo => tx_stb,
 			err => tx_err
 		);
 		
 -- Tx PHY
 
-	txphy: entity work.pdts_tx_phy_int
+	txphy: entity work.pdts_tx_phy
 		port map(
 			clk => clk,
 			rst => rsti,
-			d => d,
-			k => k,
+			d => tx_d,
+			k => tx_k,
 			stb => tx_stb,
-			txclk => fmc_clk,
+			txclk => mclk,
 			q => q
 		);
 
