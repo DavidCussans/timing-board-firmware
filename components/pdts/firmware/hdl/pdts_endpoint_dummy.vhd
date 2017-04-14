@@ -14,7 +14,7 @@ entity pdts_endpoint_fake is
 	generic(
 		SYSCLK_FREQ: real := 50.0;
 		SYSCLK_MULT: integer := 1
-	)
+	);
 	port(
 		sys_clk: in std_logic; -- free-running system clock
 		sys_rst: in std_logic; -- synchronous reset (sys_clk domain)
