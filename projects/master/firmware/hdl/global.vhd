@@ -1,4 +1,4 @@
--- master_global
+-- global
 --
 -- Global (non-partition-specific) control registers for PDTS master
 --
@@ -14,7 +14,7 @@ use work.ipbus_decode_global.all;
 use work.pdts_defs.all;
 use work.master_defs.all;
 
-entity master_global is
+entity global is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -23,19 +23,20 @@ entity master_global is
 		clk: in std_logic;
 		locked: in std_logic;
 		tx_err: in std_logic;
-		part_sel: out std_logic_vector(calc_width(N_PART));
+		sel: out std_logic_vector(calc_width(N_PART) - 1 downto 0);
 		en: out std_logic;
-		ts_clr: out std_logic
+		tstamp: out std_logic_vector(63 downto 0)
 	);
 		
-end master_global;
+end global;
 
-architecture rtl of master_global is
+architecture rtl of global is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal sel, ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
+	signal ctrl_clr: std_logic;
 	
 begin
 
@@ -49,7 +50,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_globalx(ipb_in.ipb_addr),
+      sel => ipbus_sel_global(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
@@ -97,7 +98,28 @@ begin
 		);
 
 	stat(0) <= X"0000000" & "00" & tx_err & locked;
-	ctrl_en <= ctrl(0)(0);
+	en <= ctrl(0)(0);
 	ctrl_clr <= ctrl(0)(1);
+
+-- Time stamp counter
+
+	ts: entity work.ipbus_ctrs_v
+		generic map(
+			CTR_WDS => 2
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TSTAMP),
+			ipb_out => ipbr(N_SLV_TSTAMP),
+			clk => clk,
+			rst => ctrl_clr,
+			inc(0) => '1',
+			q => tstamp
+		);
+			
+-- Spill counter
+
+	ipbr(N_SLV_SPILL_CTR) <= IPB_RBUS_NULL;
 
 end rtl;

@@ -1,21 +1,24 @@
 <node id="partition" description="timing partition" fwinfo="endpoint">
-		<node id="csr" address="0x0" fwinfo="endpoint;width=1">
+		<node id="csr" address="0x0" fwinfo="endpoint;width=2">
 			<node id="ctrl" address="0x0">
 				<node id="part_en" mask="0x1"/>
 				<node id="trig_en" mask="0x2"/>
-				<node id="sync_en" mask="0x4"/>
-				<node id="evtctr_rst" mask="0x8"/>
-				<node id="sync_rate_div" mask="0x1f00"/>
-				<node id="trig_mask" mask="0xffff0000"/>
+				<node id="evtctr_rst" mask="0x4"/>
+				<node id="trig_ctr_rst" mask="0x8"/>
 			</node>
-			<node id="stat" address="0x1">
+			<node id="mask" address="0x1"/>
+				<node id="cmd" mask="0xffff"/>
+				<node id="trig" mask="0xffff0000"/>
+			</node>
+			<node id="stat" address="0x2">
 				<node id="buf_err" mask="0x1"/>
 			</node>
 		</node>
-		<node id="evtctr" address="0x2" fwinfo="endpoint;width=0"/>
-		<node id="buf" address="0x4" fwinfo="endpoint;width=1">
+		<node id="evtctr" address="0x4" fwinfo="endpoint;width=0"/>
+		<node id="buf" address="0x6" fwinfo="endpoint;width=1">
 			<node id="data" address="0x0" mode="port"/>
 			<node id="count" address="0x1" mask="0xffff"/>
 		</node>
-		<node id="trig_ctrs" address="0x20" mode="block" size="0x20" fwinfo="endpoint;width=5"/>	
+		<node id="actrs" address="0x20" mode="block" size="0x10" fwinfo="endpoint;width=4"/>
+		<node id="rctrs" address="0x30" mode="block" size="0x10" fwinfo="endpoint;width=4"/>		
 </node>

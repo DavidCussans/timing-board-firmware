@@ -14,9 +14,8 @@ entity pdts_idle_gen is
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
-		d: out std_logic_vector(7 downto 0);
-		last: out std_logic;
-		ack: in std_logic
+		acmd_out: out cmd_w;
+		acmd_in: in cmd_r
 	);
 
 end pdts_idle_gen;
@@ -39,7 +38,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				r <= X"01";
-			elsif ack = '1' then
+			elsif acmd_in.ren = '1' then
 				r <= r(6 downto 0) & b;
 			end if;
 		end if;
@@ -52,7 +51,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctr <= X"00";
-			elsif ack = '1' then
+			elsif acmd_in.ren = '1' then
 				if last_i = '1' then
 					ctr <= X"00";
 				else
@@ -63,8 +62,8 @@ begin
 	end process;
 	
 	last_i <= '1' when ctr = ADDR_WDS + IDLE_DATA_WDS - 1 else '0';
-	last <= last_i;
-	
-	d <= X"FF" when ctr < ADDR_WDS else r;
+	acmd_out.last <= last_i;
+	acmd_out.d <= X"FF" when ctr < ADDR_WDS else r;
+	acmd_out.valid <= '1';
 	
 end rtl;

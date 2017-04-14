@@ -37,8 +37,28 @@ package pdts_defs is
 	constant TSTAMP_WDS: natural := 8; -- Number of words in timestamp
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
 	constant EVTCTR_MASK: std_logic_vector(15 downto 0) := X"0001"; -- Which sync cmds cause evt ctr update
+	constant TS_RATE_RADIX: positive :=  26; -- Issue TS at a rate of 50MHz/(2^26) = 0.75Hz per partition
 
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
 	constant SCMD_LEN: SCMD_LEN_T := (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 + TSTAMP_WDS + EVTCTR_WDS);
+	
+-- Types
+
+	type cmd_w is
+		record
+			d: std_logic_vector(7 downto 0);
+			valid: std_logic;
+			last: std_logic;
+		end record;
+
+	type cmd_w_array is array(natural range <>) of cmd_w;
+	
+	type cmd_r is
+		record
+			ack: std_logic;
+			ren: std_logic;
+		end record;
+
+	type cmd_r_array is array(natural range <>) of cmd_r;
 	
 end pdts_defs;
