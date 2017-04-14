@@ -119,7 +119,7 @@ begin
 
 -- Sync command gen
 
-	gen: entity work.pdts_trig_gen
+	gen: entity work.pdts_scmd_gen
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
