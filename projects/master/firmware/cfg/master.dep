@@ -1,4 +1,4 @@
-src master.vhd master_clk.vhd master_global.vhd master_clk.vhd
+src master.vhd master_clk.vhd global.vhd master_clk.vhd
 src ipbus_decode_master.vhd
 addrtab -t master.xml
 src -c components/pdts pdts_rx_div_mmcm.vhd pdts_synchro.vhd pdts_idle_gen.vhd pdts_scmd_merge.vhd

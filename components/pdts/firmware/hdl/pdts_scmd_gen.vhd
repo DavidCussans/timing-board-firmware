@@ -11,7 +11,7 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pdts_trig_gen.all;
+use work.ipbus_decode_pdts_scmd_gen.all;
 use work.pdts_defs.all;
 
 entity pdts_scmd_gen is
