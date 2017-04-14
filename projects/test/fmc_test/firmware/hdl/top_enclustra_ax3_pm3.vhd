@@ -60,7 +60,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk_ipb, rst_ipb, nuke, soft_rst, phy_rst_e, userled, clk125: std_logic;
+	signal clk_ipb, rst_ipb, nuke, soft_rst, phy_rst_e, userled: std_logic;
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal ipb_out: ipb_wbus;
@@ -76,7 +76,6 @@ begin
 			sysclk => sysclk,
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
-			clk125_o => clk125,
 			rst125_o => phy_rst_e,
 			nuke => nuke,
 			soft_rst => soft_rst,
@@ -111,7 +110,6 @@ begin
 			nuke => nuke,
 			soft_rst => soft_rst,
 			userled => userled,
-			clk125 => clk125,
 			fmc_clk_p => fmc_clk_p,
 			fmc_clk_n => fmc_clk_n,
 			rec_clk_p => rec_clk_p,
