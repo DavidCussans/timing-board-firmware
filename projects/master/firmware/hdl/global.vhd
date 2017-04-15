@@ -21,9 +21,8 @@ entity global is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		clk: in std_logic;
-		locked: in std_logic;
 		tx_err: in std_logic;
-		sel: out std_logic_vector(calc_width(N_PART) - 1 downto 0);
+		part_sel: out std_logic_vector(calc_width(N_PART) - 1 downto 0);
 		en: out std_logic;
 		tstamp: out std_logic_vector(63 downto 0)
 	);
@@ -60,7 +59,7 @@ begin
 	ver: entity work.ipbus_roreg_v
 		generic map(
 			N_REG => 1,
-			DATA => (MASTER_VERSION)
+			DATA => MASTER_VERSION
 		)
 		port map(
 			ipb_in => ipbw(N_SLV_VERSION),
@@ -97,7 +96,7 @@ begin
 			q => ctrl
 		);
 
-	stat(0) <= X"0000000" & "00" & tx_err & locked;
+	stat(0) <= X"0000000" & "000" & tx_err;
 	en <= ctrl(0)(0);
 	ctrl_clr <= ctrl(0)(1);
 

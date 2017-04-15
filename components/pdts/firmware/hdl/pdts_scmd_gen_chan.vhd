@@ -56,9 +56,10 @@ begin
 		)
 		port map(
 			clk => ipb_clk,
-			reset => ipb_rst,
-			ipbus_in => ipb_in,
-			ipbus_out => ipb_out,
+			rst => ipb_rst,
+			ipb_in => ipb_in,
+			ipb_out => ipb_out,
+			slv_clk => clk,
 			q => ctrl,
 			qmask(0) => X"003fff07",
 			stb(0) => stb
@@ -75,6 +76,6 @@ begin
 	
 	d <= ctrl_type;
 	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = std_logic_vector(to_unsigned(ID, 4)) and
-		or_reduce(std_logic_vector(src(r_i + 7 downto 0))) = '0') or (ctrl_force = '1' and stb) = '1') else '0';
+		or_reduce(std_logic_vector(src(r_i + 7 downto 0))) = '0') or (ctrl_force = '1' and stb = '1') else '0';
 
 end rtl;

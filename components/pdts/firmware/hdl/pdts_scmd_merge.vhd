@@ -10,7 +10,9 @@ use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
 use work.ipbus_reg_types.all;
+
 use work.pdts_defs.all;
+use work.master_defs.all;
 
 entity pdts_scmd_merge is
 	generic(
@@ -81,12 +83,13 @@ begin
 			elsif go = '1' then
 				active <= '1';
 				pa <= p;
-				q <= tgrp & std_logic_vector(sctr);
+				scmd_out.d <= tgrp & std_logic_vector(sctr);
+				scmd_out.last <= '0';
 				l <= '0';
 			elsif active = '1' and stb = '1' then
 				scmd_out.d <= scmd_in_v(ipa).d;
 				scmd_out.last <= scmd_in_v(ipa).last;
-				if last = '1' then
+				if scmd_in_v(ipa).last = '1' then
 					active <= '0';
 				end if;
 			end if;
@@ -96,7 +99,6 @@ begin
 	scmd_out.valid <= active;
 	typ <= scmd_in_v(ip).d(3 downto 0);
 	tv <= go;
-	ren <= stb;
 	
 	process(ip, go, stb)
 	begin

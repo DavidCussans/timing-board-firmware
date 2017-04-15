@@ -10,7 +10,7 @@ use ieee.numeric_std.all;
 
 use work.pdts_defs.all;
 
-entity master is
+entity master_clk is
 	port(
 		mclk: in std_logic;
 		locked: out std_logic;
@@ -18,9 +18,9 @@ entity master is
 		stb: out std_logic
 	);
 		
-end master;
+end master_clk;
 
-architecture rtl of master is
+architecture rtl of master_clk is
 
 	signal clki: std_logic;
 	signal sctr: unsigned(3 downto 0) := X"0";

@@ -125,7 +125,7 @@ begin
 	with state select q_a <=
 		a_dd when ST_A,
 		addr(iaddr * 8 + 7 downto iaddr * 8) when ST_S,
-		acmd_in.a when ST_D,
+		acmd_in.d when ST_D,
 		csum(icsum * 8 + 7 downto icsum * 8) when ST_C,
 		X"00" when others;
 		

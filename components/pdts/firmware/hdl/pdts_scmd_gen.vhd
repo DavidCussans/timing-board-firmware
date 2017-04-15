@@ -12,7 +12,9 @@ use ieee.std_logic_misc.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_pdts_scmd_gen.all;
+
 use work.pdts_defs.all;
+use work.master_defs.all;
 
 entity pdts_scmd_gen is
 	generic(
@@ -36,7 +38,7 @@ architecture rtl of pdts_scmd_gen is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(0 downto 0);
+	signal ctrl, ctrl_sel: ipb_reg_v(0 downto 0);
 	signal ctrl_en, ctrl_clr: std_logic;
 	signal sel: std_logic_vector(calc_width(N_CHAN) - 1 downto 0);
 	signal rand: std_logic_vector(31 downto 0);
@@ -61,7 +63,7 @@ begin
 		port map(
 			ipb_in => ipb_in,
 			ipb_out => ipb_out,
-			sel => ipbus_sel_pdts_trig_gen(ipb_in.ipb_addr),
+			sel => ipbus_sel_pdts_scmd_gen(ipb_in.ipb_addr),
 			ipb_to_slaves => ipbw,
 			ipb_from_slaves => ipbr
 		);
@@ -79,9 +81,8 @@ begin
 			ipb_in => ipbw(N_SLV_CTRL),
 			ipb_out => ipbr(N_SLV_CTRL),
 			slv_clk => clk,
-			d => stat,
 			q => ctrl,
-			qmask(0) = X"00000003"
+			qmask(0) => X"00000003"
 		);
 	
 	ctrl_en <= ctrl(0)(0);
@@ -89,7 +90,7 @@ begin
 		
 -- Channel select register
 
-	csr: entity work.ipbus_ctrlreg_v
+	selreg: entity work.ipbus_ctrlreg_v
 		generic map(
 			N_CTRL => 1,
 			N_STAT => 0
@@ -99,9 +100,11 @@ begin
 			reset => ipb_rst,
 			ipbus_in => ipbw(N_SLV_SEL),
 			ipbus_out => ipbr(N_SLV_SEL),
-			q(sel'range) => sel,
+			q => ctrl_sel,
 			qmask(0) => (sel'range => '1', others => '0')
 		);
+		
+	sel <= ctrl_sel(0)(sel'range);
 		
 -- RNG
 
@@ -114,7 +117,7 @@ begin
 
 -- Channels
 
-	fabric: entity work.ipbus_fabric_sel
+	fabric_t: entity work.ipbus_fabric_sel
 		generic map(
     	NSLV => N_PART,
     	SEL_WIDTH => sel'length
@@ -134,6 +137,9 @@ begin
 	begin
 		
 		gen: entity work.pdts_scmd_gen_chan
+		  generic map(
+		      ID => i
+		     )
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
@@ -200,6 +206,6 @@ begin
 	
 	scmd_out.d <= d(si);
 	scmd_out.valid <= valid(si);
-	smcd_out.last <= '1'; -- Always single-word commands
+	scmd_out.last <= '1'; -- Always single-word commands
 	
 end rtl;
