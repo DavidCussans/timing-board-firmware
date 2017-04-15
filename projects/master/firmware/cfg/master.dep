@@ -1,10 +1,8 @@
-src master.vhd master_clk.vhd global.vhd master_clk.vhd
+src master.vhd master_defs.vhd
 src ipbus_decode_master.vhd
 addrtab -t master.xml
-src -c components/pdts pdts_rx_div_mmcm.vhd pdts_synchro.vhd pdts_idle_gen.vhd pdts_scmd_merge.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+include global.dep partition.dep
 include -c components/pdts pdts_scmd_gen.dep pdts_tx.dep
-src partition.vhd
-src -c components/pdts pdts_ts_gen.vhd pdts_defs.vhd
-include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep
-src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_types.vhd ipbus_roreg_v.vhd ipbus_reg_v.vhd ipbus_ctrs_v.vhd
-src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd ipbus_package.vhd
+src -c components/pdts pdts_idle_gen.vhd pdts_scmd_merge.vhd pdts_defs.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
