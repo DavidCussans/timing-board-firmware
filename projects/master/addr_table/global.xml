@@ -5,6 +5,7 @@
 			<node id="ctrl" address="0x0">
 				<node id="en" mask="0x1"/>
 				<node id="ts_clr" mask="0x2"/>
+			</node>
 			<node id="stat" address="0x1">
 				<node id="locked" mask="0x1"/>
 				<node id="tx_err" mask="0x2"/>
