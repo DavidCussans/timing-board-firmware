@@ -6,7 +6,7 @@
 				<node id="evtctr_rst" mask="0x4"/>
 				<node id="trig_ctr_rst" mask="0x8"/>
 			</node>
-			<node id="mask" address="0x1"/>
+			<node id="mask" address="0x1">
 				<node id="cmd" mask="0xffff"/>
 				<node id="trig" mask="0xffff0000"/>
 			</node>
