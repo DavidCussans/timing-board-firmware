@@ -17,12 +17,10 @@ package ipbus_decode_top is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_top(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Sat Apr 15 21:05:15 2017 
+-- START automatically  generated VHDL the Sat Apr 15 22:41:15 2017 
   constant N_SLV_IO: integer := 0;
-  constant N_SLV_MASTER_GLOBAL: integer := 1;
-  constant N_SLV_MASTER_SCMD_GEN: integer := 2;
-  constant N_SLV_MASTER_PARTITION: integer := 3;
-  constant N_SLAVES: integer := 4;
+  constant N_SLV_MASTER: integer := 1;
+  constant N_SLAVES: integer := 2;
 -- END automatically generated VHDL
 
     
@@ -34,15 +32,11 @@ package body ipbus_decode_top is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Sat Apr 15 21:05:15 2017 
-    if    std_match(addr, "----------------------00--------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000300
-    elsif std_match(addr, "----------------------01--------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER_GLOBAL, IPBUS_SEL_WIDTH)); -- master.global / base 0x00000100 / mask 0x00000300
-    elsif std_match(addr, "----------------------01--------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER_SCMD_GEN, IPBUS_SEL_WIDTH)); -- master.scmd_gen / base 0x00000120 / mask 0x00000300
-    elsif std_match(addr, "----------------------10--------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER_PARTITION, IPBUS_SEL_WIDTH)); -- master.partition / base 0x00000200 / mask 0x00000300
+-- START automatically  generated VHDL the Sat Apr 15 22:41:15 2017 
+    if    std_match(addr, "--------------------------------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000000
+    elsif std_match(addr, "--------------------------------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER, IPBUS_SEL_WIDTH)); -- master / base 0x00000100 / mask 0x00000000
 -- END automatically generated VHDL
 
     else
