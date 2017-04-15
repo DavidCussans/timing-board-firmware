@@ -11,6 +11,7 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_master.all;
+
 use work.pdts_defs.all;
 use work.master_defs.all;
 
@@ -34,13 +35,13 @@ architecture rtl of master is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
-	signal clr, clk, rsti, rstl, stb, en: std_logic;
+	signal en: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal scmdw_v: cmd_w_array(1 downto 0);
 	signal scmdr_v: cmd_r_array(1 downto 0);
-	signal scmd_w, acmd_w: cmd_w;
-	signal scmd_r, acmd_r: cmd_r;
+	signal scmdw, acmdw: cmd_w;
+	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
 	signal ipbr_p: ipb_rbus_array(N_PART - 1 downto 0);
 	signal typ: std_logic_vector(SCMD_W - 1 downto 0);
@@ -75,9 +76,8 @@ begin
 			ipb_in => ipbw(N_SLV_GLOBAL),
 			ipb_out => ipbr(N_SLV_GLOBAL),
 			clk => clk,
-			locked => locked,
 			tx_err => tx_err,
-			sel => sel,
+			part_sel => sel,
 			en => en,
 			tstamp => tstamp
 		);
@@ -87,10 +87,9 @@ begin
 	idle: entity work.pdts_idle_gen
 		port map(
 			clk => clk,
-			rst => rsti,
-			d => async_d,
-			last => async_last,
-			ren => async_ren
+			rst => rst,
+			acmd_out => acmdw,
+			acmd_in => acmdr
 		);
 
 -- Sync command gen
@@ -103,14 +102,14 @@ begin
 			ipb_out => ipbr(N_SLV_SCMD_GEN),
 			clk => clk,
 			rst => rst,
-			trig => trig,
-			scmd_out => scmd_w_v(0),
-			scmd_in => scmd_r_v(0)
+			tstamp => tstamp,
+			scmd_out => scmdw_v(0),
+			scmd_in => scmdr_v(0)
 		);
 		
 -- Partitions
 
-	fabric: entity work.ipbus_fabric_sel
+	fabric_p: entity work.ipbus_fabric_sel
 		generic map(
     	NSLV => N_PART,
     	SEL_WIDTH => sel'length
@@ -138,8 +137,8 @@ begin
 				clk => clk,
 				rst => rst,
 				tstamp => tstamp,
-				scmd_out => scmd_w_v(i + 1),
-				scmd_in => scmd_r_v(i + i),
+				scmd_out => scmdw_v(i + 1),
+				scmd_in => scmdr_v(i + i),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
@@ -157,13 +156,13 @@ begin
 			clk => clk,
 			rst => rst,
 			stb => stb,
-			scmd_in_v => scmd_w_v,
-			scmd_out_v => scmd_r_v,
+			scmd_in_v => scmdw_v,
+			scmd_out_v => scmdr_v,
 			typ => typ,
 			tv => tv,
 			tgrp => tgrp,
-			scmd_out => scmd_w,
-			scmd_in => scmd_r
+			scmd_out => scmdw,
+			scmd_in => scmdr
 		);
 		
 -- Tx
@@ -171,13 +170,13 @@ begin
 	tx: entity work.pdts_tx
 		port map(
 			clk => clk,
-			rst => rsti,
+			rst => rst,
 			stb => stb,
 			addr => X"AA",
-			scmd_in => scmd_w,
-			scmd_out => scmd_r,
-			acmd_in => acmd_w,
-			acmd_out => acmd_r,
+			scmd_in => scmdw,
+			scmd_out => scmdr,
+			acmd_in => acmdw,
+			acmd_out => acmdr,
 			q => tx_q,
 			k => tx_k,
 			stbo => tx_stb,
@@ -189,7 +188,7 @@ begin
 	txphy: entity work.pdts_tx_phy
 		port map(
 			clk => clk,
-			rst => rsti,
+			rst => rst,
 			d => tx_q,
 			k => tx_k,
 			stb => tx_stb,
