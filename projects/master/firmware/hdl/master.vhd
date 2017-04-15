@@ -10,8 +10,9 @@ use ieee.numeric_std.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_tb_tx.all;
+use work.ipbus_decode_master.all;
 use work.pdts_defs.all;
+use work.master_defs.all;
 
 entity master is
 	port(
@@ -20,8 +21,8 @@ entity master is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		mclk: in std_logic;
-		locked: in std_logic;
 		clk: in std_logic;
+		rst: in std_logic;
 		stb: in std_logic;
 		q: out std_logic
 	);
@@ -32,8 +33,6 @@ architecture rtl of master is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(0 downto 0);
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
 	signal clr, clk, rsti, rstl, stb, en: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
@@ -81,29 +80,6 @@ begin
 			sel => sel,
 			en => en,
 			tstamp => tstamp
-		);
-		
--- Clock divider and reset CDC
-
-	clkgen: entity work.master_clk
-		port map(
-			mclk => mclk,
-			locked => locked,
-			clk => clk,
-			stb => stb
-		);
-
-	rstl <= rst or not locked;
-	
-	synchro: entity work.pdts_synchro
-		generic map(
-			N => 1
-		)
-		port map(
-			clk => ipb_clk,
-			clks => clk,
-			d(0) => rstl,
-			q(0) => rsti,
 		);
 
 -- Idle pattern gen

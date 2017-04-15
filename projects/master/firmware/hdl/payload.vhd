@@ -61,7 +61,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst, q: std_logic;
+	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io, rsti, clk, stb, rst, q: std_logic;
 
 	attribute IOB: string;
 	attribute IOB of sfp_dout: signal is "TRUE";
@@ -94,7 +94,7 @@ begin
 			clk125 => clk125,
 			soft_rst => soft_rst,
 			nuke => nuke,
-			rst => rst,
+			rst => rst_io,
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			sfp_los => sfp_los,
@@ -133,7 +133,30 @@ begin
 			gpout_1_p => gpout_1_p,
 			gpout_1_n => gpout_1_n
 		);
-    
+
+-- Master clock and reset
+		
+	clkgen: entity work.master_clk
+		port map(
+			mclk => mclk,
+			locked => locked,
+			clk => clk,
+			stb => stb
+		);
+
+	rsti <= rst_io or not locked;
+	
+	synchro: entity work.pdts_synchro
+		generic map(
+			N => 1
+		)
+		port map(
+			clk => ipb_clk,
+			clks => clk,
+			d(0) => rsti,
+			q(0) => rst,
+		);
+
 -- master block
 
 	tx: entity work.master
@@ -143,7 +166,9 @@ begin
 			ipb_in => ipbw(N_SLV_TX),
 			ipb_out => ipbr(N_SLV_TX),
 			mclk => fmc_clk,
+			clk => clk,
 			rst => rst,
+			stb => stb,
 			q => q
 		);
 		
