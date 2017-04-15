@@ -12,6 +12,7 @@
 					<node id="sfp_flt" mask="0x2"/>        	
 					<node id="cdr_los" mask="0x4"/>
 					<node id="cdr_lol" mask="0x8"/>
+					<node id="locked" mask="0x10"/>
 				</node>
 		</node>
 		<node id="uid_i2c" address="0x08" module="file://opencores_i2c.xml"/>

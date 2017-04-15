@@ -1,4 +1,4 @@
-<node id="partition" description="timing partition" fwinfo="endpoint">
+<node id="partition" description="PDTS timing partition" fwinfo="endpoint">
 		<node id="csr" address="0x0" fwinfo="endpoint;width=2">
 			<node id="ctrl" address="0x0">
 				<node id="part_en" mask="0x1"/>
