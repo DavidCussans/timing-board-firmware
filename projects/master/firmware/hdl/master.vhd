@@ -61,7 +61,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_tb_tx(ipb_in.ipb_addr),
+      sel => ipbus_sel_master(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
