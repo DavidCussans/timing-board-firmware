@@ -38,6 +38,7 @@ end pdts_scmd_gen_chan;
 
 architecture rtl of pdts_scmd_gen_chan is
 
+	constant ID_V: std_logic_vector := std_logic_vector(to_unsigned(ID, 4));
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stb: std_logic;
 	signal ctrl_en, ctrl_patt, ctrl_force: std_logic;
@@ -75,7 +76,7 @@ begin
 	src <= tstamp(26 downto 0) when ctrl_patt = '0' else rand(26 downto 0);
 	
 	d <= ctrl_type;
-	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = std_logic_vector(to_unsigned(ID, 4)) and
-		or_reduce(std_logic_vector(src(r_i + 7 downto 0))) = '0') or (ctrl_force = '1' and stb = '1') else '0';
+	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(std_logic_vector(src(r_i + 7 downto 0))) = '0') or
+		(ctrl_force = '1' and stb = '1') else '0';
 
 end rtl;
