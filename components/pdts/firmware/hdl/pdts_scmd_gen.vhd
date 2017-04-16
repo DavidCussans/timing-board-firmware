@@ -40,7 +40,7 @@ architecture rtl of pdts_scmd_gen is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, ctrl_sel: ipb_reg_v(0 downto 0);
 	signal ctrl_en, ctrl_clr: std_logic;
-	signal sel: std_logic_vector(calc_width(N_CHAN) - 1 downto 0);
+	signal sel: std_logic_vector(3 downto 0);
 	signal rand: std_logic_vector(31 downto 0);
 	signal ipbw_c: ipb_wbus_array(N_CHAN - 1 downto 0);
 	signal ipbr_c: ipb_rbus_array(N_CHAN - 1 downto 0);
