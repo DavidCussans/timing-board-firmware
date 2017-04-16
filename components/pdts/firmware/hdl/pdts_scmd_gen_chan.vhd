@@ -45,6 +45,7 @@ architecture rtl of pdts_scmd_gen_chan is
 	signal ctrl_type: std_logic_vector(7 downto 0);
 	signal ctrl_rate_div: std_logic_vector(3 downto 0);
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
+	signal mask: std_logic_vector(15 downto 0);
 	signal src: std_logic_vector(26 downto 0);
 	signal r_go, c_go: std_logic;
 
@@ -73,10 +74,21 @@ begin
 	ctrl_rate_div <= ctrl(0)(19 downto 16);
 	r_i <= to_integer(unsigned(ctrl_rate_div));
 	
+	process(r_i)
+	begin
+		for i in mask'range loop
+			if i > r_i then
+				mask(i) <= '0';
+			else
+				mask(i) <= '1';
+			end if;
+		end loop;
+	end process;
+	
 	src <= tstamp(26 downto 0) when ctrl_patt = '0' else rand(26 downto 0);
 	
 	d <= ctrl_type;
-	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(std_logic_vector(src(r_i + 7 downto 0))) = '0') or
+	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0') or
 		(ctrl_force = '1' and stb = '1') else '0';
 
 end rtl;
