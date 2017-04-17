@@ -22,7 +22,6 @@ entity fmc_test is
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic;
-		clk125: in std_logic;
 		fmc_clk_p: in std_logic;
 		fmc_clk_n: in std_logic;
 		rec_clk_p: in std_logic;
@@ -99,7 +98,6 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_IO),
 			ipb_out => ipbr(N_SLV_IO),
-			clk125 => clk125,
 			soft_rst => soft_rst,
 			nuke => nuke,
 			rst => rst,

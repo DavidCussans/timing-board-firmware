@@ -1,0 +1,2 @@
+include master.dep
+include kc705_gmii.dep
