@@ -9,6 +9,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
+use work.ipbus_reg_types.all;
+use work.pdts_defs.all;
+
 entity pdts_scmd_merge is
 	generic(
 		N_SRC: positive := 1
@@ -17,26 +20,23 @@ entity pdts_scmd_merge is
 		clk: in std_logic;
 		rst: in std_logic;
 		stb: in std_logic;
-		rdy: in std_logic;
-		d: in std_logic_vector(8 * N_SRC - 1 downto 0);
-		dv: in std_logic_vector(N_SRC - 1 downto 0);
-		last: in std_logic_vector(N_SRC - 1 downto 0);
-		ack: out std_logic_vector(N_SRC - 1 downto 0);
-		ren: out std_logic;
-		typ: out std_logic_vector(3 downto 0);
+		scmd_in_v: in cmd_w_array(N_SRC - 1 downto 0);
+		scmd_out_v: out cmd_r_array(N_SRC - 1 downto 0);
+		typ: out std_logic_vector(SCMD_W - 1 downto 0);
 		tv: out std_logic;
-		grp: in std_logic_vector(3 downto 0);
-		q: out std_logic_vector(7 downto 0);
-		v: out std_logic
+		tgrp: in std_logic_vector(N_PART - 1 downto 0);
+		scmd_out: out cmd_w;
+		scmd_in: in cmd_r
 	);
 
 end pdts_scmd_merge;
 
 architecture rtl of pdts_scmd_merge is
 
-	signal p, pa: std_logic_vector(3 downto 0);
+	signal valid: std_logic_vector(N_SRC - 1 downto 0);
+	signal p, pa: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
 	signal sctr: unsigned(3 downto 0);
-	signal ip, ipa: integer range 15 downto 0 := 0;
+	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
 	signal go, active, l: std_logic;
 
 begin
@@ -52,19 +52,26 @@ begin
 		end if;
 	end process;
 
+	process(scmd_in)
+	begin
+		for i in N_SRC - 1 downto 0 loop
+			valid(i) <= scmd_in_v(i).valid;
+		end loop;
+	end process;
+	
 	prio: entity work.pdts_prio_enc
 		generic map(
 			WIDTH => N_SRC
 		)
 		port map(
-			d => dv,
+			d => valid,
 			sel => p
 		);
 
 	ip <= to_integer(unsigned(p));
 	ipa <= to_integer(unsigned(pa));
 		
-	go <= or_reduce(dv) and not active and rdy;
+	go <= or_reduce(valid) and not active and scmd_in.ren;
 		
 	process(clk)
 	begin
@@ -74,31 +81,32 @@ begin
 			elsif go = '1' then
 				active <= '1';
 				pa <= p;
-				q <= grp & std_logic_vector(sctr);
+				q <= tgrp & std_logic_vector(sctr);
 				l <= '0';
 			elsif active = '1' and stb = '1' then
-				q <= d(8 * (ipa + 1) - 1 downto 8 * ipa);
-				l <= last(ipa);
-				if l = '1' then
+				scmd_out.d <= scmd_in_v(ipa).d;
+				scmd_out.last <= scmd_in_v(ipa).last;
+				if last = '1' then
 					active <= '0';
 				end if;
 			end if;
 		end if;
 	end process;
 	
-	v <= active;
-	typ <= d(8 * (ip + 1) - 5 downto 8 * ip);
+	scmd_out.valid <= active;
+	typ <= scmd_in_v(ip).d(3 downto 0);
 	tv <= go;
 	ren <= stb;
 	
-	process(pa, go)
+	process(ip, go, stb)
 	begin
 		for i in N_SRC - 1 downto 0 loop
 			if ip = i then
-				ack(i) <= go;
+				scmd_out_v(i).ack <= go;
 			else
-				ack(i) <= '0';
+				scmd_out_v(i).ack <= '0';
 			end if;
+			scmd_out_v(i).ren <= stb;
 		end loop;
 	end process;
 	

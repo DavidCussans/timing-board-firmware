@@ -16,12 +16,10 @@ entity pdts_tx is
 		rst: in std_logic; -- synchronous reset
 		stb: in std_logic; -- system word strobe
 		addr: in std_logic_vector((8 * ADDR_WDS) - 1 downto 0); -- address (static)
-		s_d: in std_logic_vector(7 downto 0); -- sync cmd data
-		s_valid: in std_logic; -- sync cmd valid
-		s_rdy: out std_logic; -- ready for sync cmd
-		a_d: in std_logic_vector(7 downto 0); -- async cmd data
-		a_last: in std_logic; -- async cmd packet end
-		a_ack: out std_logic; -- async cmd acknowledge
+		scmd_in: in cmd_w; -- sync command in
+		scmd_out: out cmd_r; -- sync command ack
+		acmd_in: in cmd_w; -- async command in
+		acmd_out: out cmd_r; -- async command out
 		q: out std_logic_vector(7 downto 0); -- data output
 		k: out std_logic; -- kchar output
 		stbo: out std_logic; -- stb out
@@ -77,7 +75,7 @@ begin
 						end if;
 -- Async data
 					when ST_D =>
-						if a_last = '1' then
+						if acmd_in.last = '1' then
 							state <= ST_C;
 							trans <= '1';
 						elsif actr = to_unsigned(CMD_LEN_MAX - CSUM_WDS - ADDR_WDS * 2 - 1, actr'length) then
@@ -122,12 +120,12 @@ begin
 	iaddr <= ADDR_WDS - to_integer(actr) - 1 when actr < ADDR_WDS else 0; -- Address words are sent big-endian
 	icsum <= CSUM_WDS - to_integer(actr) - 1 when actr < CSUM_WDS else 0; -- Checksum words are sent big-endian
 	
-	a_dd <= a_d when stb = '1' and rising_edge(clk);
+	a_dd <= acmd_in.d when stb = '1' and rising_edge(clk);
 	
 	with state select q_a <=
 		a_dd when ST_A,
 		addr(iaddr * 8 + 7 downto iaddr * 8) when ST_S,
-		a_d when ST_D,
+		acmd_in.a when ST_D,
 		csum(icsum * 8 + 7 downto icsum * 8) when ST_C,
 		X"00" when others;
 		
@@ -142,22 +140,24 @@ begin
 				s_ok <= '1';
 			end if;
 			if stb = '1' then
-				s_dd <= s_d;
+				s_dd <= scmd_in.d;
 				s_ddd <= s_dd;
-				smode <= s_valid and s_ok;
+				smode <= scmd_in.valid and s_ok;
 				smode_d <= smode;
 			end if;
 		end if;
 	end process;
 	
-	s_rdy <= s_ok and not smode;
+	scmd_out.ren <= s_ok and not smode;
+	scmd_out.ack <= '0';
 	q_s <= X"01" when smode = '1' and smode_d = '0' else s_ddd;
 			
 -- Outputs
 	
 	q <= q_s when (smode = '1' or smode_d = '1') else q_a;
 	k <= '1' when (smode = '1' and smode_d = '0') or (smode = '0' and smode_d = '0' and state = ST_K) else '0';
-	a_ack <= '1' when (state = ST_A or state = ST_D) and astb = '1' else '0';
+	acmd_out.ren <= '1' when (state = ST_A or state = ST_D) and astb = '1' else '0';
+	acmd_out.ack <= '0';
 	err <= '1' when state = ST_E else '0';
 	stbo <= stb when rising_edge(clk);
 	

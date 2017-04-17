@@ -1,19 +1,17 @@
--- payload.vhd
+-- master
 --
--- Dave Newbold, February 2016
+-- Interface to timing FMC v1 for PDTS master block
+--
+-- Dave Newbold, February 2017
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use ieee.std_logic_misc.all;
+use ieee.numeric_std.all;
 
 use work.ipbus.all;
-use work.ipbus_reg_types.all;
 use work.ipbus_decode_top.all;
 
-library unisim;
-use unisim.VComponents.all;
-
-entity fmc_test is
+entity payload is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -22,6 +20,7 @@ entity fmc_test is
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic;
+		clk125: in std_logic;
 		fmc_clk_p: in std_logic;
 		fmc_clk_n: in std_logic;
 		rec_clk_p: in std_logic;
@@ -56,29 +55,23 @@ entity fmc_test is
 		gpout_1_n: out std_logic		
 	);
 
-end fmc_test;
+end payload;
 
-architecture rtl of fmc_test is
+architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(4 downto 0);
-	signal rst, fmc_clk, rec_clk, rec_d, sfp_dout: std_logic;
-	signal ctrl_chk_init, rst_fmc_clk, rst_rec_clk, chk_init, rec_d_r, p: std_logic;
-	signal cyc_ctr, err_ctr: std_logic_vector(47 downto 0);
-	signal zflag: std_logic;
-	
+	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst, q: std_logic;
+
 	attribute IOB: string;
 	attribute IOB of sfp_dout: signal is "TRUE";
-	attribute IOB of rec_d_r: signal is "TRUE";
-			
+	
 begin
 
 -- ipbus address decode
 		
 	fabric: entity work.ipbus_fabric_sel
-	generic map(
+		generic map(
     	NSLV => N_SLAVES,
     	SEL_WIDTH => IPBUS_SEL_WIDTH
     )
@@ -98,6 +91,7 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_IO),
 			ipb_out => ipbr(N_SLV_IO),
+			clk125 => clk125,
 			soft_rst => soft_rst,
 			nuke => nuke,
 			rst => rst,
@@ -140,75 +134,19 @@ begin
 			gpout_1_n => gpout_1_n
 		);
     
--- CSR
+-- master block
 
-	csr: entity work.ipbus_ctrlreg_v
-		generic map(
-			N_CTRL => 1,
-			N_STAT => 5
-		)
+	tx: entity work.master
 		port map(
-			clk => ipb_clk,
-			reset => ipb_rst,
-			ipbus_in => ipbw(N_SLV_CSR),
-			ipbus_out => ipbr(N_SLV_CSR),
-			d => stat,
-			q => ctrl
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TX),
+			ipb_out => ipbr(N_SLV_TX),
+			mclk => fmc_clk,
+			rst => rst,
+			q => q
 		);
 		
-	stat(0) <= X"0000000" & "000" & zflag;
-	stat(1) <= cyc_ctr(31 downto 0);
-	stat(2) <= X"0000" & cyc_ctr(47 downto 32);
-	stat(3) <= err_ctr(31 downto 0);
-	stat(4) <= X"0000" & err_ctr(47 downto 32);
-	
-	ctrl_chk_init <= ctrl(0)(0);
-	
-	fmc_clk_s: entity work.pdts_synchro
-		port map(
-			clk => ipb_clk,
-			clks => fmc_clk,
-			d(0) => rst,
-			q(0) => rst_fmc_clk
-		);
-		
-	rec_clk_s: entity work.pdts_synchro
-		generic map(
-			N => 2
-		)
-		port map(
-			clk => ipb_clk,
-			clks => rec_clk,
-			d(0) => rst,
-			d(1) => ctrl_chk_init,
-			q(0) => rst_rec_clk,
-			q(1) => chk_init
-		);
-		
--- PRBS
-		
-	prbs: entity work.prbs7_ser
-		port map(
-			clk => fmc_clk,
-			rst => rst_fmc_clk,
-			load => '0',
-			d => '0',
-			q => p
-		);
+	sfp_dout <= q when rising_edge(fmc_clk);
 
-	sfp_dout <= p when rising_edge(fmc_clk);
-
-	rec_d_r <= rec_d when rising_edge(rec_clk);
-	
-	prbs_chk_sfp: entity work.prbs7_chk
-		port map(
-			clk => rec_clk,
-			rst => rst_rec_clk,
-			init => chk_init,
-			d => rec_d_r,
-			err_ctr => err_ctr,
-			cyc_ctr => cyc_ctr,
-			zflag => zflag
-		);
-		
 end rtl;

@@ -21,7 +21,6 @@ entity pdts_fmc_io is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
-		clk125: in std_logic;
 		soft_rst: out std_logic;
 		nuke: out std_logic;
 		rst: out std_logic;
@@ -194,7 +193,7 @@ begin
 	oddr_clkout: ODDR -- Feedback clock, not through MMCM
 		port map(
 			q => clkout,
-			c => clk125,
+			c => fmc_clk_i,
 			ce => '1',
 			d1 => '0',
 			d2 => '1',
@@ -212,7 +211,7 @@ begin
 	oddr_gp0: ODDR -- Feedback clock, not through MMCM
 		port map(
 			q => gp0out,
-			c => clk125,
+			c => fmc_clk_i,
 			ce => '1',
 			d1 => '0',
 			d2 => '1',
@@ -230,7 +229,7 @@ begin
 	oddr_gp1: ODDR -- Feedback clock, not through MMCM
 		port map(
 			q => gp1out,
-			c => clk125,
+			c => fmc_clk_i,
 			ce => '1',
 			d1 => '0',
 			d2 => '1',

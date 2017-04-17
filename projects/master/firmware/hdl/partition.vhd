@@ -1,0 +1,182 @@
+-- partition
+--
+-- The PDTS master partition block
+--
+-- Dave Newbold, April 2017
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+
+use work.ipbus.all;
+use work.ipbus_reg_types.all;
+use work.ipbus_decode_partition.all;
+use work.pdts_defs.all;
+
+entity partition is
+	generic(
+		PARTITION_ID: integer
+	);
+	port(
+		ipb_clk: in std_logic;
+		ipb_rst: in std_logic;
+		ipb_in: in ipb_wbus;
+		ipb_out: out ipb_rbus;
+		clk: in std_logic;
+		rst: in std_logic;
+		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
+		scmd_out: out cmd_w;
+		scmd_in: in cmd_r;
+		typ: in std_logic_vector(SCMD_W - 1 downto 0);
+		tv: in std_logic;
+		tack: out std_logic;
+	);
+		
+end partition;
+
+architecture rtl of partition is
+
+	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
+	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
+	signal ctrl: ipb_reg_v(1 downto 0);
+	signal stat: ipb_reg_v(0 downto 0);
+	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst: std_logic;
+	signal ctrl_cmd_mask, ctrl_trig_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
+	signal cok, tok, trig, erst, trst: std_logic;
+	signal evtctr: unsigned(8 * EVTCTR_WDS - 1 downto 0);
+	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
+	
+begin
+
+-- ipbus address decode
+		
+	fabric: entity work.ipbus_fabric_sel
+		generic map(
+    	NSLV => N_SLAVES,
+    	SEL_WIDTH => IPBUS_SEL_WIDTH
+    )
+    port map(
+      ipb_in => ipb_in,
+      ipb_out => ipb_out,
+      sel => ipbus_sel_partition(ipb_in.ipb_addr),
+      ipb_to_slaves => ipbw,
+      ipb_from_slaves => ipbr
+    );
+    
+-- CSR
+
+	csr: entity work.ipbus_syncreg_v
+		generic map(
+			N_CTRL => 2,
+			N_STAT => 1
+		)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_CSR),
+			ipb_out => ipbr(N_SLV_CSR),
+			slv_clk => clk,
+			d => stat,
+			q => ctrl
+		);
+
+	ctrl_part_en <= ctrl(0)(0);
+	ctrl_trig_en <= ctrl(0)(1);
+	ctrl_evtctr_rst <= ctrl(0)(2);
+	ctrl_trig_ctr_rst	<= ctrl(0)(3);
+	ctrl_cmd_mask <= ctrl(1)(15 downto 0);
+	ctrl_trig_mask <= ctrl(1)(31 downto 16);
+	stat(0) <= (others => '0');
+	
+-- command masks
+
+	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
+	tok <= ctrl_trig_mask(to_integer(unsigned(typ)));
+	tack <= tv and ctrl_part_en and cok and (ctrl_trig_en or not tok);
+	trig <= tv and ctrl_part_en and ctrl_trig_en and tok;
+	
+	process(typ) -- Unroll typ
+	begin
+		for i in t'range loop
+			if typ = to_unsigned(i, typ'length) then
+				t(i) <= '1';
+			else
+				t(i) <= '0';
+			end if;
+		end loop;
+	end process;
+	
+	tacc <= t(i) when (tv and tack) = '1' else (others => '0');
+	trej <= t(i) when (tv and not tack) = '1' else (others => '0');
+
+-- timestamp / event counter
+
+	erst <= rst or ctrl_evtctr_rst or not ctrl_part_en;
+	
+	ereg: entity work.ipbus_ctrs_v
+		generic map(
+			CTR_WDS => EVTCTR_WDS / 4
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_EVTCTR),
+			ipb_out => ipbr(N_SLV_EVTCTR),
+			clk => clk,
+			rst => erst,
+			inc(0) => trig,
+			q => evtctr
+		);
+
+	ts: entity work.pdts_ts_gen
+		generic map(
+			PARTITION_ID => PARTITION_ID
+		)
+		port map(
+			clk => clk,
+			rst => rst,
+			trig => trig,
+			tstamp => tstamp,
+			evtctr => evtctr,
+			div => ctrl_sync_div,
+			scmd_out => scmd_out,
+			scmd_in = scmd_in
+		);
+		
+-- Event buffer
+
+	ipbr(NL_SLV_BUF) <= IPB_RBUS_NULL;
+
+-- Trigger counters
+
+	trst <= rst or ctrl_trig_ctr_rst or not ctrl_part_en;
+	
+	actrs: entity work.ipbus_ctrs_v
+		generic map(
+			N_CTRS => t'length
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_ACTRS),
+			ipb_out => ipbr(N_SLV_ACTRS),
+			clk => clk,
+			rst => trst,
+			inc => tacc
+		);
+
+	rctrs: entity work.ipbus_ctrs_v
+		generic map(
+			N_CTRS => t'length
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_RCTRS),
+			ipb_out => ipbr(N_SLV_RCTRS),
+			clk => clk,
+			rst => trst,
+			inc => trej
+		);	
+	
+end rtl;

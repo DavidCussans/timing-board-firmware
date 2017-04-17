@@ -1,6 +1,6 @@
--- pdts_tx_phy_int
+-- pdts_tx_phy
 --
--- The transmit PHY, internal deserialiser / fixed clock phase version
+-- The transmit PHY, internal serialiser version
 --
 -- Dave Newbold, March 2017
 
@@ -11,7 +11,7 @@ use ieee.std_logic_misc.all;
 
 use work.pdts_defs.all;
 
-entity pdts_tx_phy_int is
+entity pdts_tx_phy is
 	port(
 		clk: in std_logic; -- parallel clock
 		rst: in std_logic; -- sync rst; clk domain
@@ -22,9 +22,9 @@ entity pdts_tx_phy_int is
 		q: out std_logic -- output data; txclk domain
 	);
 
-end pdts_tx_phy_int;
+end pdts_tx_phy;
 
-architecture rtl of pdts_tx_phy_int is
+architecture rtl of pdts_tx_phy is
 
 	signal d_tx: std_logic_vector(7 downto 0);
 	signal w, wb, wc: std_logic_vector(9 downto 0);

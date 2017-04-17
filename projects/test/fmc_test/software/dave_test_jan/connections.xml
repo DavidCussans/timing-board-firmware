@@ -2,7 +2,7 @@
 
 <connections>
   <connection id="DUNE_FMC_RX" uri="ipbusudp-2.0://192.168.200.16:50001"
-   address_table="file://addr_table/top.xml" />
+   address_table="file://addrtab/top.xml" />
   <connection id="DUNE_FMC_TX" uri="ipbusudp-2.0://192.168.200.17:50001"
-   address_table="file://addr_table/top.xml" />
+   address_table="file://addrtab/top.xml" />
 </connections>

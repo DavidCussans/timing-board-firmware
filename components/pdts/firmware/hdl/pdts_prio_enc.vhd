@@ -8,13 +8,15 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
+use work.ipbus_reg_types.all;
+
 entity pdts_prio_enc is
 	generic(
 		WIDTH: positive := 1
 	);
 	port(
 		d: in std_logic_vector(WIDTH - 1 downto 0);
-		sel: out std_logic_vector(3 downto 0)
+		sel: out std_logic_vector(calc_width(WIDTH) - 1 downto 0)
 	);
 
 end pdts_prio_enc;
