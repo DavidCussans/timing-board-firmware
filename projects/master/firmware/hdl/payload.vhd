@@ -134,14 +134,14 @@ begin
 			gpout_1_n => gpout_1_n
 		);
 
--- Master clock and reset
-		
-	clkgen: entity work.master_clk
+-- Clock divider
+
+	clkgen: entity work.pdts_rx_div_mmcm
 		port map(
-			mclk => fmc_clk,
-			locked => locked,
+			sclk => fmc_clk,
 			clk => clk,
-			stb => stb
+			phase_rst => '0',
+			phase_locked => locked
 		);
 
 	rsti <= rst_io or not locked;
@@ -168,7 +168,6 @@ begin
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			stb => stb,
 			q => q
 		);
 		

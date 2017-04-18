@@ -24,7 +24,6 @@ entity master is
 		mclk: in std_logic;
 		clk: in std_logic;
 		rst: in std_logic;
-		stb: in std_logic;
 		q: out std_logic
 	);
 		
@@ -36,6 +35,8 @@ architecture rtl of master is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
 	signal en: std_logic;
+	signal sctr: unsigned(3 downto 0) := X"0";
+	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal scmdw_v: cmd_w_array(1 downto 0);
@@ -81,6 +82,21 @@ begin
 			en => en,
 			tstamp => tstamp
 		);
+		
+-- Strobe gen
+
+	process(clki)
+	begin
+		if rising_edge(clki) then
+			if sctr = (10 / SCLK_RATIO) - 1 then
+				sctr <= X"0";
+			else
+				sctr <= sctr + 1;
+			end if;
+		end if;
+	end process;
+	
+	stb <= '1' when sctr = 0 else '0';
 
 -- Idle pattern gen
 
