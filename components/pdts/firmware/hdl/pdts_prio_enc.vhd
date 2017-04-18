@@ -30,7 +30,7 @@ begin
 		for i in d'range loop
 			sel <= (others => '0');
 			if d(i) = '1' then
-				sel <= std_logic_vector(to_unsigned(i, 4));
+				sel <= std_logic_vector(to_unsigned(i, sel'length));
 			end if;
 		end loop;
 	end process;

@@ -11,6 +11,7 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_partition.all;
+
 use work.pdts_defs.all;
 
 entity partition is
@@ -29,7 +30,7 @@ entity partition is
 		scmd_in: in cmd_r;
 		typ: in std_logic_vector(SCMD_W - 1 downto 0);
 		tv: in std_logic;
-		tack: out std_logic;
+		tack: out std_logic
 	);
 		
 end partition;
@@ -42,8 +43,8 @@ architecture rtl of partition is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst: std_logic;
 	signal ctrl_cmd_mask, ctrl_trig_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
-	signal cok, tok, trig, erst, trst: std_logic;
-	signal evtctr: unsigned(8 * EVTCTR_WDS - 1 downto 0);
+	signal cok, tok, trig, tack_i, erst, trst: std_logic;
+	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
 	
 begin
@@ -92,13 +93,14 @@ begin
 
 	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
 	tok <= ctrl_trig_mask(to_integer(unsigned(typ)));
-	tack <= tv and ctrl_part_en and cok and (ctrl_trig_en or not tok);
+	tack_i <= tv and ctrl_part_en and cok and (ctrl_trig_en or not tok);
 	trig <= tv and ctrl_part_en and ctrl_trig_en and tok;
+	tack <= tack_i;
 	
 	process(typ) -- Unroll typ
 	begin
 		for i in t'range loop
-			if typ = to_unsigned(i, typ'length) then
+			if typ = std_logic_vector(to_unsigned(i, typ'length)) then
 				t(i) <= '1';
 			else
 				t(i) <= '0';
@@ -106,8 +108,8 @@ begin
 		end loop;
 	end process;
 	
-	tacc <= t(i) when (tv and tack) = '1' else (others => '0');
-	trej <= t(i) when (tv and not tack) = '1' else (others => '0');
+	tacc <= t when (tv and tack_i) = '1' else (others => '0');
+	trej <= t when (tv and not tack_i) = '1' else (others => '0');
 
 -- timestamp / event counter
 
@@ -138,14 +140,13 @@ begin
 			trig => trig,
 			tstamp => tstamp,
 			evtctr => evtctr,
-			div => ctrl_sync_div,
 			scmd_out => scmd_out,
-			scmd_in = scmd_in
+			scmd_in => scmd_in
 		);
 		
 -- Event buffer
 
-	ipbr(NL_SLV_BUF) <= IPB_RBUS_NULL;
+	ipbr(N_SLV_BUF) <= IPB_RBUS_NULL;
 
 -- Trigger counters
 
