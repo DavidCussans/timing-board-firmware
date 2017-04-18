@@ -1,0 +1,12 @@
+<node id="io" description="FMC IO" fwinfo="endpoint">
+		<node id="csr" address="0x0" description="ctrl/stat register" fwinfo="endpoint;width=1">
+				<node id="ctrl" address="0x0">
+					<node id="soft_rst" mask="0x1"/>
+					<node id="nuke" mask="0x2"/>
+					<node id="rst" mask="0x4"/>
+				</node>
+				<node id="stat" address="0x1">
+					<node id="locked" mask="0x10"/>
+				</node>
+		</node>
+</node>
