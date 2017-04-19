@@ -1,4 +1,4 @@
-src payload_sim.vhd
+src --cd ../ucf payload_sim.vhd
 src ipbus_decode_top.vhd
 addrtab -t top.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
