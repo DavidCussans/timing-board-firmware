@@ -2,6 +2,8 @@
 --
 -- The PDTS master partition block
 --
+-- TODO: grabbing sync word...
+--
 -- Dave Newbold, April 2017
 
 library IEEE;
@@ -13,6 +15,7 @@ use work.ipbus_reg_types.all;
 use work.ipbus_decode_partition.all;
 
 use work.pdts_defs.all;
+use work.master_defs.all;
 
 entity partition is
 	generic(
@@ -46,6 +49,9 @@ architecture rtl of partition is
 	signal cok, tok, trig, tack_i, erst, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
+	signal rob_en, rob_en_s, buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
+	signal rob_q: std_logic_vector(31 downto 0);
+	signal rob_we, rob_last: std_logic;
 	
 begin
 
@@ -87,7 +93,7 @@ begin
 	ctrl_trig_ctr_rst	<= ctrl(0)(3);
 	ctrl_cmd_mask <= ctrl(1)(15 downto 0);
 	ctrl_trig_mask <= ctrl(1)(31 downto 16);
-	stat(0) <= (others => '0');
+	stat(0) <= X"000000" & "000" & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
 	
 -- command masks
 
@@ -146,7 +152,54 @@ begin
 		
 -- Event buffer
 
-	ipbr(N_SLV_BUF) <= IPB_RBUS_NULL;
+	synchro: entity work.pdts_synchro
+		generic map(
+			N => 1
+		)
+		port map(
+			clk => clk,
+			clks => ipb_clk,
+			d(0) => rob_en,
+			q(0) => rob_en_s
+		);
+		
+	rob_rst <= ipb_rst or not rob_en_s;
+		
+	evt: entity work.pdts_smcd_evt
+		port map(
+			clk => clk,
+			rst => rst,
+			scmd => typ,
+			valid => trig,
+			tstamp => tstamp,
+			evtctr => evtctr,
+			empty => buf_empty,
+			warn => buf_warn,
+			full => buf_full,
+			rob_clk => ipb_clk,
+			rob_rst => rob_rst,
+			rob_q => rob_q,
+			rob_we => rob_we,
+			rob_last => rob_last,
+			rob_full => rob_full
+		);
+		
+	rob: entity work.pdts_rob
+		generic map(
+			N_FIFO => N_FIFO
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_BUF),
+			ipb_out => ipbr(N_SLV_BUF),
+			rst => rob_rst,
+			d => rob_q,
+			we => rob_we,
+			last => rob_last,
+			full => rob_full,
+			empty => rob_empty
+		);
 
 -- Trigger counters
 
