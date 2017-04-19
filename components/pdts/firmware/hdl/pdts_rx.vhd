@@ -154,7 +154,7 @@ begin
 		
 -- Protocol checks
 
-	process(clk)
+	process(pkt_end, csum, actr, sctr, state, ka, ks, slen)
 		variable err: std_logic_vector(2 downto 0);
 	begin
 		err := "000";
