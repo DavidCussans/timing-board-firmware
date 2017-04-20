@@ -95,7 +95,7 @@ begin
 	ctrl_trig_mask <= ctrl(1)(31 downto 16);
 	stat(0) <= X"000000" & "000" & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
 	
--- command masks
+-- Command masks
 
 	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
 	tok <= ctrl_trig_mask(to_integer(unsigned(typ)));
@@ -117,7 +117,7 @@ begin
 	tacc <= t when (tv and tack_i) = '1' else (others => '0');
 	trej <= t when (tv and not tack_i) = '1' else (others => '0');
 
--- timestamp / event counter
+-- Timestamp / event counter
 
 	erst <= rst or ctrl_evtctr_rst or not ctrl_part_en;
 	
