@@ -80,7 +80,7 @@ begin
 			if phase_locked = '0' or fr = '0' then
 				ctr <= (others => '0');
 				m <= '1';
-				sctr <= fctr; -- Randomise starting value of stb counter, don't care about bit synchronisation
+				sctr <= fctr; -- CDC; randomise starting value of stb counter, don't care about bit synchronisation
 			else
 				if sctr = (10 / SCLK_RATIO) - 1 then
 					sctr <= X"0";
