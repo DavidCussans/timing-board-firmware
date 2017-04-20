@@ -99,7 +99,6 @@ begin
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			stb => stb,
 			q => q
 		);
 		
