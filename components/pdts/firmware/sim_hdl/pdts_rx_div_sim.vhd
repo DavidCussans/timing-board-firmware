@@ -38,7 +38,7 @@ begin
 		if sclk_i'event then
 			if phase_rst = '1' then
 				ctr <= X"0";
-				clki <= bclk;
+				clki <= sclk_i;
 				if rising_edge(sclk_i) then
 					lock <= '0';
 				end if;
