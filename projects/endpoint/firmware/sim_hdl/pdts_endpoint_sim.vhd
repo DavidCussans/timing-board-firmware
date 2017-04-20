@@ -73,7 +73,7 @@ begin
 	clkgen: entity work.pdts_rx_div_sim
 		port map(
 			sclk_i => rec_clk,
-			sclk_i => rclk,
+			sclk_o => rclk,
 			clk => clk_i,
 			phase_rst => phase_rst,
 			phase_locked => phase_locked
