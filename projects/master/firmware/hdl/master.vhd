@@ -39,8 +39,8 @@ architecture rtl of master is
 	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
-	signal scmdw_v: cmd_w_array(1 downto 0);
-	signal scmdr_v: cmd_r_array(1 downto 0);
+	signal scmdw_v: cmd_w_array(N_PART downto 0);
+	signal scmdr_v: cmd_r_array(N_PART downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
@@ -127,19 +127,18 @@ begin
 
 	fabric_p: entity work.ipbus_fabric_sel
 		generic map(
-    	NSLV => N_PART,
-    	SEL_WIDTH => sel'length
-    )
-    port map(
-      ipb_in => ipbw(N_SLV_PARTITION),
-      ipb_out => ipbr(N_SLV_PARTITION),
-      sel => sel,
-      ipb_to_slaves => ipbw_p,
-      ipb_from_slaves => ipbr_p
-    );	
-	
+			NSLV => N_PART,
+			SEL_WIDTH => sel'length
+		)
+		port map(
+			ipb_in => ipbw(N_SLV_PARTITION),
+			ipb_out => ipbr(N_SLV_PARTITION),
+			sel => sel,
+			ipb_to_slaves => ipbw_p,
+			ipb_from_slaves => ipbr_p
+		);
+				
 	pgen: for i in N_PART - 1 downto 0 generate
-	begin
 	
 		part: entity work.partition
 			generic map(
@@ -161,7 +160,7 @@ begin
 			);
 			
 	end generate;
-
+		
 -- Merge
 
 	merge: entity work.pdts_scmd_merge
