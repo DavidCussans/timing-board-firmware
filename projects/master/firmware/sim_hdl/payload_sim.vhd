@@ -20,7 +20,6 @@ entity payload_sim is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		clk125: in std_logic;
-		rst125: in std_logic;
 		nuke: out std_logic;
 		soft_rst: out std_logic
 	);
@@ -61,7 +60,6 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_IO),
 			ipb_out => ipbr(N_SLV_IO),
-			clk125 => clk125,
 			soft_rst => soft_rst,
 			nuke => nuke,
 			rst => rst_io
