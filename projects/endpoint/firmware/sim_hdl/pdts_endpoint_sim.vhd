@@ -38,7 +38,7 @@ end pdts_endpoint;
 
 architecture rtl of pdts_endpoint is
 
-	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
+	signal rclk, rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
 	signal stb, k, s_valid, s_first: std_logic;
@@ -57,7 +57,7 @@ begin
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
-			rec_clk => rec_clk,
+			rec_clk => rclk,
 			rec_rst => rec_rst,
 			rxphy_aligned => rxphy_aligned,
 			clk => clk_i,
@@ -72,7 +72,8 @@ begin
 
 	clkgen: entity work.pdts_rx_div_sim
 		port map(
-			sclk => rec_clk,
+			sclk_i => rec_clk,
+			sclk_i => rclk,
 			clk => clk_i,
 			phase_rst => phase_rst,
 			phase_locked => phase_locked
@@ -88,7 +89,7 @@ begin
 		port map(
 			fclk => sclk,
 			frst => rec_rst,
-			rxclk => rec_clk,
+			rxclk => rclk,
 			rxd => rec_d,
 			phase_rst => phase_rst,
 			phase_locked => phase_locked,

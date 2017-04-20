@@ -13,7 +13,8 @@ use work.pdts_defs.all;
 
 entity pdts_rx_div_sim is
 	port(
-		sclk: out std_logic;
+		sclk_i: in std_logic;
+		sclk_o: out std_logic;
 		clk: out std_logic;
 		phase_rst: in std_logic;
 		phase_locked: out std_logic
@@ -23,27 +24,26 @@ end pdts_rx_div_sim;
 
 architecture tb of pdts_rx_div_sim is
 
-	signal bclk, clki: std_logic := '1';
-	signal bclkd, lock: std_logic;
+	signal sclk_d, lock: std_logic;
+	signal clki: std_logic := '1';
 	signal ctr: unsigned(3 downto 0) := X"0";
 	
 begin
 
-	bclk <= not bclk after 10 ns / SCLK_RATIO;
-	bclkd <= bclk;
-	sclk <= bclkd; -- Align delta delays between sclk and clk
+	sclk_d <= sclk_i;
+	sclk_o <= sclk_d; -- Align delta delays between sclk_o and clk
 	
-	process(bclk)
+	process(sclk_i)
 	begin
-		if bclk'event then
+		if sclk_i'event then
 			if phase_rst = '1' then
 				ctr <= X"0";
 				clki <= bclk;
-				if rising_edge(bclk) then
+				if rising_edge(sclk_i) then
 					lock <= '0';
 				end if;
 			else
-				if rising_edge(bclk) then
+				if rising_edge(sclk_i) then
 					lock <= '1';
 				end if;
 				if ctr = SCLK_RATIO - 1 then
