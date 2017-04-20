@@ -13,7 +13,7 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_decode_top_sim.all;
 
-entity payload is
+entity payload_sim is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -25,9 +25,9 @@ entity payload is
 		soft_rst: out std_logic
 	);
 
-end payload;
+end payload_sim;
 
-architecture rtl of payload is
+architecture rtl of payload_sim is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
