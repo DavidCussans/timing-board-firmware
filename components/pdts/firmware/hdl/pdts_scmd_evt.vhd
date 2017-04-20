@@ -12,9 +12,10 @@ use ieee.std_logic_misc.all;
 library unisim;
 use unisim.VComponents.all;
 
-use work.master_defs.all;
-
 entity pdts_scmd_evt is
+	generic(
+		WARN_THRESH: integer := 16#300#
+	);
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
@@ -82,7 +83,7 @@ begin
 			generic map(
 				DATA_WIDTH => 36,
 				FIRST_WORD_FALL_THROUGH => true,
-				ALMOST_FULL_OFFSET => to_bitvector(std_logic_vector(to_unsigned(WARN_HWM, 16)))
+				ALMOST_FULL_OFFSET => to_bitvector(std_logic_vector(to_unsigned(WARN_THRESH, 16)))
 			)
 			port map(
 				di(63 downto 32) => (others => '0'),
