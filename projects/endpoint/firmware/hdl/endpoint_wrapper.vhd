@@ -37,7 +37,7 @@ architecture rtl of endpoint_wrapper is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_ep_en, ctrl_buf_rst, ctrl_ctr_rst: std_logic;
-	signal ctrl_addr: std_logic_vector(3 downto 0);
+	signal ctrl_addr: std_logic_vector(7 downto 0);
 	signal ctrl_tgrp: std_logic_vector(1 downto 0);
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_rst, ep_clk, ep_rsto, ep_rdy, ep_v: std_logic;
@@ -99,8 +99,8 @@ begin
 	ctrl_ep_en <= ctrl(0)(0);
 	ctrl_buf_rst <= ctrl(0)(1);
 	ctrl_ctr_rst <= ctrl(0)(2);
-	ctrl_addr <= ctrl(0)(19 downto 16);
-	ctrl_tgrp <= ctrl(0)(21 downto 20);
+	ctrl_tgrp <= ctrl(0)(5 downto 4);
+	ctrl_addr <= ctrl(0)(15 downto 8);
 	stat(0) <= X"00000" & ep_stat & '0' & ep_rdy & ep_rsto & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
 	
 -- The endpoint
