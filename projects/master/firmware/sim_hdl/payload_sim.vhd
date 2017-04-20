@@ -30,10 +30,7 @@ architecture rtl of payload_sim is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
-
-	attribute IOB: string;
-	attribute IOB of sfp_dout: signal is "TRUE";
+	signal fmc_clk, rst_io, rsti, clk, rst, locked: std_logic;
 	
 begin
 
@@ -99,9 +96,7 @@ begin
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			q => q
+			q => open
 		);
-		
-	sfp_dout <= q when rising_edge(fmc_clk);
 
 end rtl;

@@ -172,5 +172,20 @@ begin
 		);
 		
 	sfp_dout <= q when rising_edge(fmc_clk);
+	
+-- Endpoint wrapper
+
+	wrapper: entity work.endpoint_wrapper
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_ENDPOINT),
+			ipb_out => ipbr(N_SLV_ENDPOINT),
+			rec_clk => rec_clk,
+			rec_d => rec_d,
+			sfp_los => sfp_los,
+			cdr_los => cdr_los,
+			cdr_lol => cdr_lol
+		);
 
 end rtl;

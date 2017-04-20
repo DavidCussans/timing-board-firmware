@@ -30,10 +30,7 @@ architecture rtl of payload_sim is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
-
-	attribute IOB: string;
-	attribute IOB of sfp_dout: signal is "TRUE";
+	signal fmc_clk, rst_io, rsti, clk, rst, locked, d: std_logic;
 	
 begin
 
@@ -69,7 +66,7 @@ begin
 
 	clkgen: entity work.pdts_sim_clk
 		port map(
-			sclk => fmc_clk,
+			sclk_o => fmc_clk,
 			clk => clk,
 			phase_rst => '0',
 			phase_locked => locked
@@ -102,6 +99,23 @@ begin
 			q => q
 		);
 		
-	sfp_dout <= q when rising_edge(fmc_clk);
+-- The loopback
+		
+	d <= q when rising_edge(fmc_clk);
+	
+-- Endpoint wrapper
+
+	wrapper: entity work.endpoint_wrapper
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_ENDPOINT),
+			ipb_out => ipbr(N_SLV_ENDPOINT),
+			rec_clk => fmc_clk,
+			rec_d => d,
+			sfp_los => '0',
+			cdr_los => '0',
+			cdr_lol => '0'
+		);
 
 end rtl;

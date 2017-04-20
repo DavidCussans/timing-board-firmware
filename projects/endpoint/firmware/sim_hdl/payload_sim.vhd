@@ -78,9 +78,9 @@ begin
 			ipb_out => ipbr(N_SLV_ENDPOINT),
 			rec_clk => rec_clk,
 			rec_d => '0',
-			sfp_los => '1',
-			cdr_los => '1',
-			cdr_lol => '1'
+			sfp_los => '0',
+			cdr_los => '0',
+			cdr_lol => '0'
 		);
 
 end rtl;
