@@ -61,11 +61,8 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io: std_logic;
+	signal rec_clk, rec_d: std_logic;
 
-	attribute IOB: string;
-	attribute IOB of sfp_dout: signal is "TRUE";
-	
 begin
 
 -- ipbus address decode
@@ -93,8 +90,8 @@ begin
 			ipb_out => ipbr(N_SLV_IO),
 			soft_rst => soft_rst,
 			nuke => nuke,
-			rst => rst_io,
-			locked => locked,
+			rst => open,
+			locked => '0',
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			sfp_los => sfp_los,
@@ -103,7 +100,7 @@ begin
 			userled => userled,
 			fmc_clk_p => fmc_clk_p,
 			fmc_clk_n => fmc_clk_n,
-			fmc_clk => fmc_clk,
+			fmc_clk => open,
 			rec_clk_p => rec_clk_p,
 			rec_clk_n => rec_clk_n,
 			rec_clk => rec_clk,
@@ -116,7 +113,7 @@ begin
 			rj45_din_n => rj45_din_n,
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
-			sfp_dout => sfp_dout,
+			sfp_dout => '0',
 			sfp_dout_p => sfp_dout_p,
 			sfp_dout_n => sfp_dout_n,
 			uid_scl => uid_scl,

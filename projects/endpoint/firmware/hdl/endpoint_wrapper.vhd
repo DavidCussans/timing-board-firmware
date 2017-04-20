@@ -47,7 +47,7 @@ architecture rtl of endpoint_wrapper is
 	signal rob_q: std_logic_vector(31 downto 0);
 	signal rob_rst, rob_we, rob_last: std_logic;
 	signal buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
-	signal clkdiv: std_logic;
+	signal clkdiv: std_logic_vector(0 downto 0);
 	signal ctr_rst: std_logic;
 	signal t: std_logic_vector(2 ** SCMD_W - 1 downto 0);
 
@@ -100,7 +100,7 @@ begin
 	ctrl_buf_rst <= ctrl(0)(1);
 	ctrl_ctr_rst <= ctrl(0)(2);
 	ctrl_addr <= ctrl(0)(19 downto 16);
-	ctrl_tgtp <= ctrl(0)(21 downto 20);
+	ctrl_tgrp <= ctrl(0)(21 downto 20);
 	stat(0) <= X"00000" & ep_stat & '0' & ep_rdy & ep_rsto & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
 	
 -- The endpoint
@@ -231,7 +231,7 @@ begin
 	process(ep_scmd) -- Unroll sync command
 	begin
 		for i in t'range loop
-			if ep_scmd = std_logic_vector(to_unsigned(i, typ'length)) and ep_v = '1' then then
+			if ep_scmd = std_logic_vector(to_unsigned(i, ep_scmd'length)) and ep_v = '1' then
 				t(i) <= '1';
 			else
 				t(i) <= '0';
