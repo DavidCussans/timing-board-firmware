@@ -1,0 +1,5 @@
+src --cd ../sim_hdl pdts_endpoint_sim.vhd
+src pdts_ep_startup.vhd
+src -c components/pdts --cd ../sim_hdl pdts_rx_div_sim.vhd
+src -c components/pdts pdts_rx_phy.vhd pdts_rx.vhd pdts_cksum.vhd outputlogic_crc16.vhd pdts_synchro.vhd pdts_dec8b10b.vhd pdts_code8b10bpkg.vhd pdts_tstamp.vhd
+src -c components/pdts pdts_defs.vhd
