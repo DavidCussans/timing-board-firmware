@@ -36,7 +36,7 @@ architecture rtl of endpoint_wrapper is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_ep_en, ctrl_buf_rst, ctrl_ctr_rst: std_logic;
+	signal ctrl_ep_en, ctrl_buf_en, ctrl_ctr_rst: std_logic;
 	signal ctrl_addr: std_logic_vector(7 downto 0);
 	signal ctrl_tgrp: std_logic_vector(1 downto 0);
 	signal ep_stat: std_logic_vector(3 downto 0);
@@ -97,7 +97,7 @@ begin
 		);
 
 	ctrl_ep_en <= ctrl(0)(0);
-	ctrl_buf_rst <= ctrl(0)(1);
+	ctrl_buf_en <= ctrl(0)(1);
 	ctrl_ctr_rst <= ctrl(0)(2);
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_addr <= ctrl(0)(15 downto 8);
@@ -184,7 +184,7 @@ begin
 			rob_full => rob_full
 		);
 		
-	rob_rst <= ipb_rst or ctrl_buf_rst;
+	rob_rst <= ipb_rst or not ctrl_buf_en;
 		
 	rob: entity work.pdts_rob
 		generic map(

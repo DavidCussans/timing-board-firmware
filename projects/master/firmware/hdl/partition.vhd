@@ -44,12 +44,12 @@ architecture rtl of partition is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(1 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst: std_logic;
+	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
 	signal ctrl_cmd_mask, ctrl_trig_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
 	signal cok, tok, trig, tack_i, erst, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
-	signal rob_en, rob_en_s, buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
+	signal rob_en, buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);
 	signal rob_rst, rob_we, rob_last: std_logic;
 	
@@ -91,6 +91,7 @@ begin
 	ctrl_trig_en <= ctrl(0)(1);
 	ctrl_evtctr_rst <= ctrl(0)(2);
 	ctrl_trig_ctr_rst	<= ctrl(0)(3);
+	ctrl_buf_en <= ctrl(0)(4);
 	ctrl_cmd_mask <= ctrl(1)(15 downto 0);
 	ctrl_trig_mask <= ctrl(1)(31 downto 16);
 	stat(0) <= X"000000" & "000" & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
@@ -159,11 +160,11 @@ begin
 		port map(
 			clk => clk,
 			clks => ipb_clk,
-			d(0) => rob_en,
-			q(0) => rob_en_s
+			d(0) => ctrl_buf_en,
+			q(0) => rob_en
 		);
 		
-	rob_rst <= ipb_rst or not rob_en_s;
+	rob_rst <= ipb_rst or not rob_en;
 		
 	evt: entity work.pdts_scmd_evt
 		port map(

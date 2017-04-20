@@ -3,7 +3,7 @@
 		<node id="csr" address="0x2" fwinfo="endpoint;width=1">
 			<node id="ctrl" address="0x0">
 				<node id="ep_en" mask="0x1"/>
-				<node id="buf_rst" mask="0x2"/>
+				<node id="buf_en" mask="0x2"/>
 				<node id="ctr_rst" mask="0x4"/>
 				<node id="tgrp" mask="0x30"/>
 				<node id="addr" mask="0xff00"/>
