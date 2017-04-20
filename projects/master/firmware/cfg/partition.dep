@@ -2,6 +2,8 @@ src partition.vhd master_defs.vhd
 src ipbus_decode_partition.vhd
 addrtab -t partition.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+src -c components/pdts pdts_synchro.vhd pdts_scmd_evt.vhd
+include -c components/pdts pdts_rob.dep
 include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep ipbus_ctrs_v.dep
 src -c components/pdts pdts_ts_gen.vhd pdts_defs.vhd
 src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_types.vhd
