@@ -17,7 +17,7 @@ use work.ipbus.all;
 
 entity pdts_rob is
 	generic(
-		N_FIFO => 1
+		N_FIFO: positive := 1
 	);
 	port(
 		ipb_clk: in std_logic;
@@ -36,25 +36,26 @@ end pdts_rob;
 
 architecture rtl of pdts_rob is
 
-	signal re, lastw: std_logic;
+	signal rsti, re, lastw: std_logic;
 	signal ectr, ctr: unsigned(15 downto 0);
 	signal d_fifo, q_fifo: std_logic_vector(35 downto 0);
-	signal empty_i: std_logic;
+	signal valid: std_logic;
 
 begin
-	
-	re <= ipb_in.ipb_strobe and not ipb_in.ipb_addr(0) and not ipb_in.ipb_write and not empty_i;
+
+    rsti <= rst or ipb_rst;	
+	re <= ipb_in.ipb_strobe and not ipb_in.ipb_addr(0) and not ipb_in.ipb_write and valid;
 	lastw <= last and we;
 	
 	process(ipb_clk)
 	begin
 		if rising_edge(ipb_clk) then
-			if rst = '1' or lastw = '1' then
+			if rsti = '1' or lastw = '1' then
 				ectr <= (others => '0');
 			elsif we = '1' then
 				ectr <= ectr + 1;
 			end if;
-			if rst = '1' then
+			if rsti = '1' then
 				ctr <= (others => '0');
 			elsif re = '1' then
 				if lastw = '1' then
@@ -66,7 +67,7 @@ begin
 				ctr <= ctr + ectr + 1;
 			end if;
 		end if;
-	end if;
+	end process;
 	
 	d_fifo <= X"0" & d;
 	
@@ -75,22 +76,20 @@ begin
 			N_FIFO => N_FIFO
 		)
 		port map(
-			clk => clk,
-			rst => rst,
+			clk => ipb_clk,
+			rst => rsti,
 			d => d_fifo,
 			wen => we,
 			full => full,
-			empty => empty_i,
+			empty => empty,
 			ctr => open,
 			ren => re,
 			q => q_fifo,
 			valid => valid
 		);
 		
-	empty <= empty_i;
-		
 	ipb_out.ipb_rdata <= q_fifo(31 downto 0) when ipb_in.ipb_addr(0) = '0' else X"0000" & std_logic_vector(ctr);
-	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not (empty_i and not ipb_in.ipb_addr(0));
-	ipb_out.ipb_err <= ipb_in.ipb_strobe and (ipb_in.ipb_write or (empty_i and not ipb_in.ipb_addr(0)));
+	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write and (valid or ipb_in.ipb_addr(0));
+	ipb_out.ipb_err <= ipb_in.ipb_strobe and (ipb_in.ipb_write or not (valid or ipb_in.ipb_addr(0)));
 	
 end rtl;

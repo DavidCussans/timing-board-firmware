@@ -7,7 +7,10 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
-use std_logic_misc.all;
+use ieee.std_logic_misc.all;
+
+library unisim;
+use unisim.VComponents.all;
 
 use work.master_defs.all;
 
@@ -35,12 +38,12 @@ end pdts_scmd_evt;
 architecture rtl of pdts_scmd_evt is
 
 	signal rst_ctr: unsigned(3 downto 0);
-	signal rsti, fifo_rst, wen: std_logic;
-	type d_t is array(3 downto 0) of std_logic_vector(31 downto 0);
+	signal rsti, rst_f, wen: std_logic;
+	type d_t is array(5 downto 0) of std_logic_vector(31 downto 0);
 	signal d, q: d_t;
-	signal empty_f, full_f, warn_f: std_logic_vector(5 downto 0); := (others => '0');
+	signal empty_f, full_f, warn_f: std_logic_vector(5 downto 0) := (others => '0');
 	signal rctr: unsigned(2 downto 0);
-	signal empty_i, full_i, v: std_logic;
+	signal done, empty_i, full_i, v: std_logic;
 	
 begin
 
@@ -56,7 +59,7 @@ begin
 	end process;
 	
 	rsti <= '0' when rst_ctr = "1111" else '1';
-	fifo_rst <= rsti and rst_ctr(3);
+	rst_f <= rsti and rst_ctr(3);
 	wen <= valid and not rsti and not full_i;
 
 	d(0) <= X"aa000600"; -- DAQ word 0
@@ -66,8 +69,14 @@ begin
 	d(4) <= evtctr; -- DAQ word 4
 	d(5) <= X"00000000"; -- Dummy checksum (not implemented yet)
 	
-	fgen: for i in 4 downto 1 generate	
+	fgen: for i in 4 downto 1 generate
+	
+	   signal ren: std_logic;
+	   signal ql: std_logic_vector(63 downto 0);
+	   
 	begin
+	
+	   ren <= '1' when rctr = i and v = '1' else '0';
 	
 		fifo: FIFO36E1
 			generic map(
@@ -76,9 +85,10 @@ begin
 				ALMOST_FULL_OFFSET => to_bitvector(std_logic_vector(to_unsigned(WARN_HWM, 16)))
 			)
 			port map(
-				di => d(i),
-				dip => X"0",
-				do => q(i),
+				di(63 downto 32) => (others => '0'),
+				di(31 downto 0) => d(i),
+				dip => X"00",
+				do => ql,
 				dop => open,
 				empty => empty_f(i),
 				full => full_f(i),
@@ -88,11 +98,13 @@ begin
 				rdclk => rob_clk,
 				rden => ren,
 				regce => '1',
-				rst => rst_w,
+				rst => rst_f,
 				rstreg => '0',
 				wrclk => clk,
 				wren => wen
 			);
+			
+		q(i) <= ql(31 downto 0);
 		
 	end generate;
 

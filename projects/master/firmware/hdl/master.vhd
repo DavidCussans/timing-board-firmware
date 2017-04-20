@@ -85,9 +85,9 @@ begin
 		
 -- Strobe gen
 
-	process(clki)
+	process(clk)
 	begin
-		if rising_edge(clki) then
+		if rising_edge(clk) then
 			if sctr = (10 / SCLK_RATIO) - 1 then
 				sctr <= X"0";
 			else

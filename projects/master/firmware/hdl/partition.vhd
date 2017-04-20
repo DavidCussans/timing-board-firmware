@@ -51,7 +51,7 @@ architecture rtl of partition is
 	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
 	signal rob_en, rob_en_s, buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_we, rob_last: std_logic;
+	signal rob_rst, rob_we, rob_last: std_logic;
 	
 begin
 
@@ -165,7 +165,7 @@ begin
 		
 	rob_rst <= ipb_rst or not rob_en_s;
 		
-	evt: entity work.pdts_smcd_evt
+	evt: entity work.pdts_scmd_evt
 		port map(
 			clk => clk,
 			rst => rst,
