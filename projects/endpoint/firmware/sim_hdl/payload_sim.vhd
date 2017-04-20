@@ -32,7 +32,7 @@ architecture rtl of payload_sim is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal rec_clk: std_logic := '1'
+	signal rec_clk: std_logic := '1';
 	
 begin
 
