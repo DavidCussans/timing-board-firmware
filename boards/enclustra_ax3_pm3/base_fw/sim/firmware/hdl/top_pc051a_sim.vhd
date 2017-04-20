@@ -31,8 +31,8 @@ begin
 			rst125_o => rst125,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			mac_addr => MAC_ADDR,
-			ip_addr => IP_ADDR,
+			mac_addr => X"020ddba11610",
+			ip_addr => X"c0a8c910", -- 192.168.201.16
 			ipb_in => ipb_in,
 			ipb_out => ipb_out
 		);

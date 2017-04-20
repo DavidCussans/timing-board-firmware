@@ -62,7 +62,7 @@ begin
 		
 	leds <= not ('0' & userled & inf_leds);
 	phy_rstn <= not phy_rst_e;
-		
+
 	mac_addr <= X"020ddba1151" & not cfg; -- Careful here, arbitrary addresses do not always work
 	ip_addr <= X"c0a8c81" & not cfg; -- 192.168.200.16+n
 
