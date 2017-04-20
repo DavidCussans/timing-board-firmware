@@ -8,7 +8,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
-use work.top_decl.all;
 
 entity top is
 
