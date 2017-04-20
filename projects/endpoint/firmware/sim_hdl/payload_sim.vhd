@@ -61,7 +61,7 @@ begin
 			ipb_out => ipbr(N_SLV_IO),
 			soft_rst => soft_rst,
 			nuke => nuke,
-			rst => rst_io
+			rst => open
 		);
 
 -- Clock
