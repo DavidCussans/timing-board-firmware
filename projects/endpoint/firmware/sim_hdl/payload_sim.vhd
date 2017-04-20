@@ -13,6 +13,8 @@ use ieee.numeric_std.all;
 use work.ipbus.all;
 use work.ipbus_decode_top_sim.all;
 
+use work.pdts_defs.all;
+
 entity payload_sim is
 	port(
 		ipb_clk: in std_logic;
@@ -30,10 +32,7 @@ architecture rtl of payload_sim is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
-
-	attribute IOB: string;
-	attribute IOB of sfp_dout: signal is "TRUE";
+	signal rec_clk: std_logic := '1'
 	
 begin
 
@@ -65,43 +64,23 @@ begin
 			rst => rst_io
 		);
 
--- Clock divider
+-- Clock
 
-	clkgen: entity work.pdts_sim_clk
-		port map(
-			sclk => fmc_clk,
-			clk => clk,
-			phase_rst => '0',
-			phase_locked => locked
-		);
+	rec_clk <= not rec_clk after 10 ns / SCLK_RATIO;
 
-	rsti <= rst_io or not locked;
-	
-	synchro: entity work.pdts_synchro
-		generic map(
-			N => 1
-		)
-		port map(
-			clk => ipb_clk,
-			clks => clk,
-			d(0) => rsti,
-			q(0) => rst
-		);
+-- Endpoint wrapper
 
--- master block
-
-	tx: entity work.master
+	wrapper: entity work.endpoint_wrapper
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_MASTER),
-			ipb_out => ipbr(N_SLV_MASTER),
-			mclk => fmc_clk,
-			clk => clk,
-			rst => rst,
-			q => q
+			ipb_in => ipbw(N_SLV_ENDPOINT),
+			ipb_out => ipbr(N_SLV_ENDPOINT),
+			rec_clk => rec_clk,
+			rec_d => '0',
+			sfp_los => '1',
+			cdr_los => '1',
+			cdr_lol => '1'
 		);
-		
-	sfp_dout <= q when rising_edge(fmc_clk);
 
 end rtl;

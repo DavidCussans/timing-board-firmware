@@ -71,6 +71,9 @@ begin
 -- Clock divider
 
 	clkgen: entity work.pdts_rx_div_sim
+		generic map(
+			INTERNAL_CLOCK => false
+		)
 		port map(
 			sclk_i => rec_clk,
 			sclk_o => rclk,

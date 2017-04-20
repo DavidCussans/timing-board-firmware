@@ -69,7 +69,7 @@ begin
 
 	clkgen: entity work.pdts_sim_clk
 		port map(
-			sclk => fmc_clk,
+			sclk_o => fmc_clk,
 			clk => clk,
 			phase_rst => '0',
 			phase_locked => locked

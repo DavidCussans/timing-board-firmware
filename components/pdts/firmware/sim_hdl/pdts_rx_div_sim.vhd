@@ -12,8 +12,11 @@ use ieee.math_real.all;
 use work.pdts_defs.all;
 
 entity pdts_rx_div_sim is
+	generic(
+		INTERNAL_CLOCK: boolean := true
+	);
 	port(
-		sclk_i: in std_logic;
+		sclk_i: in std_logic := '0';
 		sclk_o: out std_logic;
 		clk: out std_logic;
 		phase_rst: in std_logic;
@@ -24,26 +27,28 @@ end pdts_rx_div_sim;
 
 architecture tb of pdts_rx_div_sim is
 
-	signal sclk_d, lock: std_logic;
-	signal clki: std_logic := '1';
+	signal sclk, sclk_d, lock: std_logic;
+	signal bclk, clki: std_logic := '1';
 	signal ctr: unsigned(3 downto 0) := X"0";
 	
 begin
 
-	sclk_d <= sclk_i;
+	bclk <= not bclk after 10 ns / SCLK_RATIO;
+	sclk <= bclk when INTERNAL_CLOCK else sclk_i;
+	sclk_d <= sclk;
 	sclk_o <= sclk_d; -- Align delta delays between sclk_o and clk
 	
-	process(sclk_i)
+	process(sclk)
 	begin
 		if sclk_i'event then
 			if phase_rst = '1' then
 				ctr <= X"0";
-				clki <= sclk_i;
-				if rising_edge(sclk_i) then
+				clki <= sclk;
+				if rising_edge(sclk) then
 					lock <= '0';
 				end if;
 			else
-				if rising_edge(sclk_i) then
+				if rising_edge(sclk) then
 					lock <= '1';
 				end if;
 				if ctr = SCLK_RATIO - 1 then
