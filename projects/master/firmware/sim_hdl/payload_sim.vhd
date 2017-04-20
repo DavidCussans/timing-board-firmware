@@ -11,7 +11,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
 use work.ipbus.all;
-use work.ipbus_decode_top.all;
+use work.ipbus_decode_top_sim.all;
 
 entity payload is
 	port(
@@ -48,7 +48,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_top(ipb_in.ipb_addr),
+      sel => ipbus_sel_top_sim(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
