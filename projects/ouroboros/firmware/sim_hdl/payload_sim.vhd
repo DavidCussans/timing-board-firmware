@@ -64,7 +64,7 @@ begin
 
 -- Clock divider
 
-	clkgen: entity work.pdts_sim_clk
+	clkgen: entity work.pdts_rx_div_sim
 		port map(
 			sclk_o => fmc_clk,
 			clk => clk,

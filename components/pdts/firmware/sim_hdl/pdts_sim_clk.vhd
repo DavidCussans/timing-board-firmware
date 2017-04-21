@@ -13,7 +13,7 @@ use work.pdts_defs.all;
 
 entity pdts_sim_clk is
 	port(
-		sclk: out std_logic;
+		sclk_o: out std_logic;
 		clk: out std_logic;
 		rst: out std_logic;
 		stb: out std_logic;
@@ -37,7 +37,7 @@ begin
 	fclk <= fclki;
 	bclk <= not bclk after 10 ns / SCLK_RATIO;
 	bclkd <= bclk;
-	sclk <= bclkd; -- Align delta delays between sclk and clk
+	sclk_o <= bclkd; -- Align delta delays between sclk and clk
 	
 	process(bclk)
 	begin
