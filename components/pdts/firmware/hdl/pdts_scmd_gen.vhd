@@ -119,7 +119,7 @@ begin
 
 	fabric_t: entity work.ipbus_fabric_sel
 		generic map(
-    	NSLV => N_PART,
+    	NSLV => N_CHAN,
     	SEL_WIDTH => sel'length
     )
     port map(
