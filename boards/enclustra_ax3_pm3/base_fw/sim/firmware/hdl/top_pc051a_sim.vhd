@@ -8,7 +8,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
-use work.top_decl.all;
 
 entity top is
 
@@ -16,7 +15,7 @@ end top;
 
 architecture rtl of top is
 
-	signal clk_ipb, rst_ipb, clk125, rst125, nuke, soft_rst, userled, clk200: std_logic;
+	signal clk_ipb, rst_ipb, clk125, nuke, soft_rst, userled, clk200: std_logic;
 	signal ipb_out: ipb_wbus;
 	signal ipb_in: ipb_rbus;
 	
@@ -29,11 +28,10 @@ begin
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
 			clk125_o => clk125,
-			rst125_o => rst125,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			mac_addr => MAC_ADDR,
-			ip_addr => IP_ADDR,
+			mac_addr => X"020ddba11610",
+			ip_addr => X"c0a8c910", -- 192.168.201.16
 			ipb_in => ipb_in,
 			ipb_out => ipb_out
 		);
@@ -45,7 +43,6 @@ begin
 			ipb_in => ipb_out,
 			ipb_out => ipb_in,
 			clk125 => clk125,
-			rst125 => rst125,
 			nuke => nuke,
 			soft_rst => soft_rst
 		);

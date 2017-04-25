@@ -40,4 +40,4 @@ set_property PACKAGE_PIN AH25 [get_ports {sfp_sda}]
 set_property PACKAGE_PIN AE25 [get_ports {pll_scl}]
 set_property PACKAGE_PIN AF25 [get_ports {pll_sda}]
 set_property PACKAGE_PIN AE28 [get_ports {pll_rstn}]
-false_path {cdr_rstn cdr_lol cdr_los sfp_los sfp_tx_dis sfp_flt uid_scl uid_sda sfp_scl sfp_sda pll_scl pll_sda} sysclk
+false_path {pll_rstn cdr_lol cdr_los sfp_los sfp_tx_dis sfp_flt uid_scl uid_sda sfp_scl sfp_sda pll_scl pll_sda} sysclk

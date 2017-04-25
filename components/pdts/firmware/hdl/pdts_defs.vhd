@@ -22,15 +22,15 @@ package pdts_defs is
 
 -- L2	constants
 	
-	constant GRP_W: natural := 2; -- Bitwidth of group ID
+	constant GRP_W: positive := 2; -- Bitwidth of group ID
 	constant ADDR_WDS: positive := 1; -- Number of address words	
 --	constant ADDR_FLD_W: natural := 8; -- Add fancier address matching later
-	constant SCMD_W: natural := 4; -- Bitwidth of sync cmd
+	constant SCMD_W: positive := 4; -- Bitwidth of sync cmd
 	constant CSUM_WDS : positive := 2; -- Number of checksum words (CRC16)
 	constant ACMD_LEN_MIN: natural := ADDR_WDS * 2 + 1 + CSUM_WDS;
-	constant IDLE_DATA_WDS: natural := 16; -- Number of data words in idle packet
+	constant IDLE_DATA_WDS: positive := 16; -- Number of data words in idle packet
 	constant CMD_LEN_MAX: natural := IDLE_DATA_WDS + ACMD_LEN_MIN; -- Maximum command length
-	constant COMMA_TIMEOUT_W: natural := 8; -- Bitwidth of timeout counter
+	constant COMMA_TIMEOUT_W: positive := 8; -- Bitwidth of timeout counter
 	
 -- L3 constants
 

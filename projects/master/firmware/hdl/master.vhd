@@ -10,8 +10,10 @@ use ieee.numeric_std.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_tb_tx.all;
+use work.ipbus_decode_master.all;
+
 use work.pdts_defs.all;
+use work.master_defs.all;
 
 entity master is
 	port(
@@ -20,9 +22,8 @@ entity master is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		mclk: in std_logic;
-		locked: in std_logic;
 		clk: in std_logic;
-		stb: in std_logic;
+		rst: in std_logic;
 		q: out std_logic
 	);
 		
@@ -32,16 +33,16 @@ architecture rtl of master is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(0 downto 0);
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
-	signal clr, clk, rsti, rstl, stb, en: std_logic;
+	signal en: std_logic;
+	signal sctr: unsigned(3 downto 0) := X"0";
+	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
-	signal scmdw_v: cmd_w_array(1 downto 0);
-	signal scmdr_v: cmd_r_array(1 downto 0);
-	signal scmd_w, acmd_w: cmd_w;
-	signal scmd_r, acmd_r: cmd_r;
+	signal scmdw_v: cmd_w_array(N_PART downto 0);
+	signal scmdr_v: cmd_r_array(N_PART downto 0);
+	signal scmdw, acmdw: cmd_w;
+	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
 	signal ipbr_p: ipb_rbus_array(N_PART - 1 downto 0);
 	signal typ: std_logic_vector(SCMD_W - 1 downto 0);
@@ -62,7 +63,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_tb_tx(ipb_in.ipb_addr),
+      sel => ipbus_sel_master(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
@@ -76,45 +77,35 @@ begin
 			ipb_in => ipbw(N_SLV_GLOBAL),
 			ipb_out => ipbr(N_SLV_GLOBAL),
 			clk => clk,
-			locked => locked,
 			tx_err => tx_err,
-			sel => sel,
+			part_sel => sel,
 			en => en,
 			tstamp => tstamp
 		);
 		
--- Clock divider and reset CDC
+-- Strobe gen
 
-	clkgen: entity work.master_clk
-		port map(
-			mclk => mclk,
-			locked => locked,
-			clk => clk,
-			stb => stb
-		);
-
-	rstl <= rst or not locked;
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if sctr = (10 / SCLK_RATIO) - 1 then
+				sctr <= X"0";
+			else
+				sctr <= sctr + 1;
+			end if;
+		end if;
+	end process;
 	
-	synchro: entity work.pdts_synchro
-		generic map(
-			N => 1
-		)
-		port map(
-			clk => ipb_clk,
-			clks => clk,
-			d(0) => rstl,
-			q(0) => rsti,
-		);
+	stb <= '1' when sctr = 0 else '0';
 
 -- Idle pattern gen
 
 	idle: entity work.pdts_idle_gen
 		port map(
 			clk => clk,
-			rst => rsti,
-			d => async_d,
-			last => async_last,
-			ren => async_ren
+			rst => rst,
+			acmd_out => acmdw,
+			acmd_in => acmdr
 		);
 
 -- Sync command gen
@@ -127,28 +118,27 @@ begin
 			ipb_out => ipbr(N_SLV_SCMD_GEN),
 			clk => clk,
 			rst => rst,
-			trig => trig,
-			scmd_out => scmd_w_v(0),
-			scmd_in => scmd_r_v(0)
+			tstamp => tstamp,
+			scmd_out => scmdw_v(0),
+			scmd_in => scmdr_v(0)
 		);
 		
 -- Partitions
 
-	fabric: entity work.ipbus_fabric_sel
+	fabric_p: entity work.ipbus_fabric_sel
 		generic map(
-    	NSLV => N_PART,
-    	SEL_WIDTH => sel'length
-    )
-    port map(
-      ipb_in => ipbw(N_SLV_PARTITION),
-      ipb_out => ipbr(N_SLV_PARTITION),
-      sel => sel,
-      ipb_to_slaves => ipbw_p,
-      ipb_from_slaves => ipbr_p
-    );	
-	
+			NSLV => N_PART,
+			SEL_WIDTH => sel'length
+		)
+		port map(
+			ipb_in => ipbw(N_SLV_PARTITION),
+			ipb_out => ipbr(N_SLV_PARTITION),
+			sel => sel,
+			ipb_to_slaves => ipbw_p,
+			ipb_from_slaves => ipbr_p
+		);
+				
 	pgen: for i in N_PART - 1 downto 0 generate
-	begin
 	
 		part: entity work.partition
 			generic map(
@@ -162,15 +152,15 @@ begin
 				clk => clk,
 				rst => rst,
 				tstamp => tstamp,
-				scmd_out => scmd_w_v(i + 1),
-				scmd_in => scmd_r_v(i + i),
+				scmd_out => scmdw_v(i + 1),
+				scmd_in => scmdr_v(i + i),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
 			);
 			
 	end generate;
-
+		
 -- Merge
 
 	merge: entity work.pdts_scmd_merge
@@ -181,13 +171,13 @@ begin
 			clk => clk,
 			rst => rst,
 			stb => stb,
-			scmd_in_v => scmd_w_v,
-			scmd_out_v => scmd_r_v,
+			scmd_in_v => scmdw_v,
+			scmd_out_v => scmdr_v,
 			typ => typ,
 			tv => tv,
 			tgrp => tgrp,
-			scmd_out => scmd_w,
-			scmd_in => scmd_r
+			scmd_out => scmdw,
+			scmd_in => scmdr
 		);
 		
 -- Tx
@@ -195,13 +185,13 @@ begin
 	tx: entity work.pdts_tx
 		port map(
 			clk => clk,
-			rst => rsti,
+			rst => rst,
 			stb => stb,
 			addr => X"AA",
-			scmd_in => scmd_w,
-			scmd_out => scmd_r,
-			acmd_in => acmd_w,
-			acmd_out => acmd_r,
+			scmd_in => scmdw,
+			scmd_out => scmdr,
+			acmd_in => acmdw,
+			acmd_out => acmdr,
 			q => tx_q,
 			k => tx_k,
 			stbo => tx_stb,
@@ -213,7 +203,7 @@ begin
 	txphy: entity work.pdts_tx_phy
 		port map(
 			clk => clk,
-			rst => rsti,
+			rst => rst,
 			d => tx_q,
 			k => tx_k,
 			stb => tx_stb,

@@ -23,12 +23,12 @@ entity pdts_endpoint is
 		rec_clk: in std_logic; -- CDR recovered clock
 		rec_d: in std_logic; -- CDR recovered data (rec_clk domain)
 		sfp_los: in std_logic; -- SFP LOS line (async, sampled in sclk domain)
-		cdr_los: in std_logic; -- CDR LOS line (asnc, sampled in sclk domain)
+		cdr_los: in std_logic; -- CDR LOS line (async, sampled in sclk domain)
 		cdr_lol: in std_logic; -- CDR LOL line (async, sampled in sclk domain)
 		clk: out std_logic; -- 50MHz clock output
 		rst: out std_logic; -- 50MHz domain reset
 		rdy: out std_logic; -- Timestamp valid flag
-		sync: out std_logic_vector(3 downto 0); -- Sync command output (clk domain)
+		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
 		sync_v: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		evtctr: out std_logic_vector(8 * EVTCTR_WDS - 1 downto 0) -- Event counter out

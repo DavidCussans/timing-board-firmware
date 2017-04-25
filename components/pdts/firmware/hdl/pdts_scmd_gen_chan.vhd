@@ -38,12 +38,14 @@ end pdts_scmd_gen_chan;
 
 architecture rtl of pdts_scmd_gen_chan is
 
+	constant ID_V: std_logic_vector := std_logic_vector(to_unsigned(ID, 4));
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stb: std_logic;
 	signal ctrl_en, ctrl_patt, ctrl_force: std_logic;
 	signal ctrl_type: std_logic_vector(7 downto 0);
 	signal ctrl_rate_div: std_logic_vector(3 downto 0);
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
+	signal mask: std_logic_vector(15 downto 0);
 	signal src: std_logic_vector(26 downto 0);
 	signal r_go, c_go: std_logic;
 
@@ -56,9 +58,10 @@ begin
 		)
 		port map(
 			clk => ipb_clk,
-			reset => ipb_rst,
-			ipbus_in => ipb_in,
-			ipbus_out => ipb_out,
+			rst => ipb_rst,
+			ipb_in => ipb_in,
+			ipb_out => ipb_out,
+			slv_clk => clk,
 			q => ctrl,
 			qmask(0) => X"003fff07",
 			stb(0) => stb
@@ -71,10 +74,21 @@ begin
 	ctrl_rate_div <= ctrl(0)(19 downto 16);
 	r_i <= to_integer(unsigned(ctrl_rate_div));
 	
+	process(r_i)
+	begin
+		for i in mask'range loop
+			if i > r_i then
+				mask(i) <= '0';
+			else
+				mask(i) <= '1';
+			end if;
+		end loop;
+	end process;
+	
 	src <= tstamp(26 downto 0) when ctrl_patt = '0' else rand(26 downto 0);
 	
 	d <= ctrl_type;
-	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = std_logic_vector(to_unsigned(ID, 4)) and
-		or_reduce(std_logic_vector(src(r_i + 7 downto 0))) = '0') or (ctrl_force = '1' and stb) = '1') else '0';
+	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0') or
+		(ctrl_force = '1' and stb = '1') else '0';
 
 end rtl;

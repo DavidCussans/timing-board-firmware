@@ -24,6 +24,7 @@ entity pdts_fmc_io is
 		soft_rst: out std_logic;
 		nuke: out std_logic;
 		rst: out std_logic;
+		locked: in std_logic;
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		sfp_los: in std_logic;
@@ -109,7 +110,7 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"0000000" & cdr_lol & cdr_los & sfp_flt & sfp_los;
+	stat(0) <= X"000000" & "000" & locked & cdr_lol & cdr_los & sfp_flt & sfp_los;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);

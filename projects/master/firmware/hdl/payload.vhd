@@ -61,7 +61,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst, q: std_logic;
+	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
 
 	attribute IOB: string;
 	attribute IOB of sfp_dout: signal is "TRUE";
@@ -91,10 +91,10 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_IO),
 			ipb_out => ipbr(N_SLV_IO),
-			clk125 => clk125,
 			soft_rst => soft_rst,
 			nuke => nuke,
-			rst => rst,
+			rst => rst_io,
+			locked => locked,
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			sfp_los => sfp_los,
@@ -133,16 +133,40 @@ begin
 			gpout_1_p => gpout_1_p,
 			gpout_1_n => gpout_1_n
 		);
-    
+
+-- Clock divider
+
+	clkgen: entity work.pdts_rx_div_mmcm
+		port map(
+			sclk => fmc_clk,
+			clk => clk,
+			phase_rst => '0',
+			phase_locked => locked
+		);
+
+	rsti <= rst_io or not locked;
+	
+	synchro: entity work.pdts_synchro
+		generic map(
+			N => 1
+		)
+		port map(
+			clk => ipb_clk,
+			clks => clk,
+			d(0) => rsti,
+			q(0) => rst
+		);
+
 -- master block
 
-	tx: entity work.master
+	master: entity work.master
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_TX),
-			ipb_out => ipbr(N_SLV_TX),
+			ipb_in => ipbw(N_SLV_MASTER),
+			ipb_out => ipbr(N_SLV_MASTER),
 			mclk => fmc_clk,
+			clk => clk,
 			rst => rst,
 			q => q
 		);
