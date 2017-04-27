@@ -15,7 +15,7 @@
 				<node id="buf_full" mask="0x1"/>
 				<node id="buf_warn" mask="0x2"/>
 				<node id="buf_empty" mask="0x4"/>
-				<node id="rob_full" mask="0x8"/>				
+				<node id="rob_full" mask="0x8"/>
 				<node id="rob_empty" mask="0x10"/>				
 			</node>
 		</node>
