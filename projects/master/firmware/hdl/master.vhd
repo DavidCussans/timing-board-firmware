@@ -153,7 +153,7 @@ begin
 				rst => rst,
 				tstamp => tstamp,
 				scmd_out => scmdw_v(i + 1),
-				scmd_in => scmdr_v(i + i),
+				scmd_in => scmdr_v(i + 1),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
