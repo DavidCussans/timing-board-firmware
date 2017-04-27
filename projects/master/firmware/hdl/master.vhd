@@ -77,6 +77,7 @@ begin
 			ipb_in => ipbw(N_SLV_GLOBAL),
 			ipb_out => ipbr(N_SLV_GLOBAL),
 			clk => clk,
+			rst => rst,
 			tx_err => tx_err,
 			part_sel => sel,
 			en => en,

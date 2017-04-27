@@ -68,7 +68,7 @@ begin
 		port map(
 			sclk_o => fmc_clk,
 			clk => clk,
-			phase_rst => '0',
+			phase_rst => rst_io,
 			phase_locked => locked
 		);
 

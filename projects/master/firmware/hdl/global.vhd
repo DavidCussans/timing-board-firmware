@@ -22,6 +22,7 @@ entity global is
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
 		clk: in std_logic;
+		rst: in std_logic;
 		tx_err: in std_logic;
 		part_sel: out std_logic_vector(calc_width(N_PART) - 1 downto 0);
 		en: out std_logic;
@@ -36,7 +37,7 @@ architecture rtl of global is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal sel, ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_clr: std_logic;
+	signal ctrl_clr, ts_rst: std_logic;
 	
 begin
 
@@ -103,6 +104,8 @@ begin
 
 -- Time stamp counter
 
+	ts_rst <= ctrl_clr or rst;
+
 	ts: entity work.ipbus_ctrs_v
 		generic map(
 			CTR_WDS => 2
@@ -113,7 +116,7 @@ begin
 			ipb_in => ipbw(N_SLV_TSTAMP),
 			ipb_out => ipbr(N_SLV_TSTAMP),
 			clk => clk,
-			rst => ctrl_clr,
+			rst => ts_rst,
 			inc(0) => '1',
 			q => tstamp
 		);
