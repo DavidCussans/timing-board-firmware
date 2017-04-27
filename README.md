@@ -8,7 +8,8 @@
 The master firmware uses the [ipbb](https://github.com/ipbus/ipbb) build tool, and requires the ipbus system firmware.
 The following example procedure should build a board image for testing of the timing FMC. Note that a reasonably up-to-date
 operating system (e.g. Centos7) is required.  You will need to run the scripts using python2.7 (not python3).  If you are 
-going to build on a computer outside of the CERN network, then you will need to run kerberos (kinit username@CERNNOSPAM.CH)) 
+going to build on a computer outside of the CERN network, then you will need to run kerberos (kinit username@CERNNOSPAM.CH)).
+These instructions assume that you have your Xilinx Vivado licensing already setup for your enviroment.
 
 	mkdir work
 	cd work
