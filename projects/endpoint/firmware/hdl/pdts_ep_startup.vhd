@@ -37,7 +37,7 @@ end pdts_ep_startup;
 
 architecture rtl of pdts_ep_startup is
 
-	type state_t is (W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T);
+	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T);
 	signal state, state_d: state_t;
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
 	signal sfp_los_ok, cdr_ok: std_logic;
@@ -50,9 +50,11 @@ begin
 	begin
 		if rising_edge(sclk) then
 			if srst = '1' then
-				state <= W_SFP;
+				state <= W_RST;
 			else
 				case state is
+				when W_RST =>
+					state <= W_SFP;
 -- Startup; wait for SFP signal
 				when W_SFP =>
 					if sfp_los_ok = '1' then
@@ -200,12 +202,13 @@ begin
 -- State output
 
 	with state select stat <=
-		"0000" when W_SFP,
-		"0001" when W_CDR,
-		"0010" when W_FREQ,
-		"0011" when W_ALIGN,
-		"0100" when W_LOCK,
-		"0101" when W_RDY,
+		"0000" when W_RST,
+		"0001" when W_SFP,
+		"0010" when W_CDR,
+		"0011" when W_FREQ,
+		"0100" when W_ALIGN,
+		"0101" when W_LOCK,
+		"0110" when W_RDY,
 		"1000" when RUN,
 		"1100" when ERR_R,
 		"1101" when ERR_T;
