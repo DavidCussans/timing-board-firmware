@@ -40,7 +40,7 @@ begin
 	
 	process(sclk)
 	begin
-		if sclk_i'event then
+		if sclk'event then
 			if phase_rst = '1' then
 				ctr <= X"0";
 				clki <= sclk;
