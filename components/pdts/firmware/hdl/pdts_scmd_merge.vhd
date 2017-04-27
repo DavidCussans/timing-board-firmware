@@ -54,7 +54,7 @@ begin
 		end if;
 	end process;
 
-	process(scmd_in)
+	process(scmd_in_v)
 	begin
 		for i in N_SRC - 1 downto 0 loop
 			valid(i) <= scmd_in_v(i).valid;
