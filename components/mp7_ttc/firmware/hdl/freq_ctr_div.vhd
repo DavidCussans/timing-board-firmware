@@ -9,8 +9,6 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-library unisim;
-use unisim.VComponents.all;
 
 entity freq_ctr_div is
 	generic(
