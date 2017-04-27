@@ -1,4 +1,4 @@
-src global.vhd master_defs.vhd
+src global.vhd
 src ipbus_decode_global.vhd
 addrtab -t global.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
