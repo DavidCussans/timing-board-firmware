@@ -83,7 +83,7 @@ begin
 			elsif go = '1' then
 				active <= '1';
 				pa <= p;
-				scmd_out.d <= tgrp & std_logic_vector(sctr);
+				scmd_out.d <= (3 downto N_PART => '0') & tgrp & std_logic_vector(sctr);
 				scmd_out.last <= '0';
 				l <= '0';
 			elsif active = '1' and stb = '1' then
