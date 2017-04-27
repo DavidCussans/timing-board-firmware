@@ -38,7 +38,6 @@ architecture rtl of master is
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal scmdw_v: cmd_w_array(N_PART downto 0);
 	signal scmdr_v: cmd_r_array(N_PART downto 0);
 	signal scmdw, acmdw: cmd_w;

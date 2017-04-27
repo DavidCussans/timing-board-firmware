@@ -39,7 +39,7 @@ begin
 
 	sync <= '1' when tstamp(TS_RATE_RADIX - 1 downto TS_RATE_RADIX - 2) = std_logic_vector(to_unsigned(PARTITION_ID, 2)) and
 		or_reduce(std_logic_vector(tstamp(TS_RATE_RADIX - 3 downto 0))) = '0' else '0';
-	go <= sync and scmd_in.ack;
+	go <= sync and scmd_in.ack and not rst;
 	
 -- Capture
 
