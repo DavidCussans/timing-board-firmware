@@ -21,7 +21,7 @@
 		</node>
 		<node id="evtctr" address="0x4" fwinfo="endpoint;width=0"/>
 		<node id="buf" address="0x6" fwinfo="endpoint;width=1">
-			<node id="data" address="0x0" mode="port"/>
+			<node id="data" address="0x0" size="0x400" mode="port"/>
 			<node id="count" address="0x1" mask="0xffff"/>
 		</node>
 		<node id="actrs" address="0x20" mode="block" size="0x10" fwinfo="endpoint;width=4"/>
