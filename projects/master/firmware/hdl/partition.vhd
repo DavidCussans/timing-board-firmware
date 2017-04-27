@@ -139,7 +139,8 @@ begin
 
 	ts: entity work.pdts_ts_gen
 		generic map(
-			PARTITION_ID => PARTITION_ID
+			PARTITION_ID => PARTITION_ID,
+			TS_RATE_RADIX => TS_RATE_RADIX
 		)
 		port map(
 			clk => clk,

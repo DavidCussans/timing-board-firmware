@@ -13,7 +13,8 @@ use work.pdts_defs.all;
 
 entity pdts_ts_gen is
 	generic(
-		PARTITION_ID: integer
+		PARTITION_ID: integer;
+		TS_RATE_RADIX: positive
 	);
 	port(
 		clk: in std_logic;
