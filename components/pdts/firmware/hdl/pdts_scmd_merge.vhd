@@ -81,7 +81,7 @@ begin
 	
 	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when go = '1' else scmd_in_v(ipa).d;
 	scmd_out.valid <= go or active;
-	scmd_out.last <= scmd_in_v(ipa).last;
+	scmd_out.last <= active and scmd_in_v(ipa).last;
 	typ <= scmd_in_v(ip).d(3 downto 0);
 	tv <= go;
 	
