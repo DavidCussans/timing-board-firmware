@@ -37,6 +37,7 @@ architecture rtl of pdts_tx is
 	signal smode, smode_r, s_ok, astb, cclr, cstb, trans: std_logic;
 	signal q_a, q_s: std_logic_vector(7 downto 0);
 	signal sctr, spctr: unsigned(3 downto 0);	-- Limit on length of scmd packet
+	signal stime: std_logic_vector(3 downto 0);
 	signal iaddr: integer range ADDR_WDS - 1 downto 0 := 0;
 	signal icsum: integer range CSUM_WDS - 1 downto 0 := 0;
 
@@ -162,17 +163,20 @@ begin
 					spctr <= spctr + 1;
 				end if;
 			end if;
+			if scmd_in.valid = '1' and smode = '0' then
+				stime <= std_logic_vector(sctr);
+			end if;
 		end if;
 	end process;
 	
-	smode <= (scmd_in.valid and s_ok) or smode_r;
+	smode <= (scmd_in.valid and stb and s_ok) or smode_r;
 	
 	scmd_out.ren <= stb and smode;
 	scmd_out.ack <= '1';
 	
 	with spctr select q_s <=
 		X"01" when X"0",
-		scmd_in.d(7 downto 4) & std_logic_vector(sctr) when X"1",
+		scmd_in.d(7 downto 4) & stime when X"1",
 		scmd_in.d when others;
 
 -- Outputs
