@@ -163,7 +163,7 @@ begin
 					spctr <= spctr + 1;
 				end if;
 			end if;
-			if scmd_in.valid = '1' and smode = '0' then
+			if scmd_in.valid = '1' and smode_r = '0' then
 				stime <= std_logic_vector(sctr);
 			end if;
 		end if;
