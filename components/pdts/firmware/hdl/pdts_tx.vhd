@@ -178,7 +178,7 @@ begin
 -- Outputs
 	
 	q <= q_s when smode = '1' else q_a;
-	k <= '1' when (smode = '1' and spctr = '0') or (smode = '0' and state = ST_K) else '0';
+	k <= '1' when (smode = '1' and spctr = X"0") or (smode = '0' and state = ST_K) else '0';
 	err <= '1' when state = ST_E else '0';
 	stbo <= stb;
 	
