@@ -19,7 +19,6 @@ entity pdts_ts_gen is
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
-		trig: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		evtctr: in std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 		scmd_out: out cmd_w;
