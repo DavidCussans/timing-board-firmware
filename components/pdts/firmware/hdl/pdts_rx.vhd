@@ -158,7 +158,7 @@ begin
 		variable err: std_logic_vector(2 downto 0);
 	begin
 		err := "000";
-		if pkt_end = '1' and csum /= (csum'range => '0') then
+		if pkt_end = '1' and csum /= (csum'range => '0') then -- checksum error
 			err := "001";
 		end if;
 		if actr > CMD_LEN_MAX or sctr > CMD_LEN_MAX then -- cmd overrun

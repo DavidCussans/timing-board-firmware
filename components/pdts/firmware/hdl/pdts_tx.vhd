@@ -34,14 +34,15 @@ architecture rtl of pdts_tx is
 	signal state: state_t;
 	signal actr, actr_i: unsigned(7 downto 0);
 	signal csum: std_logic_vector(15 downto 0);
-	signal smode, smode_d, s_ok, astb, cclr, cstb, trans: std_logic;
-	signal q_a, q_s, a_dd, s_dd, s_ddd: std_logic_vector(7 downto 0);
+	signal smode, smode_r, s_ok, astb, cclr, cstb, trans: std_logic;
+	signal q_a, q_s: std_logic_vector(7 downto 0);
+	signal sctr, spctr: unsigned(3 downto 0);	-- Limit on length of scmd packet
 	signal iaddr: integer range ADDR_WDS - 1 downto 0 := 0;
 	signal icsum: integer range CSUM_WDS - 1 downto 0 := 0;
 
 begin
 
-	astb <= stb and not (smode or smode_d); 
+	astb <= stb and not smode;
 
 -- Async state machine
 	
@@ -103,7 +104,7 @@ begin
 
 -- Checksum
 
-	cclr <= '1' when state = ST_K or rst = '1' else '0';
+	cclr <= '1' when state = ST_K else '0';
 	cstb <= astb when state /= ST_K and state /= ST_C else '0';
 	
 	cksum: entity work.pdts_cksum
@@ -120,15 +121,29 @@ begin
 	iaddr <= ADDR_WDS - to_integer(actr) - 1 when actr < ADDR_WDS else 0; -- Address words are sent big-endian
 	icsum <= CSUM_WDS - to_integer(actr) - 1 when actr < CSUM_WDS else 0; -- Checksum words are sent big-endian
 	
-	a_dd <= acmd_in.d when stb = '1' and rising_edge(clk);
+	acmd_out.ren <= '1' when (state = ST_A or state = ST_D) and astb = '1' else '0';
+	acmd_out.ack <= '1';
 	
 	with state select q_a <=
-		a_dd when ST_A,
+		acmd_in.d when ST_A,
 		addr(iaddr * 8 + 7 downto iaddr * 8) when ST_S,
 		acmd_in.d when ST_D,
 		csum(icsum * 8 + 7 downto icsum * 8) when ST_C,
 		X"00" when others;
 		
+-- Strobe alignment
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if stb = '1' then
+				sctr <= (others => '0');
+			else
+				sctr <= sctr + 1;
+			end if;
+		end if;
+	end process;	
+			
 -- Sync handshaking
 
 	process(clk)
@@ -140,25 +155,31 @@ begin
 				s_ok <= '1';
 			end if;
 			if stb = '1' then
-				s_dd <= scmd_in.d;
-				s_ddd <= s_dd;
-				smode <= scmd_in.valid and s_ok;
-				smode_d <= smode;
+				smode_r <= smode and not scmd_in.last;
+				if scmd_in.valid = '0' or scmd_in.last = '1' then
+					spctr <= (others => '0');
+				else
+					spctr <= spctr + 1;
+				end if;
 			end if;
 		end if;
 	end process;
 	
-	scmd_out.ren <= s_ok and not smode;
-	scmd_out.ack <= '0';
-	q_s <= X"01" when smode = '1' and smode_d = '0' else s_ddd;
-			
+	smode <= (scmd_in.valid and s_ok) or smode_r;
+	
+	scmd_out.ren <= stb and smode;
+	scmd_out.ack <= '1';
+	
+	with spctr select q_s <=
+		X"01" when 0,
+		scmd_in.d(7 downto 4) & std_logic_vector(sctr) when 1,
+		scmd_in.d when others;
+
 -- Outputs
 	
 	q <= q_s when (smode = '1' or smode_d = '1') else q_a;
-	k <= '1' when (smode = '1' and smode_d = '0') or (smode = '0' and smode_d = '0' and state = ST_K) else '0';
-	acmd_out.ren <= '1' when (state = ST_A or state = ST_D) and astb = '1' else '0';
-	acmd_out.ack <= '0';
+	k <= '1' when (smode = '1' and spctr = 0) or (smode = '0' and state = ST_K) else '0';
 	err <= '1' when state = ST_E else '0';
-	stbo <= stb when rising_edge(clk);
+	stbo <= stb;
 	
 end rtl;

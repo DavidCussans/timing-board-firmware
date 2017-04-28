@@ -21,7 +21,6 @@ entity pdts_scmd_merge is
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
-		stb: in std_logic;
 		scmd_in_v: in cmd_w_array(N_SRC - 1 downto 0);
 		scmd_out_v: out cmd_r_array(N_SRC - 1 downto 0);
 		typ: out std_logic_vector(SCMD_W - 1 downto 0);
@@ -37,22 +36,10 @@ architecture rtl of pdts_scmd_merge is
 
 	signal valid: std_logic_vector(N_SRC - 1 downto 0);
 	signal p, pa: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
-	signal sctr: unsigned(3 downto 0);
 	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
 	signal go, active, l: std_logic;
 
 begin
-
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			if stb = '1' then
-				sctr <= (others => '0');
-			else
-				sctr <= sctr + 1;
-			end if;
-		end if;
-	end process;
 
 	process(scmd_in_v)
 	begin
@@ -70,6 +57,7 @@ begin
 			sel => p
 		);
 
+	pa <= p when go = '1 and rising_edge(clk);
 	ip <= to_integer(unsigned(p));
 	ipa <= to_integer(unsigned(pa));
 		
@@ -82,13 +70,8 @@ begin
 				active <= '0';
 			elsif go = '1' then
 				active <= '1';
-				pa <= p;
-				scmd_out.d <= (3 downto N_PART => '0') & tgrp & std_logic_vector(sctr);
-				scmd_out.last <= '0';
 				l <= '0';
-			elsif active = '1' and stb = '1' then
-				scmd_out.d <= scmd_in_v(ipa).d;
-				scmd_out.last <= scmd_in_v(ipa).last;
+			elsif active = '1' and scmd_in.ren = '1' then
 				if scmd_in_v(ipa).last = '1' then
 					active <= '0';
 				end if;
@@ -96,20 +79,15 @@ begin
 		end if;
 	end process;
 	
+	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when go = '1' else scmd_in_v(ipa).d;
 	scmd_out.valid <= active;
+	scmd_out.last <= scmd_in_v(ipa).last;
 	typ <= scmd_in_v(ip).d(3 downto 0);
 	tv <= go;
 	
-	process(ip, go, stb)
-	begin
-		for i in N_SRC - 1 downto 0 loop
-			if ip = i then
-				scmd_out_v(i).ack <= go;
-			else
-				scmd_out_v(i).ack <= '0';
-			end if;
-			scmd_out_v(i).ren <= stb;
-		end loop;
-	end process;
+	ogen: for i in N_SRC - 1 downto 0 generate
+		scmd_out_v(i).ack <= go when ip = i else '0';
+		scmd_out_v(i).ren <= scmd_in.ren;
+	end generate;
 	
 end rtl;

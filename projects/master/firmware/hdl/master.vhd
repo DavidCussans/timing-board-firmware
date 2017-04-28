@@ -170,7 +170,6 @@ begin
 		port map(
 			clk => clk,
 			rst => rst,
-			stb => stb,
 			scmd_in_v => scmdw_v,
 			scmd_out_v => scmdr_v,
 			typ => typ,
