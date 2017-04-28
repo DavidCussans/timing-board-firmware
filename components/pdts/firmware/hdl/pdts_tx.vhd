@@ -171,7 +171,7 @@ begin
 	
 	smode <= (scmd_in.valid and stb and s_ok) or smode_r;
 	
-	scmd_out.ren <= stb and smode;
+	scmd_out.ren <= stb and smode when spctr > 1 else '0';
 	scmd_out.ack <= '1';
 	
 	with spctr select q_s <=
@@ -182,7 +182,7 @@ begin
 -- Outputs
 	
 	q <= q_s when smode = '1' else q_a;
-	k <= '1' when (smode = '1' and spctr = X"0") or (smode = '0' and state = ST_K) else '0';
+	k <= '1' when (smode = '1' and spctr = 0) or (smode = '0' and state = ST_K) else '0';
 	err <= '1' when state = ST_E else '0';
 	stbo <= stb;
 	
