@@ -57,7 +57,7 @@ begin
 			sel => p
 		);
 
-	pa <= p when go = '1 and rising_edge(clk);
+	pa <= p when go = '1' and rising_edge(clk);
 	ip <= to_integer(unsigned(p));
 	ipa <= to_integer(unsigned(pa));
 		
