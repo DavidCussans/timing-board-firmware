@@ -171,14 +171,14 @@ begin
 	scmd_out.ack <= '1';
 	
 	with spctr select q_s <=
-		X"01" when 0,
-		scmd_in.d(7 downto 4) & std_logic_vector(sctr) when 1,
+		X"01" when X"0",
+		scmd_in.d(7 downto 4) & std_logic_vector(sctr) when X"1",
 		scmd_in.d when others;
 
 -- Outputs
 	
-	q <= q_s when (smode = '1' or smode_d = '1') else q_a;
-	k <= '1' when (smode = '1' and spctr = 0) or (smode = '0' and state = ST_K) else '0';
+	q <= q_s when smode = '1' else q_a;
+	k <= '1' when (smode = '1' and spctr = '0') or (smode = '0' and state = ST_K) else '0';
 	err <= '1' when state = ST_E else '0';
 	stbo <= stb;
 	
