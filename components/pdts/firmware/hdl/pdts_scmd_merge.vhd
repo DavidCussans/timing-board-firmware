@@ -61,7 +61,7 @@ begin
 	ip <= to_integer(unsigned(p));
 	ipa <= to_integer(unsigned(pa));
 		
-	go <= or_reduce(valid) and not active and scmd_in.ren;
+	go <= or_reduce(valid) and not active;
 		
 	process(clk)
 	begin
