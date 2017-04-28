@@ -101,6 +101,7 @@ begin
 			soft_rst => soft_rst,
 			nuke => nuke,
 			rst => rst,
+			locked => '1',
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			sfp_los => sfp_los,
