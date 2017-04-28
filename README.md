@@ -13,8 +13,8 @@ These instructions assume that you have your Xilinx Vivado licensing already set
 
 	mkdir work
 	cd work
-	curl -L https://github.com/ipbus/ipbb/archive/v0.2.3.tar.gz | tar xvz
-	source ipbb-0.2.3/env.sh
+	curl -L https://github.com/ipbus/ipbb/archive/v0.2.5.tar.gz | tar xvz
+	source ipbb-0.2.5/env.sh
 	ipbb init build
 	cd build
 	ipbb add git https://github.com/ipbus/ipbus-firmware.git -b ipbus_2_0_v1
