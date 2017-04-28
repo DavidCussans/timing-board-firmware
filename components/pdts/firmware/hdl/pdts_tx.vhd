@@ -156,7 +156,7 @@ begin
 				s_ok <= '1';
 			end if;
 			if stb = '1' then
-				smode_r <= smode and not scmd_in.last;
+				smode_r <= smode and not (scmd_in.last or rst);
 				if scmd_in.valid = '0' or scmd_in.last = '1' then
 					spctr <= (others => '0');
 				else
