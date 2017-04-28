@@ -69,7 +69,7 @@ begin
 			if rst = '1' then
 				active <= '0';
 			elsif scmd_in.ren = '1' then
-				active <= (active and scmd_in_v(ipa).last) or go;
+				active <= (active and not scmd_in_v(ipa).last) or go;
 			end if;
 		end if;
 	end process;
@@ -82,7 +82,7 @@ begin
 	
 	ogen: for i in N_SRC - 1 downto 0 generate
 		scmd_out_v(i).ack <= go when ip = i else '0';
-		scmd_out_v(i).ren <= scmd_in.ren;
+		scmd_out_v(i).ren <= scmd_in.ren and active;
 	end generate;
 	
 end rtl;
