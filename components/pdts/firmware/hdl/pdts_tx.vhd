@@ -163,13 +163,13 @@ begin
 					spctr <= spctr + 1;
 				end if;
 			end if;
-			if scmd_in.valid = '1' and smode_r = '0' then
+			if smode = '1' and smode_r = '0' then
 				stime <= std_logic_vector(sctr);
 			end if;
 		end if;
 	end process;
 	
-	smode <= (scmd_in.valid and stb and s_ok) or smode_r;
+	smode <= (scmd_in.valid and s_ok) or smode_r;
 	
 	scmd_out.ren <= stb and smode when spctr > 0 else '0';
 	scmd_out.ack <= '1';
