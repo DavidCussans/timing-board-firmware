@@ -80,7 +80,6 @@ begin
 		
 	clk <= clk_i;
 	rst <= rst_i;
-	rdy <= rdy_i;
 	
 -- Rx PHY
 
@@ -138,5 +137,7 @@ begin
 			evtctr => evtctr,
 			rdy => rdy_i
 		);
+		
+		rdy <= rdy_i;
 		
 end rtl;

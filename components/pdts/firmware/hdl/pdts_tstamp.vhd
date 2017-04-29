@@ -31,7 +31,7 @@ architecture rtl of pdts_tstamp is
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr_i: unsigned(8 * EVTCTR_WDS - 1 downto 0);
 	signal ctr: unsigned(6 downto 0);
-	signal lock, pkt_end, pkt_end_d: std_logic;
+	signal lock, init, pkt_end, pkt_end_d: std_logic;
 
 begin
 		
@@ -42,7 +42,7 @@ begin
 				ctr <= (others => '0');
 			elsif (s_valid = '1' and s_first = '1' and d(3 downto 0) = X"F") or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
-				if ctr < (TSTAMP_WDS + EVTCTR_WDS + 1) * (10 / SCLK_RATIO) then
+				if ctr < (TSTAMP_WDS + EVTCTR_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
 					sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);
 				end if;
 			end if;
@@ -58,16 +58,18 @@ begin
 				tstamp_i <= (others => '0');
 				evtctr_i <= (others => '0');
 				lock <= '0';
+				init <= '0';
 			else
 				if pkt_end = '1' then
 					evtctr_i <= unsigned(sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8 * TSTAMP_WDS));
 				elsif s_valid = '1' and EVTCTR_MASK(to_integer(unsigned(d(3 downto 0)))) = '1' then
 					evtctr_i <= evtctr_i + 1;
 				end if;
-				if lock = '0' then
+				if lock = '0' and init = '0' then
 					if pkt_end = '1' then
 						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 8)) & X"80";
 						lock <= '1';
+						init <= '1';
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
