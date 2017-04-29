@@ -46,7 +46,7 @@ begin
 				if ctr < TSTAMP_WDS + EVTCTR_WDS + 1 then
 					sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);
 				end if;
-				pkt_end <= and_reduce(std_logic_vector(ctr)) = '1';
+				pkt_end <= and_reduce(std_logic_vector(ctr));
 				pkt_end_d <= pkt_end;
 			end if;
 		end if;
