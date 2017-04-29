@@ -7,6 +7,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.pdts_defs.all;
 
@@ -29,7 +30,7 @@ architecture rtl of pdts_tstamp is
 	signal sr: std_logic_vector(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 0);
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr_i: unsigned(8 * EVTCTR_WDS - 1 downto 0);
-	signal ctr: unsigned(3 downto 0);
+	signal ctr: unsigned(6 downto 0);
 	signal lock, pkt_end, pkt_end_d: std_logic;
 
 begin
@@ -37,20 +38,22 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' or pkt_end = '1' then
+			if rst = '1' then
 				ctr <= X"0";
 				pkt_end <= '0';
-			elsif s_valid = '1' and (ctr /= X"0" or (s_first = '1' and d(3 downto 0) = X"F")) then
+			elsif (s_valid = '1' and s_first = '1' and d(3 downto 0) = X"F") or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
-				sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);
-				if ctr = TSTAMP_WDS + EVTCTR_WDS then
+				if ctr < TSTAMP_WDS + EVTCTR_WDS + 1 then
+					sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);
+				end if;
+				if and_reduce(std_logic_vector(ctr)) = '1' then
 					pkt_end <= '1';
 				end if;
+				pkt_end_d <= pkt_end;
 			end if;
-			pkt_end_d <= pkt_end;
 		end if;
 	end process;
-
+	
 	process(clk)
 	begin
 		if rising_edge(clk) then
@@ -66,12 +69,12 @@ begin
 				end if;
 				if lock = '0' then
 					if pkt_end = '1' then
-						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 0));
+						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 8)) & X"80";
 						lock <= '1';
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
-					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 0))   then
+					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 8) & X"80")   then
 						lock <= '0';
 					end if;
 				end if;
