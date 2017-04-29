@@ -39,7 +39,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
-				ctr <= X"0";
+				ctr <= (others => '0');
 				pkt_end <= '0';
 			elsif (s_valid = '1' and s_first = '1' and d(3 downto 0) = X"F") or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
