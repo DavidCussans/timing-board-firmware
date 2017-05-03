@@ -50,9 +50,9 @@ architecture rtl of partition is
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
 	signal scmd_out_i: cmd_w;
-	signal rob_en, buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
+	signal rob_en, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_rst, rob_we, rob_last: std_logic;
+	signal rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
 	
 begin
 
@@ -95,7 +95,7 @@ begin
 	ctrl_buf_en <= ctrl(0)(4);
 	ctrl_cmd_mask <= ctrl(1)(15 downto 0);
 	ctrl_trig_mask <= ctrl(1)(31 downto 16);
-	stat(0) <= X"000000" & "000" & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
+	stat(0) <= X"000000" & "000" & rob_empty & rob_full & rob_warn & buf_empty & buf_err;
 	
 -- Command masks
 
@@ -167,8 +167,16 @@ begin
 			q(0) => rob_en
 		);
 		
-	rob_rst <= ipb_rst or not rob_en;
+	rob_rst_u <= ipb_rst or not rob_en;
 		
+	rsts: entity work.pdts_rst_stretch
+		port map(
+			clk => ipb_clk,
+			rst => rob_rst_u,
+			rsto => rob_rst,
+			wen => rob_en
+		);
+	
 	evt: entity work.pdts_scmd_evt
 		port map(
 			clk => clk,
@@ -178,8 +186,7 @@ begin
 			tstamp => tstamp,
 			evtctr => evtctr,
 			empty => buf_empty,
-			warn => buf_warn,
-			full => buf_full,
+			err => buf_err,
 			rob_clk => ipb_clk,
 			rob_rst => rob_rst,
 			rob_q => rob_q,
@@ -190,7 +197,9 @@ begin
 		
 	rob: entity work.pdts_rob
 		generic map(
-			N_FIFO => N_FIFO
+			N_FIFO => N_FIFO,
+			WARN_HWM => N_FIFO * 1024 - 256,
+			WARN_LWM => N_FIFO * 1024 - 512
 		)
 		port map(
 			ipb_clk => ipb_clk,
@@ -200,9 +209,9 @@ begin
 			rst => rob_rst,
 			d => rob_q,
 			we => rob_we,
-			last => rob_last,
 			full => rob_full,
-			empty => rob_empty
+			empty => rob_empty,
+			warn => rob_warn
 		);
 
 -- Trigger counters

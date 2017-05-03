@@ -88,7 +88,7 @@ begin
 	src <= tstamp(26 downto 0) when ctrl_patt = '0' else rand(26 downto 0);
 	
 	d <= ctrl_type;
-	v <= ctrl_en when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0') or
+	v <= '1' when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0' and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
 
 end rtl;

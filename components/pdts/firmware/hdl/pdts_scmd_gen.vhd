@@ -155,7 +155,7 @@ begin
 
 		ack_l <= scmd_in.ack when si = i else '0';
 		tacc(i) <= valid(i) and ack_l;
-		trej(i) <= valid(i) and not ack_l;
+		trej(i) <= valid(i) and not ack_l and ctrl_en;
 
 	end generate;
   
@@ -205,7 +205,7 @@ begin
 	si <= to_integer(unsigned(s));
 	
 	scmd_out.d <= d(si);
-	scmd_out.valid <= valid(si);
+	scmd_out.valid <= valid(si) and ctrl_en;
 	scmd_out.last <= '1'; -- Always single-word commands
 	
 end rtl;
