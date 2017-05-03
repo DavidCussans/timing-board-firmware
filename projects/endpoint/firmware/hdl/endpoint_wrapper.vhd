@@ -49,7 +49,7 @@ architecture rtl of endpoint_wrapper is
 	signal buf_empty, buf_err, rob_full, rob_empty: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal ctr_rst: std_logic;
-	signal t: std_logic_vector(2 ** SCMD_W - 1 downto 0);
+	signal t: std_logic_vector(SCMD_MAX downto 0);
 
 begin
 
