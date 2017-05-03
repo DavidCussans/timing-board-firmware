@@ -50,9 +50,9 @@ architecture rtl of partition is
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
 	signal scmd_out_i: cmd_w;
-	signal rob_en, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
+	signal rob_en_s, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
+	signal rob_en, rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
 	
 begin
 
@@ -164,10 +164,10 @@ begin
 			clk => clk,
 			clks => ipb_clk,
 			d(0) => ctrl_buf_en,
-			q(0) => rob_en
+			q(0) => rob_en_s
 		);
 		
-	rob_rst_u <= ipb_rst or not rob_en;
+	rob_rst_u <= ipb_rst or not rob_en_s;
 		
 	rsts: entity work.pdts_rst_stretch
 		port map(
