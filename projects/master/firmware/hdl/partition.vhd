@@ -52,7 +52,7 @@ architecture rtl of partition is
 	signal scmd_out_i: cmd_w;
 	signal rob_en_s, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_en, rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
+	signal rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
 	
 begin
 

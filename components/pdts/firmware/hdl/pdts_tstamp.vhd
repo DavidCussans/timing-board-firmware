@@ -40,7 +40,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctr <= (others => '0');
-			elsif (s_valid = '1' and s_first = '1' and d(3 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
+			elsif (s_valid = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = std_logic_vector(to_unsigned(SCMD_SYNC, SCMD_W))) or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
 				if ctr < (TSTAMP_WDS + EVTCTR_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
 					sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);

@@ -6,6 +6,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
 
 package pdts_defs is
 
@@ -39,7 +40,7 @@ package pdts_defs is
 	constant EVTCTR_MASK: std_logic_vector(15 downto 0) := X"0001"; -- Which sync cmds cause evt ctr update
 
 	constant SCMD_MAX: integer := 4; -- Number of scmds in use (must be contiguous)
-	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"4"; -- The sync commmand ID
+	constant SCMD_SYNC: integer := 4; -- The sync commmand ID
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
 	constant SCMD_LEN: SCMD_LEN_T := (SCMD_SYNC => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
 	
