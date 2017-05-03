@@ -24,6 +24,7 @@ entity pdts_scmd_evt is
 		err: out std_logic;
 		rob_clk: in std_logic; -- readout buffer clock
 		rob_rst: in std_logic;
+		rob_en: in std_logic;
 		rob_q: out std_logic_vector(31 downto 0);
 		rob_we: out std_logic;
 		rob_full: in std_logic

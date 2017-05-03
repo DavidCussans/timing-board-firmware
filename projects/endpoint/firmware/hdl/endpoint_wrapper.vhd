@@ -45,8 +45,8 @@ architecture rtl of endpoint_wrapper is
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_rst, rob_we, rob_last: std_logic;
-	signal buf_empty, buf_warn, buf_full, rob_full, rob_empty: std_logic;
+	signal rob_rst_u, rob_rst, rob_we, rob_warn: std_logic;
+	signal buf_empty, buf_full, rob_full, rob_empty: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal ctr_rst: std_logic;
 	signal t: std_logic_vector(2 ** SCMD_W - 1 downto 0);
@@ -101,7 +101,7 @@ begin
 	ctrl_ctr_rst <= ctrl(0)(2);
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_addr <= ctrl(0)(15 downto 8);
-	stat(0) <= X"00000" & ep_stat & '0' & ep_rdy & ep_rsto & rob_empty & rob_full & buf_empty & buf_warn & buf_full;
+	stat(0) <= X"00000" & ep_stat & '0' & ep_rdy & ep_rsto & rob_empty & rob_full & rob_warn & buf_empty & buf_err;
 	
 -- The endpoint
 
@@ -165,6 +165,16 @@ begin
 		
 -- Buffer
 
+	rob_rst_u <= ipb_rst or not ctrl_buf_en;
+		
+	rsts: entity work.pdts_rst_stretch
+		port map(
+			clk => ipb_clk,
+			rst => rob_rst_u,
+			rsto => rob_rst,
+			wen => rob_en
+		);
+
 	evt: entity work.pdts_scmd_evt
 		port map(
 			clk => ep_clk,
@@ -178,18 +188,13 @@ begin
 			full => buf_full,
 			rob_clk => ipb_clk,
 			rob_rst => rob_rst,
+			rob_en => rob_en,
 			rob_q => rob_q,
 			rob_we => rob_we,
-			rob_last => rob_last,
 			rob_full => rob_full
 		);
 		
-	rob_rst <= ipb_rst or not ctrl_buf_en;
-		
 	rob: entity work.pdts_rob
-		generic map(
-			N_FIFO => N_FIFO
-		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -198,9 +203,9 @@ begin
 			rst => rob_rst,
 			d => rob_q,
 			we => rob_we,
-			last => rob_last,
 			full => rob_full,
-			empty => rob_empty
+			empty => rob_empty,
+			warn => rob_warn
 		);
 		
 -- Frequency counter

@@ -189,9 +189,9 @@ begin
 			err => buf_err,
 			rob_clk => ipb_clk,
 			rob_rst => rob_rst,
+			rob_en => rob_en,
 			rob_q => rob_q,
 			rob_we => rob_we,
-			rob_last => rob_last,
 			rob_full => rob_full
 		);
 		
