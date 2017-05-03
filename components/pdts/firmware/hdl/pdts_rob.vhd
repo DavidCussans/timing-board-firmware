@@ -12,8 +12,8 @@ use work.ipbus.all;
 
 entity pdts_rob is
 	generic(
-		N_FIFO: positive := 1,
-		WARN_HWM: natural := 768,
+		N_FIFO: positive := 1;
+		WARN_HWM: natural := 768;
 		WARN_LWM: natural := 512
 	);
 	port(
@@ -62,7 +62,7 @@ begin
 			valid => valid
 		);
 	
-	ipb_out.ipb_rdata <= q_fifo(31 downto 0) when ipb_in.ipb_addr(0) = '0' else (ctr'range => ctr, others => '0');
+	ipb_out.ipb_rdata <= q_fifo(31 downto 0) when ipb_in.ipb_addr(0) = '0' else (31 downto ctr'length => '0') & ctr;
 	ipb_out.ipb_ack <= ipb_in.ipb_strobe and not ipb_in.ipb_write and (valid or ipb_in.ipb_addr(0));
 	ipb_out.ipb_err <= ipb_in.ipb_strobe and (ipb_in.ipb_write or not (valid or ipb_in.ipb_addr(0)));
 	
