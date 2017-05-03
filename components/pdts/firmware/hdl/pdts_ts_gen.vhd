@@ -45,7 +45,7 @@ begin
 
 	s <= ((s and not (done and scmd_in.ren)) or go) and not rst when rising_edge(clk);
 	cap(8 * (TSTAMP_WDS + EVTCTR_WDS + 1) - 1 downto 8) <= evtctr & tstamp when go = '1' and rising_edge(clk);
-	cap(7 downto 0) <= std_logic_vector(to_unsigned(PARTITION_ID, 4)) & X"F"; -- aux = PARTITION_ID, tcmd = 0xf
+	cap(7 downto 0) <= std_logic_vector(to_unsigned(PARTITION_ID, 4)) & SCMD_SYNC; -- aux = PARTITION_ID, tcmd = 0xf
 		
 	process(clk)
 	begin

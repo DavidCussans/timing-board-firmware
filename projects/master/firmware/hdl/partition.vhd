@@ -48,7 +48,7 @@ architecture rtl of partition is
 	signal ctrl_cmd_mask, ctrl_trig_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
 	signal cok, tok, trig, tack_i, erst, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
-	signal t, tacc, trej: std_logic_vector(2 ** SCMD_W - 1 downto 0);
+	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
 	signal scmd_out_i: cmd_w;
 	signal rob_en, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);

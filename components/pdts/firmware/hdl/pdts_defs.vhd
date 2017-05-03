@@ -38,8 +38,10 @@ package pdts_defs is
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
 	constant EVTCTR_MASK: std_logic_vector(15 downto 0) := X"0001"; -- Which sync cmds cause evt ctr update
 
+	constant SCMD_MAX: integer := 4; -- Number of scmds in use (must be contiguous)
+	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"4"; -- The sync commmand ID
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
-	constant SCMD_LEN: SCMD_LEN_T := (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 + TSTAMP_WDS + EVTCTR_WDS);
+	constant SCMD_LEN: SCMD_LEN_T := (SCMD_SYNC => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
 	
 -- Types
 
