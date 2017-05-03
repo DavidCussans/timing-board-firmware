@@ -94,7 +94,7 @@ begin
 	
 	empty_i <= or_reduce(empty_f);
 	empty <= empty_i;
-	err_i <= (err_i or or_reduce(full_f)) and not rst;
+	err_i <= (err_i or or_reduce(full_f)) and not rst when rising_edge(clk); -- err status is latched
 	err <= err_i;
 	
 	v <= not (rob_full or empty_i);
