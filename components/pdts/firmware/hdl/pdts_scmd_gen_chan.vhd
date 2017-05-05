@@ -92,7 +92,7 @@ begin
 	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst);		
 	
 	scmd_out.d <= ctrl_type;
-	scmd_out.v <= v or valid;
+	scmd_out.valid <= v or valid;
 	scmd_out.last <= '1';
 		
 end rtl;
