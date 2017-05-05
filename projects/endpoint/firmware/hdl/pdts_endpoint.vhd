@@ -138,6 +138,6 @@ begin
 			rdy => rdy_i
 		);
 		
-		rdy <= rdy_i;
+	rdy <= rdy_i;
 		
 end rtl;
