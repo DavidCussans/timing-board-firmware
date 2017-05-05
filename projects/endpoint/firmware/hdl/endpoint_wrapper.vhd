@@ -232,7 +232,7 @@ begin
 
 -- Trigger counters
 
-	process(ep_scmd) -- Unroll sync command
+	process(ep_scmd, ep_v) -- Unroll sync command
 	begin
 		for i in t'range loop
 			if ep_scmd = std_logic_vector(to_unsigned(i, ep_scmd'length)) and ep_v = '1' then
