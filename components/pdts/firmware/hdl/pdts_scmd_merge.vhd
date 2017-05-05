@@ -62,7 +62,7 @@ begin
 	ipa <= to_integer(unsigned(pa));
 		
 	go <= or_reduce(valid) and not active;
-	last <= (go and scmd_in_v(ip).last) or (active and scmd_in_v(ipa).last);
+	last <= active and scmd_in_v(ipa).last;
 		
 	process(clk)
 	begin
