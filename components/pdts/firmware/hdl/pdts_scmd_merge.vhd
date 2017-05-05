@@ -71,7 +71,7 @@ begin
 			else
 				active <= ((active and not (scmd_in_v(ipa).last and scmd_in.ren)) or go);
 				if scmd_in.ren = '1' then
-					src <= (src or (active or go)) and not scmd_in_v(ipa).last;
+					src <= (src or (active or go)) and not (src and scmd_in_v(ipa).last);
 				end if;
 			end if;
 		end if;
@@ -79,7 +79,7 @@ begin
 	
 	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when src = '0' else scmd_in_v(ipa).d;
 	scmd_out.valid <= go or active;
-	scmd_out.last <= scmd_in_v(ipa).last and src;
+	scmd_out.last <= src and scmd_in_v(ipa).last;
 	typ <= scmd_in_v(ip).d(3 downto 0);
 	tv <= go;
 	
