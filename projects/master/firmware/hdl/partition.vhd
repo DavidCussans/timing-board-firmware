@@ -100,7 +100,7 @@ begin
 
 	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
 	tok <= ctrl_trig_mask(to_integer(unsigned(typ)));
-	tack_i <= tv or and ctrl_part_en and (cok or scmd_in.ack) and (ctrl_trig_en or not tok);
+	tack_i <= tv and ctrl_part_en and (cok or scmd_in.ack) and (ctrl_trig_en or not tok);
 	trig <= tv and ctrl_part_en and ctrl_trig_en and tok;
 	tack <= tack_i;
 	
