@@ -155,7 +155,7 @@ begin
 			elsif state = ST_K and astb = '1' then
 				s_ok <= '1';
 			end if;
-			smode_r <= smode and not (scmd_in.last or rst);
+			smode_r <= smode and not ((scmd_in.last and stb) or rst);
 			if stb = '1' then
 				if smode = '0' then
 					spctr <= (others => '0');

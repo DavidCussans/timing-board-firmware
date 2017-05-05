@@ -91,7 +91,7 @@ begin
 	v <= '1' when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0' and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
 	
-	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst);		
+	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst) when rising_edge(clk);		
 	
 	scmd_out.d <= ctrl_type;
 	scmd_out.valid <= v or valid;
