@@ -38,8 +38,8 @@ architecture rtl of master is
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-	signal scmdw_v: cmd_w_array(N_PART downto 0);
-	signal scmdr_v: cmd_r_array(N_PART downto 0);
+	signal scmdw_v: cmd_w_array(N_CHAN + N_PART - 1 downto 0);
+	signal scmdr_v: cmd_r_array(N_CHAN + N_PART - 1 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
@@ -111,6 +111,9 @@ begin
 -- Sync command gen
 
 	gen: entity work.pdts_scmd_gen
+		generic map(
+			N_CHAN => N_CHAN
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -119,8 +122,8 @@ begin
 			clk => clk,
 			rst => rst,
 			tstamp => tstamp,
-			scmd_out => scmdw_v(0),
-			scmd_in => scmdr_v(0)
+			scmd_out => scmdw_v(N_CHAN - 1 downto 0),
+			scmd_in => scmdr_v(N_CHAN - 1 downto 0)
 		);
 		
 -- Partitions
@@ -152,8 +155,8 @@ begin
 				clk => clk,
 				rst => rst,
 				tstamp => tstamp,
-				scmd_out => scmdw_v(i + 1),
-				scmd_in => scmdr_v(i + 1),
+				scmd_out => scmdw_v(i + N_CHAN),
+				scmd_in => scmdr_v(i + N_CHAN),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
@@ -165,7 +168,7 @@ begin
 
 	merge: entity work.pdts_scmd_merge
 		generic map(
-			N_SRC => N_PART + 1
+			N_SRC => N_CHAN + N_PART
 		)
 		port map(
 			clk => clk,
