@@ -49,7 +49,6 @@ architecture rtl of partition is
 	signal cok, tok, trig, tack_i, erst, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
-	signal scmd_out_i: cmd_w;
 	signal rob_en_s, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
 	signal rob_q: std_logic_vector(31 downto 0);
 	signal rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
@@ -101,9 +100,9 @@ begin
 
 	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
 	tok <= ctrl_trig_mask(to_integer(unsigned(typ)));
-	tack_i <= tv and ctrl_part_en and cok and (ctrl_trig_en or not tok);
+	tack_i <= tv or and ctrl_part_en and (cok or scmd_in.ack) and (ctrl_trig_en or not tok);
 	trig <= tv and ctrl_part_en and ctrl_trig_en and tok;
-	tack <= tack_i or (scmd_out_i.valid and scmd_in.ack);
+	tack <= tack_i;
 	
 	process(typ) -- Unroll typ
 	begin
@@ -148,11 +147,9 @@ begin
 			rst => rst,
 			tstamp => tstamp,
 			evtctr => evtctr,
-			scmd_out => scmd_out_i,
+			scmd_out => scmd_out,
 			scmd_in => scmd_in
 		);
-		
-	scmd_out <= scmd_out_i;
 		
 -- Event buffer
 
