@@ -28,8 +28,8 @@ entity pdts_scmd_gen is
 		clk: in std_logic;
 		rst: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-		scmd_out: out cmd_w;
-		scmd_in: in cmd_r
+		scmd_out: out cmd_w_array(N_CHAN - 1 downto 0);
+		scmd_in: in cmd_r_array(N_CHAN - 1 downto 0)
 	);
 
 end pdts_scmd_gen;
@@ -44,12 +44,8 @@ architecture rtl of pdts_scmd_gen is
 	signal rand: std_logic_vector(31 downto 0);
 	signal ipbw_c: ipb_wbus_array(N_CHAN - 1 downto 0);
 	signal ipbr_c: ipb_rbus_array(N_CHAN - 1 downto 0);
-	type d_t is array(N_CHAN - 1 downto 0) of std_logic_vector(7 downto 0);
-	signal d: d_t;
-	signal valid, tacc, trej: std_logic_vector(N_CHAN - 1 downto 0);
+	signal tacc, trej: std_logic_vector(N_CHAN - 1 downto 0);
 	signal trst: std_logic;
-	signal s: std_logic_vector(calc_width(N_CHAN) - 1 downto 0);
-	signal si: integer range N_CHAN - 1 downto 0 := 0;
 
 begin
 
@@ -130,16 +126,13 @@ begin
       ipb_from_slaves => ipbr_c
     );
 		
-	tgen: for i in N_CHAN - 1 downto 0 generate
-	
-		signal ack_l: std_logic;
-	
+	tgen: for i in N_CHAN - 1 downto 0 generate	
 	begin
 		
 		gen: entity work.pdts_scmd_gen_chan
 		  generic map(
-		      ID => i
-		     )
+		  	ID => i
+		  )
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
@@ -149,16 +142,15 @@ begin
 				rst => rst,
 				tstamp => tstamp,
 				rand => rand,
-				d => d(i),
-				v => valid(i)
+				scmd_out => scmd_out(i),
+				scmd_in => scmd_in(i)
 			);
 
-		ack_l <= scmd_in.ack when si = i else '0';
-		tacc(i) <= valid(i) and ack_l;
-		trej(i) <= valid(i) and not ack_l and ctrl_en;
+		tacc(i) <= valid(i) and scmd_in(i).ack;
+		trej(i) <= valid(i) and not scmd_in(i).ack and ctrl_en;
 
 	end generate;
-  
+
 -- Counters
 
 	trst <= rst or ctrl_clr;
@@ -190,22 +182,5 @@ begin
 			rst => trst,
 			inc => trej
 		);	
-		
--- Output
 
-	prio: entity work.pdts_prio_enc
-		generic map(
-			WIDTH => N_CHAN
-		)
-		port map(
-			d => valid,
-			sel => s
-		);
-		
-	si <= to_integer(unsigned(s));
-	
-	scmd_out.d <= d(si);
-	scmd_out.valid <= valid(si) and ctrl_en;
-	scmd_out.last <= '1'; -- Always single-word commands
-	
 end rtl;

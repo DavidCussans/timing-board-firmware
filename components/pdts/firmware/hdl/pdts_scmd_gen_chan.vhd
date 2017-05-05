@@ -30,8 +30,8 @@ entity pdts_scmd_gen_chan is
 		rst: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		rand: in std_logic_vector(31 downto 0);
-		d: out std_logic_vector(7 downto 0);
-		v: out std_logic
+		scmd_out: out cmd_w;
+		scmd_in: in cmd_r
 	);
 
 end pdts_scmd_gen_chan;
@@ -47,7 +47,7 @@ architecture rtl of pdts_scmd_gen_chan is
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
 	signal mask: std_logic_vector(15 downto 0);
 	signal src: std_logic_vector(26 downto 0);
-	signal r_go, c_go: std_logic;
+	signal v, valid: std_logic;
 
 begin
 
@@ -86,9 +86,13 @@ begin
 	end process;
 	
 	src <= tstamp(26 downto 0) when ctrl_patt = '0' else rand(26 downto 0);
-	
-	d <= ctrl_type;
 	v <= '1' when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0' and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
-
+	
+	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst);		
+	
+	scmd_out.d <= ctrl_type;
+	scmd_out.v <= v or valid;
+	scmd_out.last <= '1';
+		
 end rtl;
