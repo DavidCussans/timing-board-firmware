@@ -127,9 +127,6 @@ begin
     );
 		
 	tgen: for i in N_CHAN - 1 downto 0 generate	
-	
-		signal sout: cmd_w;
-	
 	begin
 		
 		gen: entity work.pdts_scmd_gen_chan
@@ -146,13 +143,10 @@ begin
 				tstamp => tstamp,
 				rand => rand,
 				scmd_out => sout,
-				scmd_in => scmd_in(i)
+				scmd_in => scmd_in(i),
+				ack => tacc(i),
+				rej => trej(i)
 			);
-			
-		scmd_out(i) <= sout;
-
-		tacc(i) <= sout.valid and scmd_in(i).ack;
-		trej(i) <= sout.valid and not scmd_in(i).ack and ctrl_en;
 
 	end generate;
 

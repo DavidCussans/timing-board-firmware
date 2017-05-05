@@ -35,9 +35,9 @@ end pdts_scmd_merge;
 architecture rtl of pdts_scmd_merge is
 
 	signal valid: std_logic_vector(N_SRC - 1 downto 0);
-	signal p, pa: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
+	signal p: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
 	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
-	signal go, last, active: std_logic;
+	signal go, last, active, src: std_logic;
 
 begin
 
@@ -57,9 +57,8 @@ begin
 			sel => p
 		);
 
-	pa <= p when go = '1' and rising_edge(clk);
 	ip <= to_integer(unsigned(p));
-	ipa <= to_integer(unsigned(pa));
+	ipa <= ip when go = '1' and rising_edge(clk);
 		
 	go <= or_reduce(valid) and not active;
 	last <= active and scmd_in_v(ipa).last;
@@ -67,15 +66,14 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' then
-				active <= '0';
-			elsif scmd_in.ren = '1' then
-				active <= (active and not last) or go;
+			active <= ((active and not last) or go) and not rst;
+			if scmd_in.ren = '1' then
+				src <= (src or (active or go)) and not (last or rst);
 			end if;
 		end if;
 	end process;
 	
-	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when go = '1' else scmd_in_v(ipa).d;
+	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when src = '0' else scmd_in_v(ipa).d;
 	scmd_out.valid <= go or active;
 	scmd_out.last <= last;
 	typ <= scmd_in_v(ip).d(3 downto 0);

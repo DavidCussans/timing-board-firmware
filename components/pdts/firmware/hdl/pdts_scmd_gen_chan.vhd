@@ -31,7 +31,9 @@ entity pdts_scmd_gen_chan is
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		rand: in std_logic_vector(31 downto 0);
 		scmd_out: out cmd_w;
-		scmd_in: in cmd_r
+		scmd_in: in cmd_r;
+		ack: out std_logic;
+		rej: out std_logic
 	);
 
 end pdts_scmd_gen_chan;
@@ -94,5 +96,8 @@ begin
 	scmd_out.d <= ctrl_type;
 	scmd_out.valid <= v or valid;
 	scmd_out.last <= '1';
+	
+	ack <= v and scmd_in.ack;
+	rej <= v and not scmd_in.ack;
 		
 end rtl;
