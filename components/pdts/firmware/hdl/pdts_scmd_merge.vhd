@@ -80,7 +80,7 @@ begin
 	
 	ogen: for i in N_SRC - 1 downto 0 generate
 		scmd_out_v(i).ack <= go when ip = i else '0';
-		scmd_out_v(i).ren <= scmd_in.ren and active;
+		scmd_out_v(i).ren <= scmd_in.ren and src;
 	end generate;
 	
 end rtl;
