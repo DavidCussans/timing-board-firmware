@@ -142,7 +142,7 @@ begin
 				rst => rst,
 				tstamp => tstamp,
 				rand => rand,
-				scmd_out => sout,
+				scmd_out => scmd_out(i),
 				scmd_in => scmd_in(i),
 				ack => tacc(i),
 				rej => trej(i)
