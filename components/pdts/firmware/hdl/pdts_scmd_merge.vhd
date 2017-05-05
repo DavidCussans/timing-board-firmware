@@ -37,7 +37,7 @@ architecture rtl of pdts_scmd_merge is
 	signal valid: std_logic_vector(N_SRC - 1 downto 0);
 	signal p: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
 	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
-	signal go, active, src: std_logic;
+	signal go, last, active, src: std_logic;
 
 begin
 
@@ -61,6 +61,7 @@ begin
 	ipa <= ip when go = '1' and rising_edge(clk);
 		
 	go <= or_reduce(valid) and not active;
+	last <= src and scmd_in_v(ipa).last and scmd_in.ren;
 		
 	process(clk)
 	begin
@@ -69,9 +70,9 @@ begin
 				active <= '0';
 				src <= '0';
 			else
-				active <= ((active and not (scmd_in_v(ipa).last and scmd_in.ren)) or go);
+				active <= ((active and not last) or go);
 				if scmd_in.ren = '1' then
-					src <= (src or (active or go)) and not (src and scmd_in_v(ipa).last);
+					src <= (src or (active or go)) and not last;
 				end if;
 			end if;
 		end if;
