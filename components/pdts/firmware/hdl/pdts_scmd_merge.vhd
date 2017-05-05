@@ -65,9 +65,14 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			active <= ((active and not (scmd_in_v(ipa).last and scmd_in.ren)) or go) and not rst;
-			if scmd_in.ren = '1' then
-				src <= (src or (active or go)) and not scmd_in_v(ipa).last and not rst;
+			if rst = '1' then
+				active <= '0';
+				src <= '0';
+			else
+				active <= ((active and not (scmd_in_v(ipa).last and scmd_in.ren)) or go);
+				if scmd_in.ren = '1' then
+					src <= (src or (active or go)) and not scmd_in_v(ipa).last;
+				end if;
 			end if;
 		end if;
 	end process;
