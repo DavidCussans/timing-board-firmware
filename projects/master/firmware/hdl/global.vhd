@@ -74,8 +74,8 @@ begin
 		port map(
 			clk => ipb_clk,
 			reset => ipb_rst,
-			ipbus_in => ipbw(N_SLV_SEL),
-			ipbus_out => ipbr(N_SLV_SEL),
+			ipbus_in => ipbw(N_SLV_PART_SEL),
+			ipbus_out => ipbr(N_SLV_PART_SEL),
 			q => sel
 		);
 		
