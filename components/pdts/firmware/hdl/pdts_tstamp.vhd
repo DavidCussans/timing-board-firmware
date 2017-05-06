@@ -30,7 +30,7 @@ architecture rtl of pdts_tstamp is
 	signal sr: std_logic_vector(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 0);
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr_i: unsigned(8 * EVTCTR_WDS - 1 downto 0);
-	signal ctr: unsigned(6 downto 0);
+	signal ctr: unsigned(7 downto 0);
 	signal lock, init, pkt_end, pkt_end_d: std_logic;
 
 begin
@@ -67,13 +67,13 @@ begin
 				end if;
 				if lock = '0' and init = '0' then
 					if pkt_end = '1' then
-						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 8)) & X"80";
+						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"00");
 						lock <= '1';
 						init <= '1';
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
-					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 8) & X"80")   then
+					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"00") then
 						lock <= '0';
 					end if;
 				end if;
