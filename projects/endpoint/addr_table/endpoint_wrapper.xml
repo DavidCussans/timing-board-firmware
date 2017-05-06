@@ -9,11 +9,11 @@
 				<node id="addr" mask="0xff00"/>
 			</node>
 			<node id="stat" address="0x1">
-				<node id="buf_full" mask="0x1"/>
-				<node id="buf_warn" mask="0x2"/>
-				<node id="buf_empty" mask="0x4"/>
-				<node id="rob_full" mask="0x8"/>				
-				<node id="rob_empty" mask="0x10"/>
+				<node id="buf_err" mask="0x1"/>
+				<node id="buf_empty" mask="0x2"/>
+				<node id="rob_warn" mask="0x4"/>
+				<node id="rob_full" mask="0x8"/>
+				<node id="rob_empty" mask="0x10"/>		
 				<node id="ep_rsto" mask="0x20"/>
 				<node id="ep_rdy" mask="0x40"/>
 				<node id="ep_stat" mask="0xf00"/>

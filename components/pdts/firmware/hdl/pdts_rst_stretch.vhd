@@ -23,7 +23,7 @@ end pdts_rst_stretch;
 
 architecture rtl of pdts_rst_stretch is
 
-	signal rst_ctr: unsigned(3 downto 0);
+	signal rst_ctr: unsigned(4 downto 0);
 	signal rsti: std_logic;
 
 
@@ -40,8 +40,8 @@ begin
 		end if;
 	end process;
 	
-	rsti <= '0' when rst_ctr = "1111" else '1';
-	rsto <= rsti and (rst_ctr(2) xor rst_ctr(3)) when rising_edge(clk); -- No glitches pls, used across clock domains
+	rsti <= '0' when rst_ctr = "11111" else '1';
+	rsto <= rsti and (rst_ctr(3) xor rst_ctr(4)) when rising_edge(clk); -- No glitches pls, used across clock domains
 	wen <= not rsti when rising_edge(clk);
 
 end rtl;
