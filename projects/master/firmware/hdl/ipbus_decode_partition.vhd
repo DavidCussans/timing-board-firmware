@@ -17,7 +17,7 @@ package ipbus_decode_partition is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_partition(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Sat Apr 15 21:05:15 2017 
+-- START automatically  generated VHDL the Sat May  6 19:50:56 2017 
   constant N_SLV_CSR: integer := 0;
   constant N_SLV_EVTCTR: integer := 1;
   constant N_SLV_BUF: integer := 2;
@@ -35,17 +35,17 @@ package body ipbus_decode_partition is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Sat Apr 15 21:05:15 2017 
-    if    std_match(addr, "--------------------------00-0--") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x00000034
+-- START automatically  generated VHDL the Sat May  6 19:50:56 2017 
+    if    std_match(addr, "--------------------------00-00-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x00000036
+    elsif std_match(addr, "--------------------------00-01-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_EVTCTR, IPBUS_SEL_WIDTH)); -- evtctr / base 0x00000002 / mask 0x00000036
     elsif std_match(addr, "--------------------------00-10-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_EVTCTR, IPBUS_SEL_WIDTH)); -- evtctr / base 0x00000004 / mask 0x00000036
-    elsif std_match(addr, "--------------------------00-11-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_BUF, IPBUS_SEL_WIDTH)); -- buf / base 0x00000006 / mask 0x00000036
+      sel := ipbus_sel_t(to_unsigned(N_SLV_BUF, IPBUS_SEL_WIDTH)); -- buf / base 0x00000004 / mask 0x00000036
+    elsif std_match(addr, "--------------------------01----") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_ACTRS, IPBUS_SEL_WIDTH)); -- actrs / base 0x00000010 / mask 0x00000030
     elsif std_match(addr, "--------------------------10----") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_ACTRS, IPBUS_SEL_WIDTH)); -- actrs / base 0x00000020 / mask 0x00000030
-    elsif std_match(addr, "--------------------------11----") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_RCTRS, IPBUS_SEL_WIDTH)); -- rctrs / base 0x00000030 / mask 0x00000030
+      sel := ipbus_sel_t(to_unsigned(N_SLV_RCTRS, IPBUS_SEL_WIDTH)); -- rctrs / base 0x00000020 / mask 0x00000030
 -- END automatically generated VHDL
 
     else
