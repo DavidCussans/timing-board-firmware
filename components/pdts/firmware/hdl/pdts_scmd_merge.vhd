@@ -60,7 +60,7 @@ begin
 	ip <= to_integer(unsigned(p));
 	ipa <= ip when go = '1' and rising_edge(clk);
 		
-	go <= or_reduce(valid) and not active;
+	go <= or_reduce(valid) and not active and scmd_in.ack;
 	last <= src and scmd_in_v(ipa).last and scmd_in.ren;
 		
 	process(clk)
