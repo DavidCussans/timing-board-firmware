@@ -41,7 +41,7 @@ begin
 	end process;
 	
 	rsti <= '0' when rst_ctr = "1111" else '1';
-	rsto <= rsti and rst_ctr(3) when rising_edge(clk); -- No glitches pls, used across clock domains
+	rsto <= rsti and (rst_ctr(2) xor rst_ctr(3)) when rising_edge(clk); -- No glitches pls, used across clock domains
 	wen <= not rsti when rising_edge(clk);
 
 end rtl;
