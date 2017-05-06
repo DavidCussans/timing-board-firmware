@@ -156,8 +156,10 @@ begin
 				s_ok <= '1';
 			end if;
 			smode_r <= smode and not ((scmd_in.last and stb) or rst);
-			if stb = '1' then
-				if smode = '0' then
+			if rst = '1' then
+				spctr <= (others => '0');
+			elsif stb = '1' then
+				if scmd_in.last = '1' then
 					spctr <= (others => '0');
 				else
 					spctr <= spctr + 1;
@@ -172,7 +174,7 @@ begin
 	smode <= (scmd_in.valid and s_ok) or smode_r;
 	
 	scmd_out.ren <= stb and smode when spctr > 0 else '0';
-	scmd_out.ack <= '1';
+	scmd_out.ack <= smode and not smode_r;
 	
 	with spctr select q_s <=
 		X"01" when X"0",
