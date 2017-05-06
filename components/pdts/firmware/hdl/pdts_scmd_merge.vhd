@@ -37,7 +37,7 @@ architecture rtl of pdts_scmd_merge is
 	signal valid: std_logic_vector(N_SRC - 1 downto 0);
 	signal p: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
 	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
-	signal go, last, active, src: std_logic;
+	signal go, goq, last, active, src: std_logic;
 
 begin
 
