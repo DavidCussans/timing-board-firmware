@@ -60,9 +60,10 @@ begin
 	ip <= to_integer(unsigned(p));
 	ipa <= ip when go = '1' and rising_edge(clk);
 		
-	go <= or_reduce(valid) and not active and scmd_in.ack;
+	go <= or_reduce(valid) and not active;
+	goq <= go and scmd_in.ack;
 	last <= src and scmd_in_v(ipa).last and scmd_in.ren;
-		
+
 	process(clk)
 	begin
 		if rising_edge(clk) then
@@ -70,9 +71,9 @@ begin
 				active <= '0';
 				src <= '0';
 			else
-				active <= ((active and not last) or go);
+				active <= ((active and not last) or goq);
 				if scmd_in.ren = '1' then
-					src <= (src or (active or go)) and not last;
+					src <= (src or (active or goq)) and not last;
 				end if;
 			end if;
 		end if;
@@ -85,7 +86,7 @@ begin
 	tv <= go;
 	
 	ogen: for i in N_SRC - 1 downto 0 generate
-		scmd_out_v(i).ack <= go when ip = i else '0';
+		scmd_out_v(i).ack <= goq when ip = i else '0';
 		scmd_out_v(i).ren <= scmd_in.ren and src;
 	end generate;
 	
