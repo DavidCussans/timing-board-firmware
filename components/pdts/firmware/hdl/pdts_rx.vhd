@@ -185,6 +185,8 @@ begin
 	begin
 		if rising_edge(clk) then
 			if stb = '1' then
+				vctr <= to_unsigned(1, vctr'length);
+			elsif vctr = (10 / SCLK_RATIO) - 1 then
 				vctr <= (others => '0');
 			else
 				vctr <= vctr + 1;
