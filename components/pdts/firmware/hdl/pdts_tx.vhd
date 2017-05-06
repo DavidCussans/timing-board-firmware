@@ -161,7 +161,7 @@ begin
 			elsif stb = '1' then
 				if scmd_in.last = '1' then
 					spctr <= (others => '0');
-				else
+				elsif smode = '1' then
 					spctr <= spctr + 1;
 				end if;
 			end if;
