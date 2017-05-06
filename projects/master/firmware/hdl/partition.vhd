@@ -42,7 +42,7 @@ architecture rtl of partition is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(1 downto 0);
+	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
 	signal ctrl_cmd_mask, ctrl_trig_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
@@ -74,7 +74,7 @@ begin
 
 	csr: entity work.ipbus_syncreg_v
 		generic map(
-			N_CTRL => 2,
+			N_CTRL => 1,
 			N_STAT => 1
 		)
 		port map(
@@ -92,14 +92,13 @@ begin
 	ctrl_evtctr_rst <= ctrl(0)(2);
 	ctrl_trig_ctr_rst	<= ctrl(0)(3);
 	ctrl_buf_en <= ctrl(0)(4);
-	ctrl_cmd_mask <= ctrl(1)(15 downto 0);
-	ctrl_trig_mask <= ctrl(1)(31 downto 16);
+	ctrl_cmd_mask <= ctrl(0)(31 downto 16);
 	stat(0) <= X"000000" & "000" & rob_empty & rob_full & rob_warn & buf_empty & buf_err;
 	
 -- Command masks
 
 	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
-	tok <= ctrl_trig_mask(to_integer(unsigned(typ)));
+	tok <= EVTCTR_MASK(to_integer(unsigned(typ)));
 	tack_i <= tv and ctrl_part_en and (cok or scmd_in.ack) and (ctrl_trig_en or not tok);
 	trig <= tv and ctrl_part_en and ctrl_trig_en and tok;
 	tack <= tack_i;
