@@ -10,6 +10,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 entity pdts_rst_stretch is
 	port(
@@ -33,14 +34,14 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
-				rst_ctr <= "0000";
+				rst_ctr <= (others => '0');
 			elsif rsti = '1' then
 				rst_ctr <= rst_ctr + 1;
 			end if;
 		end if;
 	end process;
 	
-	rsti <= '0' when rst_ctr = "11111" else '1';
+	rsti <= not and_reduce(std_logic_vector(rst_ctr));
 	rsto <= rsti and (rst_ctr(3) xor rst_ctr(4)) when rising_edge(clk); -- No glitches pls, used across clock domains
 	wen <= not rsti when rising_edge(clk);
 
