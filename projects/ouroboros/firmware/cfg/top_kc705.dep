@@ -1,2 +1,2 @@
 include -c projects/master kc705_gmii.dep
-include master.dep
+include payload.dep

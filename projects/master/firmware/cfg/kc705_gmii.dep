@@ -8,5 +8,5 @@ setup settings_v7.tcl
 src top_kc705_gmii.vhd
 include -c ipbus-firmware:boards/kc705/base_fw/kc705_gmii/synth kc705_gmii_infra.dep
 src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
-src --cd ../ucf pc053_kc705.tcl
+src -c components/pdts --cd ../ucf pc053_kc705.tcl
 src -c ipbus-firmware:boards/kc705/base_fw/kc705_gmii/synth --cd ../ucf kc705_gmii.tcl

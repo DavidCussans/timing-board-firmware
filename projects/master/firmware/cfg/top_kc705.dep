@@ -1,0 +1,2 @@
+include kc705_gmii.dep
+include payload.dep

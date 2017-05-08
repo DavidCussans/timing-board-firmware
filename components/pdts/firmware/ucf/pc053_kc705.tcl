@@ -1,7 +1,7 @@
 create_clock -period 4.000 -name fmc_clk [get_ports fmc_clk_p]
 create_clock -period 4.000 -name rec_clk [get_ports rec_clk_p]
 
-set_clock_groups -asynchronous -group [get_clocks fmc_clk] -group [get_clocks rec_clk] -group [get_clocks -include_generated_clocks -of_obj [get_pins -of_obj [get_cells infra/clocks/mmcm] -filter {NAME =~ *CLKOUT*}]]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks fmc_clk] -group [get_clocks -include_generated_clocks rec_clk] -group [get_clocks -include_generated_clocks -of_obj [get_pins -of_obj [get_cells infra/clocks/mmcm] -filter {NAME =~ *CLKOUT*}]]
 
 set_property IOSTANDARD LVDS_25 [get_port {fmc_clk_* rec_clk_* rec_d_* clk_out_* rj45_din_* rj45_dout_* sfp_dout_* gpin_* gpout_*}]
 set_property DIFF_TERM TRUE [get_port {fmc_clk_* rec_clk_* rec_d_* rj45_din_* gpin_*}]
