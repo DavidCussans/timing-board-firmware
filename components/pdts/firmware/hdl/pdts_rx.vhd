@@ -197,7 +197,7 @@ begin
 	q <= d;
 	valid <= '1' when state = SYNC and s_match_r = '1' and stb = '1' else '0';
 	first <= '1' when sctr = to_unsigned(1, sctr'length) else '0';
-	issue <= '1' when vctr = unsigned(ts) else '0';
+	issue <= '1' when vctr = unsigned(ts) or SCLK_RATIO = 10 else '0';
 	pend <= (pend or valid) and not (issue or rst) when rising_edge(clk);
 	pend_f <= (pend_f or (valid and first)) and not (issue or rst) when rising_edge(clk);
 	s_valid <= (valid or pend) and issue;
