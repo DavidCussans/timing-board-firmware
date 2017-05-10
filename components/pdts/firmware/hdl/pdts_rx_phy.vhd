@@ -14,8 +14,8 @@ use work.pdts_defs.all;
 entity pdts_rx_phy is
 	port(
 		fclk: in std_logic; -- free-running clock
-		frst: in std_logic; -- reset (fclk domain, internally synchronised)
 		rxclk: in std_logic; -- serial data clock
+		rxrst: in std_logic; -- reset (rxclk domain)
 		rxd: in std_logic; -- serial data (rxclk domain)
 		phase_rst: out std_logic; -- pll reset (clk domain)
 		phase_locked: in std_logic; -- pll locked (async)
@@ -63,7 +63,7 @@ begin
 			else
 				t <= t(0) & t(9 downto 1);
 			end if;
-			f <= (f or c) and not frst;
+			f <= (f or c) and not rxrst;
 		end if;
 	end process;
 

@@ -86,8 +86,8 @@ begin
 	rxphy: entity work.pdts_rx_phy
 		port map(
 			fclk => sclk,
-			frst => rec_rst,
 			rxclk => rec_clk,
+			rxrst => rec_rst,
 			rxd => rec_d,
 			phase_rst => phase_rst,
 			phase_locked => phase_locked,
