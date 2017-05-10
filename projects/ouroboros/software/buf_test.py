@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 # -*- coding: utf-8 -*-
+import sys
 import uhal
 import time
 import random
@@ -44,7 +45,7 @@ def dump(buf):
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-hw_list = [manager.getDevice("DUNE_FMC_SIM")]
+hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
 
 N_SCHAN = 1
 N_TYPE = 5
@@ -55,7 +56,7 @@ for hw in hw_list:
     hw.getNode("master.partition.csr.ctrl.cmd_mask").write(0x000f)
     hw.getNode("master.partition.csr.ctrl.trig_en").write(1)
     hw.getNode("master.scmd_gen.chan_ctrl.type").write(3)
-    hw.getNode("master.scmd_gen.chan_ctrl.rate_div").write(1)
+    hw.getNode("master.scmd_gen.chan_ctrl.rate_div").write(0xb)
     hw.getNode("master.scmd_gen.chan_ctrl.patt").write(1)
     hw.getNode("master.partition.csr.ctrl.buf_en").write(1)
     hw.getNode("endpoint.csr.ctrl.buf_en").write(1)
@@ -68,7 +69,7 @@ for hw in hw_list:
 
 for i in range(256):
 
-    time.sleep(5)
+    time.sleep(1)
 
     for hw in hw_list:
 
