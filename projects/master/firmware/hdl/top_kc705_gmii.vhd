@@ -75,7 +75,7 @@ begin
 			sysclk_n => sysclk_n,
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
-			clk125_o => clk125,
+			clk_125_o => clk125,
 			rst_125_o => phy_rst_e,
 			nuke => nuke,
 			soft_rst => soft_rst,
