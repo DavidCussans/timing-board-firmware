@@ -262,7 +262,7 @@ begin
 			ob => gpout_1_n
 		);
 		
-	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk);
+	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk_i);
 		
 	obuf_sfp_dout: OBUFDS
 		port map(
