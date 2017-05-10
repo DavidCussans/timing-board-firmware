@@ -72,8 +72,8 @@ architecture rtl of pdts_fmc_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out: std_logic;
-	signal gpin, rj45_din: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, rec_d_i: std_logic;
+	signal gpin, rj45_din, loopback: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 			
@@ -117,6 +117,7 @@ begin
 	rst <= ctrl(0)(2);
 	sfp_tx_dis <= ctrl(0)(3);
 	pll_rstn <= not ctrl(0)(4);
+	loopback <= ctrl(0)(5);
 	
 	userled <= not (cdr_lol or cdr_los or sfp_los);
 	
@@ -187,7 +188,7 @@ begin
 			o => rec_clk_i
 		);
 		
-	rec_clk <= rec_clk_i;
+	rec_clk <= rec_clk_i when loopback = '0' else fmc_clk_i;
 
 -- Outputs
 		
@@ -258,8 +259,10 @@ begin
 		port map(
 			i => rec_d_p,
 			ib => rec_d_n,
-			o => rec_d
+			o => rec_d_i
 		);
+		
+	rec_d <= rec_d_i when loopback = '0' else sfp_dout;
 		
 -- Frequency measurement
 
