@@ -28,12 +28,8 @@ entity pdts_fmc_io is
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		sfp_los: in std_logic;
-		cdr_lol_o: out std_logic;
-		cdr_los_o: out std_logic;
-		sfp_los_o: out std_logic;
 		sfp_tx_dis: out std_logic;
 		sfp_flt: in std_logic;
-		sfp_flt_o: out std_logic;
 		userled: out std_logic;
 		fmc_clk_p: in std_logic;
 		fmc_clk_n: in std_logic;
@@ -77,7 +73,7 @@ architecture rtl of pdts_fmc_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
-	signal gpin, rj45_din, loopback: std_logic;
+	signal gpin, rj45_din: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
@@ -124,7 +120,6 @@ begin
 	rst <= ctrl(0)(2);
 	sfp_tx_dis <= ctrl(0)(3);
 	pll_rstn <= not ctrl(0)(4);
-	loopback <= ctrl(0)(5);
 	
 	userled <= not (cdr_lol or cdr_los or sfp_los);
 	
@@ -165,13 +160,6 @@ begin
 			o => rj45_din
 		);
 
--- Status bits
-
-	cdr_lol_o <= cdr_lol and not loopback;
-	cdr_los_o <= cdr_los and not loopback;
-	sfp_los_o <= sfp_los and not loopback;
-	sfp_flt_o <= sfp_flt and not loopback;
-
 -- Clocks
 			
 	ibufg_in: IBUFGDS
@@ -196,11 +184,9 @@ begin
 			o => rec_clk_u
 		);
 		
-	bufh_rec_clk: BUFGMUX
+	bufh_rec_clk: BUFG
 		port map(
-			i0 => rec_clk_u,
-			i1 => fmc_clk_i,
-			s => loopback,
+			i => rec_clk_u,
 			o => rec_clk_i
 		);
 		
@@ -277,11 +263,9 @@ begin
 		port map(
 			i => rec_d_p,
 			ib => rec_d_n,
-			o => rec_d_i
+			o => rec_d
 		);
-		
-	rec_d <= rec_d_i when loopback = '0' else sfp_dout;
-		
+
 -- Frequency measurement
 
 	div: entity work.freq_ctr_div

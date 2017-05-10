@@ -6,7 +6,6 @@
 					<node id="rst" mask="0x4"/>
 					<node id="sfp_tx_dis" mask="0x8"/>
 					<node id="pll_rst" mask="0x10"/>
-					<node id="loopback" mask="0x20"/>
 				</node>
 				<node id="stat" address="0x1">
 					<node id="sfp_los" mask="0x1"/>
