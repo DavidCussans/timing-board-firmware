@@ -15,7 +15,7 @@ use work.ipbus_decode_pdts_fmc_io.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity pdts_fmc_io is
+entity pdts_fmc_io_loopback is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -64,9 +64,9 @@ entity pdts_fmc_io is
 		gpout_1_n: out std_logic		
 	);
 
-end pdts_fmc_io;
+end pdts_fmc_io_loopback;
 
-architecture rtl of pdts_fmc_io is
+architecture rtl of pdts_fmc_io_loopback is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
