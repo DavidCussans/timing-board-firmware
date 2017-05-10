@@ -27,7 +27,6 @@ architecture rtl of pdts_rst_stretch is
 	signal rst_ctr: unsigned(4 downto 0);
 	signal rsti: std_logic;
 
-
 begin
 
 	process(clk)

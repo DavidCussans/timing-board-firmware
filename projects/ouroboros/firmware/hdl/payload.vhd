@@ -61,6 +61,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
+	signal cdr_lol_i, cdr_los_i, sfp_los_i: std_logic;
 	signal fmc_clk, rec_clk, rec_d, sfp_dout, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
 
 	attribute IOB: string;
@@ -98,6 +99,9 @@ begin
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			sfp_los => sfp_los,
+			cdr_lol_o => cdr_lol_i,
+			cdr_los_o => cdr_los_i,
+			sfp_los_o => sfp_los_i,
 			sfp_tx_dis => sfp_tx_dis,
 			sfp_flt => sfp_flt,
 			userled => userled,
@@ -183,9 +187,9 @@ begin
 			ipb_out => ipbr(N_SLV_ENDPOINT),
 			rec_clk => rec_clk,
 			rec_d => rec_d,
-			sfp_los => sfp_los,
-			cdr_los => cdr_los,
-			cdr_lol => cdr_lol
+			sfp_los => sfp_los_i,
+			cdr_los => cdr_los_i,
+			cdr_lol => cdr_lol_i
 		);
 
 end rtl;

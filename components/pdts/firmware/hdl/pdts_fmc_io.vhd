@@ -28,8 +28,12 @@ entity pdts_fmc_io is
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		sfp_los: in std_logic;
+		cdr_lol_o: out std_logic;
+		cdr_los_o: out std_logic;
+		sfp_los_o: out std_logic;
 		sfp_tx_dis: out std_logic;
-		sfp_flt: in std_logic;		
+		sfp_flt: in std_logic;
+		sfp_flt_o: out std_logic;
 		userled: out std_logic;
 		fmc_clk_p: in std_logic;
 		fmc_clk_n: in std_logic;
@@ -157,6 +161,13 @@ begin
 			ib => rj45_din_n,
 			o => rj45_din
 		);
+
+-- Status bits
+
+	cdr_lol_o <= cdr_lol and not loopback;
+	cdr_los_o <= cdr_los and not loopback;
+	sfp_los_o <= sfp_los and not loopback;
+	sfp_flt_o <= sfp_flt and not loopback;
 
 -- Clocks
 			
