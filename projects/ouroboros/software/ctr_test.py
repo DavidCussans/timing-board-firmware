@@ -25,7 +25,7 @@ def status(hw):
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-hw_list = [manager.getDevice("MASTER")]
+hw_list = [manager.getDevice("DUNE_FMC_SIM")]
 
 N_SCHAN = 1
 N_TYPE = 5
@@ -33,7 +33,7 @@ N_TYPE = 5
 for hw in hw_list:
 
     hw.getNode("master.scmd_gen.ctrl.en").write(1)
-    hw.getNode("master.partition.csr.mask").write(0x0000000f)
+    hw.getNode("master.partition.csr.ctrl.cmd_mask").write(0x000f)
     hw.getNode("master.scmd_gen.chan_ctrl.type").write(1)
     hw.dispatch()
 
