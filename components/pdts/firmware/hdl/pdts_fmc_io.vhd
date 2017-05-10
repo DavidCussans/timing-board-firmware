@@ -76,10 +76,13 @@ architecture rtl of pdts_fmc_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, rec_d_i: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
 	signal gpin, rj45_din, loopback: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
+	
+	attribute IOB: string;
+	attribute IOB of sfp_dout_r: signal is "TRUE";
 			
 begin
 
@@ -196,7 +199,7 @@ begin
 	bufh_rec_clk: BUFGMUX
 		port map(
 			i0 => rec_clk_u,
-			i1 => fmc_clk_u,
+			i1 => fmc_clk_i,
 			s => loopback,
 			o => rec_clk_i
 		);
@@ -259,9 +262,11 @@ begin
 			ob => gpout_1_n
 		);
 		
+	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk);
+		
 	obuf_sfp_dout: OBUFDS
 		port map(
-			i => sfp_dout,
+			i => sfp_dout_r,
 			o => sfp_dout_p,
 			ob => sfp_dout_n
 		);
