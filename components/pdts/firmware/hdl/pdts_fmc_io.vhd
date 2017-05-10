@@ -193,13 +193,15 @@ begin
 			o => rec_clk_u
 		);
 		
-	bufh_rec_clk: BUFG
+	bufh_rec_clk: BUFGMUX
 		port map(
-			i => rec_clk_u,
+			i0 => rec_clk_u,
+			i1 => fmc_clk_u,
+			s => loopback,
 			o => rec_clk_i
 		);
 		
-	rec_clk <= rec_clk_i when loopback = '0' else fmc_clk_i;
+	rec_clk <= rec_clk_i;
 
 -- Outputs
 		
