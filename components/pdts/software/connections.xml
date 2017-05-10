@@ -6,5 +6,5 @@
   <connection id="DUNE_FMC_SLAVE" uri="ipbusudp-2.0://192.168.200.17:50001"
    address_table="file://addrtab/top.xml" />
   <connection id="DUNE_FMC_SIM" uri="ipbusudp-2.0://192.168.201.16:50001"
-   address_table="file://addrtab/top.xml" />
+   address_table="file://addrtab/top_sim.xml" />
 </connections>
