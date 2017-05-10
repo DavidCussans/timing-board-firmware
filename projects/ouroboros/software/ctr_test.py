@@ -25,7 +25,7 @@ def status(hw):
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-hw_list = [manager.getDevice("SIM")]
+hw_list = [manager.getDevice("MASTER")]
 
 N_SCHAN = 1
 N_TYPE = 5
