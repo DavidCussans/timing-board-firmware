@@ -9,7 +9,7 @@ from si5344 import si5344
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
 # hw_list = [manager.getDevice("DUNE_FMC_TX"), manager.getDevice("DUNE_FMC_RX")]
-hw_list = [manager.getDevice("DUNE_FMC_MASTER")]
+hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
 pll_cfg_list = ["SI5344/PDTS0000.txt", "SI5344/PDTS0000.txt"]
 
 for hw in hw_list:

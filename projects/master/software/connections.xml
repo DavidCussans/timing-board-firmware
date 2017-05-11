@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<connections>
-  <connection id="DUNE_FMC_MASTER" uri="ipbusudp-2.0://192.168.200.16:50001"
-   address_table="file://addrtab/top.xml" />
-  <connection id="DUNE_FMC_SLAVE" uri="ipbusudp-2.0://192.168.200.17:50001"
-   address_table="file://addrtab/top.xml" />
-</connections>
+../../../components/pdts/software/connections.xml

@@ -6,7 +6,7 @@ import time
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-hw_list = [manager.getDevice("DUNE_FMC_SIM")]
+hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
 
 for hw in hw_list:
 
