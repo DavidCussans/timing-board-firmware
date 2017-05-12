@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 # -*- coding: utf-8 -*-
+import sys
 import uhal
 from I2CuHal import I2CCore
 import time
