@@ -35,8 +35,7 @@ architecture rtl of global is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal sel, ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(0 downto 0);
+	signal sel, ctrl, stat: ipb_reg_v(0 downto 0);
 	signal ctrl_clr, ts_rst: std_logic;
 	
 begin
