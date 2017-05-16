@@ -14,7 +14,7 @@ use work.pdts_defs.all;
 entity pdts_ep_startup is
 	generic(
 		SCLK_FREQ: real;
-		SIM: boolean
+		SIM: boolean := false
 	);
 	port(
 		sclk: in std_logic; -- Free-running system clock
@@ -141,7 +141,7 @@ begin
 		port map(
 			clk => clk,
 			clks => sclk,
-			d(0) => r(4),
+			d(0) => rctr(4),
 			q(0) => t
 		);
 
@@ -156,11 +156,11 @@ begin
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
-					if cctr_rnd = to_unsigned((CLK_FREQ / SCLK_FREQ) * 2048, 16) then
+					if cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 2048.0), 16) then
 						f_ok <= '1';
 					else
 						f_ok <= '0';
-					endif;
+					end if;
 					cctr <= (others => '0');
 				elsif t = '1' and td = '0' then
 					cctr <= cctr + 1;

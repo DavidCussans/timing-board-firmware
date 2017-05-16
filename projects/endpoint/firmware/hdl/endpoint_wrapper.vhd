@@ -109,8 +109,7 @@ begin
 
 	ep: entity work.pdts_endpoint
 		generic map(
-			SCLK_FREQ => 31.25,
-			SIM => SIM
+			SCLK_FREQ => 31.25
 		)
 		port map(
 			sclk => ipb_clk,
