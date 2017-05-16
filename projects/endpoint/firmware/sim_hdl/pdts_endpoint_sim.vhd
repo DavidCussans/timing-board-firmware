@@ -50,6 +50,10 @@ begin
 -- Startup controller
 
 	startup: entity work.pdts_ep_startup
+		generic map(
+			SCLK_FREQ => SCLK_FREQ,
+			SIM => true
+		)
 		port map(
 			sclk => sclk,
 			srst => srst,

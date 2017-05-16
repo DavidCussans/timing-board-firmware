@@ -13,7 +13,8 @@ use work.pdts_defs.all;
 
 entity pdts_ep_startup is
 	generic(
-		SCLK_FREQ: real := 50.0
+		SCLK_FREQ: real;
+		SIM: boolean
 	);
 	port(
 		sclk: in std_logic; -- Free-running system clock
@@ -39,6 +40,9 @@ architecture rtl of pdts_ep_startup is
 
 	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T);
 	signal state, state_d: state_t;
+	signal rctr: unsigned(4 downto 0);
+	signal f_ok, t, td: std_logic;
+	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
 	signal sfp_los_ok, cdr_ok: std_logic;
 	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, rdy_i: std_logic;
@@ -63,18 +67,23 @@ begin
 -- Wait for CDR lock
 				when W_CDR =>
 					if cdr_ok = '1' then
-						state <= W_FREQ;
+						state <= W_ALIGN;
 					end if;
--- Wait for frequency match (not implemented yet)
-				when W_FREQ =>
-					state <= W_ALIGN;
 -- Wait for rxphy alignment
 				when W_ALIGN =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
 					elsif rxphy_aligned_i = '1' then
+						state <= W_FREQ;
+					end if;
+-- Wait for frequency match
+				when W_FREQ =>
+					if sfp_los_ok = '0' or cdr_ok = '0' then
+						state <= W_SFP;
+					elsif f_ok = '1' or SIM then -- Don't want simulation to wait for freq lock
 						state <= W_LOCK;
 					end if;
+				state <= W_LOCK;
 -- Wait for rxphy lock
 				when W_LOCK =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
@@ -111,7 +120,57 @@ begin
 			end if;
 		end if;
 	end process;
+
+-- Freq check
+
+	process(clk) -- Predivide by 32
+	begin
+		if rising_edge(clk) then
+			if rxphy_locked = '0' then
+				rctr <= (others => '0');
+			else
+				rctr <= rctr + 1;
+			end if;
+		end if;
+	end process;
 	
+	sync_t: entity work.pdts_synchro
+		generic map(
+			N => 1
+		)
+		port map(
+			clk => clk,
+			clks => sclk,
+			d(0) => r(4),
+			q(0) => t
+		);
+
+	process(sclk)
+	begin
+		if rising_edge(sclk) then
+			td <= t;
+			if srst = '1' then
+				sctr <= (others => '0');
+				cctr <= (others => '0');
+				f_ok <= '0';
+			else
+				sctr <= sctr + 1;
+				if sctr = X"ffff" then
+					if cctr_rnd = to_unsigned((CLK_FREQ / SCLK_FREQ) * 2048, 16) then
+						f_ok <= '1';
+					else
+						f_ok <= '0';
+					endif;
+					cctr <= (others => '0');
+				elsif t = '1' and td = '0' then
+					cctr <= cctr + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	cctr_rnd <= cctr when t = '0' else cctr + 1;
+
 -- External signal debounce	
 
 	process(sclk)
@@ -170,7 +229,7 @@ begin
 
 -- Resets
 
-	rec_rst_i <= '1' when state = W_SFP or state = W_CDR or state = W_FREQ else '0';
+	rec_rst_i <= '1' when state = W_RST or state = W_SFP or state = W_CDR or state = W_FREQ else '0';
 	rxphy_rst_i <= '1' when rec_rst_i = '1' or state = W_ALIGN else '0';
 	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK else '0';
 
@@ -205,8 +264,8 @@ begin
 		"0000" when W_RST,
 		"0001" when W_SFP,
 		"0010" when W_CDR,
-		"0011" when W_FREQ,
-		"0100" when W_ALIGN,
+		"0011" when W_ALIGN,
+		"0100" when W_FREQ,
 		"0101" when W_LOCK,
 		"0110" when W_RDY,
 		"1000" when RUN,
