@@ -52,9 +52,11 @@ N_TYPE = 5
 
 for hw in hw_list:
 
+    hw.getNode("endpoint.csr.ctrl.ep_en").write(1)
     hw.getNode("master.scmd_gen.ctrl.en").write(1)
     hw.getNode("master.partition.csr.ctrl.cmd_mask").write(0x000f)
     hw.getNode("master.partition.csr.ctrl.trig_en").write(1)
+    hw.getNode("master.partition.csr.ctrl.part_en").write(1)
     hw.getNode("master.scmd_gen.chan_ctrl.type").write(3)
     hw.getNode("master.scmd_gen.chan_ctrl.rate_div").write(0xb)
     hw.getNode("master.scmd_gen.chan_ctrl.patt").write(1)
