@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 # -*- coding: utf-8 -*-
+import sys
 import uhal
 import time
 
@@ -21,7 +22,7 @@ for hw in hw_list:
     hw.dispatch()
     print "m_ts / m_stat:", hex(int(m_t[0]) + (int(m_t[1]) << 32)), hex(m_stat)
 
-	hw.getNode("master.partition.csr.ctrl.part_en").write(1) # Enable partition 0
+    hw.getNode("master.partition.csr.ctrl.part_en").write(1) # Enable partition 0
     hw.getNode("master.partition.csr.ctrl.buf_en").write(0) # Disable buffer in partition 0
     hw.getNode("master.partition.csr.ctrl.cmd_mask").write(0x000f) # Set command mask in partition 0
     hw.dispatch()
