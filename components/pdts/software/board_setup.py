@@ -7,11 +7,33 @@ from I2CuHal import I2CCore
 import time
 from si5344 import si5344
 
+brd_rev = {
+	0xd880395e720b: 1,
+	0xd880395e501a: 1,
+	0xd880395e50b8: 1,
+	0xd880395e501b: 1,
+	0xd880395e7201: 1,
+	0xd880395e4fcc: 1,
+	0xd880395e5069: 1,
+	0xd880395e1c86: 2,
+	0xd880395e2630: 2,
+	0xd880395e262b: 2,
+	0xd880395e2b38: 2,
+	0xd880395e1a6a: 2,
+	0xd880395e36ae: 2,
+	0xd880395e2b2e: 2,
+	0xd880395e2b33: 2,
+	0xd880395e1c81: 2
+}
+
+clk_cfg_files = {
+	1: "SI5344/PDTS0000.txt",
+	2: "SI5344/PDTS0000.txt"
+}
+
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-# hw_list = [manager.getDevice("DUNE_FMC_TX"), manager.getDevice("DUNE_FMC_RX")]
 hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
-pll_cfg_list = ["SI5344/PDTS0000.txt", "SI5344/PDTS0000.txt"]
 
 for hw in hw_list:
 
@@ -36,7 +58,11 @@ for hw in hw_list:
     print "I2c enable lines: " , res
     uid_I2C.write(0x53, [0xfa], False)
     res = uid_I2C.read(0x53, 6)
-    print "Unique ID PROM: " , [hex(no) for no in res]
+    id = 0
+    for i in res:
+    	id = (id << 8) | int(i)
+    print "Unique ID PROM:", hex(id)
+    print "Board rev:", brd_rev[id]
 
     clock_I2C = I2CCore(hw, 10, 5, "io.pll_i2c", None)
     zeClock=si5344(clock_I2C)
