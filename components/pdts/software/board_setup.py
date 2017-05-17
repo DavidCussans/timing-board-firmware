@@ -61,15 +61,14 @@ for hw in hw_list:
     id = 0
     for i in res:
     	id = (id << 8) | int(i)
-    print "Unique ID PROM:", hex(id)
-    print "Board rev:", brd_rev[id]
+    print "Unique ID PROM / board rev", hex(id), brd_rev[id]
 
     clock_I2C = I2CCore(hw, 10, 5, "io.pll_i2c", None)
     zeClock=si5344(clock_I2C)
     res= zeClock.getDeviceVersion()
     zeClock.setPage(0, True)
     zeClock.getPage()
-    regCfgList=zeClock.parse_clk(pll_cfg_list.pop(0))
+    regCfgList=zeClock.parse_clk(clk_cfg_files[brd_rev[id]])
     zeClock.writeConfiguration(regCfgList)
 
     for i in range(2):
