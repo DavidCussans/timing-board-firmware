@@ -28,7 +28,7 @@ brd_rev = {
 
 clk_cfg_files = {
 	1: "SI5344/PDTS0000.txt",
-	2: "SI5344/PDTS0000.txt"
+	2: "SI5344/PDTS0003.txt"
 }
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
@@ -55,7 +55,7 @@ for hw in hw_list:
     uid_I2C.write(0x21, [0x01, 0x7f], True)
     uid_I2C.write(0x21, [0x01], False)
     res = uid_I2C.read(0x21, 1)
-    print "I2c enable lines: " , res
+    print "I2c enable lines:" , res
     uid_I2C.write(0x53, [0xfa], False)
     res = uid_I2C.read(0x53, 6)
     id = 0
