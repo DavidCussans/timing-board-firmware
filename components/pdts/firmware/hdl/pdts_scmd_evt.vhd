@@ -97,7 +97,7 @@ begin
 	err_i <= (err_i or or_reduce(full_f)) and (rob_en and not rob_rst) when rising_edge(clk); -- err status is latched
 	err <= err_i;
 	
-	v <= (v or not empty_i) and not (done or rob_rst or not_rob_en);
+	v <= (v or not empty_i) and not (done or rob_rst or not rob_en);
 	done <= '1' when rctr = 5 else '0';
 	
 	process(rob_clk)
