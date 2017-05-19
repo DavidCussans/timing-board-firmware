@@ -17,7 +17,7 @@ package ipbus_decode_top is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_top(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Sat Apr 15 22:41:15 2017 
+-- START automatically  generated VHDL the Fri May 19 08:15:09 2017 
   constant N_SLV_IO: integer := 0;
   constant N_SLV_MASTER: integer := 1;
   constant N_SLAVES: integer := 2;
@@ -32,11 +32,11 @@ package body ipbus_decode_top is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Sat Apr 15 22:41:15 2017 
-    if    std_match(addr, "--------------------------------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000000
-    elsif std_match(addr, "--------------------------------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER, IPBUS_SEL_WIDTH)); -- master / base 0x00000100 / mask 0x00000000
+-- START automatically  generated VHDL the Fri May 19 08:15:09 2017 
+    if    std_match(addr, "----------------------0---------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000200
+    elsif std_match(addr, "----------------------1---------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER, IPBUS_SEL_WIDTH)); -- master / base 0x00000200 / mask 0x00000200
 -- END automatically generated VHDL
 
     else
