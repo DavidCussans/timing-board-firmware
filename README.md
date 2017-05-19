@@ -17,8 +17,8 @@ These instructions assume that you have your Xilinx Vivado licensing already set
 	source ipbb-0.2.5/env.sh
 	ipbb init build
 	cd build
-	ipbb add git https://github.com/ipbus/ipbus-firmware.git
-	ipbb add git https://:@gitlab.cern.ch:8443/protoDUNE-SP-DAQ/timing-board-firmware.git -b v2
+	ipbb add git https://github.com/ipbus/ipbus-firmware.git -b feature/16
+	ipbb add git https://:@gitlab.cern.ch:8443/protoDUNE-SP-DAQ/timing-board-firmware.git -b v3c
 	ipbb proj create vivado fmc_test timing-board-firmware:projects/test/fmc_test -t top_master_a35.dep
 	cd proj/fmc_test
 	ipbb vivado project
