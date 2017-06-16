@@ -1,5 +1,5 @@
 src pdts_fmc_io_loopback.vhd
-include -c components/opencores_i2c
+include -c ipbus-firmware:components/opencores_i2c
 src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd
 src -c components/mp7_ttc freq_ctr.vhd freq_ctr_div.vhd
 addrtab -c components/mp7_ttc freq_ctr.xml
