@@ -67,13 +67,15 @@ begin
 				end if;
 				if lock = '0' and init = '0' then
 					if pkt_end = '1' then
-						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"01");
+--						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"01");
+						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 0)) + 256 + 1;
 						lock <= '1';
 						init <= '1';
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
-					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"01") then
+--					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"01") then
+					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9)) + 256 + 1 then
 						lock <= '0';
 					end if;
 				end if;
