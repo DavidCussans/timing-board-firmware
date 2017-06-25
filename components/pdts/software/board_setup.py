@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-# -*- coding: utf-8 -*-
 import sys
 import uhal
-from I2CuHal import I2CCore
 import time
+from I2CuHal import I2CCore
 from si5344 import si5344
 
 brd_rev = {
@@ -34,6 +33,10 @@ clk_cfg_files = {
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
 hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
+
+if len(hw_list) == 0:
+	print "No targets specified - I'm done"
+	sys.exit()
 
 for hw in hw_list:
 
