@@ -22,6 +22,7 @@ entity payload is
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic;
+		clk125: in std_logic;
 		fmc_clk_p: in std_logic;
 		fmc_clk_n: in std_logic;
 		rec_clk_p: in std_logic;
