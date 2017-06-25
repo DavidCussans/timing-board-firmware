@@ -1,17 +1,13 @@
 #!/usr/bin/python
 
-# -*- coding: utf-8 -*-
 import uhal
-from I2CuHal import I2CCore
 import time
-from si5344 import si5344
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-hw_tx = manager.getDevice("DUNE_FMC_TX")
-hw_rx = manager.getDevice("DUNE_FMC_RX")
+hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
 
-for hw in [hw_tx, hw_rx]:
+for hw in hw_list:
     print hw.id()
     hw.getNode("csr.ctrl.prbs_init").write(1);
     hw.dispatch()
@@ -21,11 +17,10 @@ for hw in [hw_tx, hw_rx]:
     hw.dispatch()
     print hex(reg)
 
-
-for i in range(10000):
+while True:
 
     time.sleep(1)
-    for hw in [hw_tx, hw_rx]:
+    for hw in hw_list:
         reg = hw.getNode("io.csr.stat").read()
         r2 = hw.getNode("csr.stat.zflag").read()
         cyc_l = hw.getNode("csr.cyc_ctr_l").read()
