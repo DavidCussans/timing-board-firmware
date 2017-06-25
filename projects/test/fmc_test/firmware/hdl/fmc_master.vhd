@@ -13,7 +13,7 @@ use work.ipbus_decode_top.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity fmc_test is
+entity payload is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -56,9 +56,9 @@ entity fmc_test is
 		gpout_1_n: out std_logic		
 	);
 
-end fmc_test;
+end payload;
 
-architecture rtl of fmc_test is
+architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);

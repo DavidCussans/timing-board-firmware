@@ -48,7 +48,7 @@ architecture rtl of pdts_scmd_gen_chan is
 	signal ctrl_rate_div: std_logic_vector(3 downto 0);
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
 	signal mask: std_logic_vector(15 downto 0);
-	signal src: std_logic_vector(26 downto 0);
+	signal src: std_logic_vector(27 downto 0);
 	signal v, valid: std_logic;
 
 begin
@@ -87,8 +87,8 @@ begin
 		end loop;
 	end process;
 	
-	src <= tstamp(26 downto 0) when ctrl_patt = '0' else rand(26 downto 0);
-	v <= '1' when (src(r_i + 11 downto r_i + 8) = ID_V and or_reduce(mask and src(22 downto 7)) = '0' and or_reduce(src(6 downto 0)) = '0' and ctrl_en = '1') or
+	src <= tstamp(27 downto 0) when ctrl_patt = '0' else rand(27 downto 0);
+	v <= '1' when (or_reduce(mask and src(27 downto 12)) = '0' and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and or_reduce(src(7 downto 0)) = '0' and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
 	
 	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst) when rising_edge(clk);		
