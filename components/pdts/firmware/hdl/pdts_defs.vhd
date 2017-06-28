@@ -40,10 +40,22 @@ package pdts_defs is
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
 	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"0008"; -- Which sync cmds cause evt ctr update
 
-	constant SCMD_MAX: integer := 4; -- Number of scmds in use (must be contiguous)
-	constant SCMD_SYNC: integer := 4; -- The sync commmand ID
+	constant SCMD_MAX: integer := 7; -- Number of scmds in use (must be contiguous)
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
 	constant SCMD_LEN: SCMD_LEN_T := (SCMD_SYNC => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
+	
+	constant SCMD_RUN_START: integer := 0;
+	constant SCMD_RUN_STOP: integer := 1;
+	constant SCMD_SPILL_START: integer := 2;
+	constant SCMD_SPILL_STOP: integer := 3;
+	constant SCMD_TRIG: integer := 4;
+	constant SCMD_CALIB: integer := 5;
+	constant SCMD_SYNC: integer := 6;
+
+-- System-level constants
+
+	constant SPS_CYCLE_LEN: real := 30.0; -- 30s cycle time
+	constant SPS_SPILL_LEN: real := 4.8; -- 4.8s spill
 	
 -- Types
 
@@ -55,6 +67,7 @@ package pdts_defs is
 		end record;
 
 	type cmd_w_array is array(natural range <>) of cmd_w;
+	constant CMD_W_NULL: cmd_w := ((others => '0'), '0', '0');
 	
 	type cmd_r is
 		record

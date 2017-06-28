@@ -26,7 +26,8 @@ entity global is
 		tx_err: in std_logic;
 		part_sel: out std_logic_vector(calc_width(N_PART) - 1 downto 0);
 		en: out std_logic;
-		tstamp: out std_logic_vector(63 downto 0)
+		tstamp: out std_logic_vector(63 downto 0);
+		spill: in std_logic
 	);
 		
 end global;
@@ -97,7 +98,7 @@ begin
 			q => ctrl
 		);
 
-	stat(0) <= X"0000000" & "000" & tx_err;
+	stat(0) <= X"0000000" & "00" & spill & tx_err;
 	en <= ctrl(0)(0);
 	ctrl_clr <= ctrl(0)(1);
 

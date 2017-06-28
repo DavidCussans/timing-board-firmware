@@ -80,7 +80,8 @@ begin
 			tx_err => tx_err,
 			part_sel => sel,
 			en => en,
-			tstamp => tstamp
+			tstamp => tstamp,
+			spill => spill
 		);
 		
 -- Strobe gen
@@ -106,6 +107,19 @@ begin
 			rst => rst,
 			acmd_out => acmdw,
 			acmd_in => acmdr
+		);
+		
+-- Spill gate
+
+	spgate: entity work.pdts_spill_gate
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SPILL),
+			ipb_out => ipbr(N_SLV_SPILL),
+			clk => clk,
+			rst => rst,
+			spill => spill
 		);
 
 -- Sync command gen
