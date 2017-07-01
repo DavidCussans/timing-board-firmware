@@ -24,7 +24,6 @@ if len(hw_list) == 0:
 	print "No targets specified - I'm done"
 	sys.exit()
 
-
 for hw in hw_list:
 
     print hw.id()

@@ -11,9 +11,7 @@
 			</node>
 			<node id="stat" address="0x1">
 				<node id="tx_err" mask="0x1"/>
-				<node id="in_spill" mask="0x2"/>
 			</node>
 		</node>
 		<node id="tstamp" address="0x4" mode="block" size="0x2" fwinfo="endpoint;width=1"/>
-		<node id="spill_ctr" address="0x6" fwinfo="endpoint;width=0"/>
 </node>
