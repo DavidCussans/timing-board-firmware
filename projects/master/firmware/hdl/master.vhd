@@ -38,8 +38,8 @@ architecture rtl of master is
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-	signal scmdw_v: cmd_w_array(N_CHAN + N_PART - 1 downto 0);
-	signal scmdr_v: cmd_r_array(N_CHAN + N_PART - 1 downto 0);
+	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 1 downto 0);
+	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 1 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
@@ -80,8 +80,7 @@ begin
 			tx_err => tx_err,
 			part_sel => sel,
 			en => en,
-			tstamp => tstamp,
-			spill => spill
+			tstamp => tstamp
 		);
 		
 -- Strobe gen
@@ -119,9 +118,27 @@ begin
 			ipb_out => ipbr(N_SLV_SPILL),
 			clk => clk,
 			rst => rst,
-			spill => spill
+			spill => spill,
+			scmd_out => scmdw_v(N_CHAN + N_PART),
+			scmd_in => scmdr_v(N_CHAN + N_PART)
 		);
 
+-- Timestamp
+
+	ts: entity work.pdts_ts_gen
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TSTAMP),
+			ipb_out => ipbr(N_SLV_TSTAMP),		
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			evtctr => evtctr,
+			scmd_out => scmdw_v(N_CHAN + N_PART + 1),
+			scmd_in => scmdr_v(N_CHAN + N_PART + 1)
+		);
+	
 -- Sync command gen
 
 	gen: entity work.pdts_scmd_gen
@@ -158,9 +175,6 @@ begin
 	pgen: for i in N_PART - 1 downto 0 generate
 	
 		part: entity work.partition
-			generic map(
-				PARTITION_ID => i
-			)
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
@@ -182,7 +196,7 @@ begin
 
 	merge: entity work.pdts_scmd_merge
 		generic map(
-			N_SRC => N_CHAN + N_PART
+			N_SRC => N_CHAN + N_PART + 2
 		)
 		port map(
 			clk => clk,

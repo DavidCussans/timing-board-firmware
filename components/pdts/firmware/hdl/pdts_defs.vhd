@@ -44,13 +44,13 @@ package pdts_defs is
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
 	constant SCMD_LEN: SCMD_LEN_T := (SCMD_SYNC => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
 	
-	constant SCMD_RUN_START: integer := 0;
-	constant SCMD_RUN_STOP: integer := 1;
-	constant SCMD_SPILL_START: integer := 2;
-	constant SCMD_SPILL_STOP: integer := 3;
-	constant SCMD_TRIG: integer := 4;
-	constant SCMD_CALIB: integer := 5;
-	constant SCMD_SYNC: integer := 6;
+	constant SCMD_SPILL_START: std_logic_vector(3 downto 0) := X"0";
+	constant SCMD_SPILL_STOP: std_logic_vector(3 downto 0) := X"1";
+	constant SCMD_RUN_START: std_logic_vector(3 downto 0) := X"2";
+	constant SCMD_RUN_STOP: std_logic_vector(3 downto 0) := X"3";
+	constant SCMD_TRIG: std_logic_vector(3 downto 0) := X"4";
+	constant SCMD_CALIB: std_logic_vector(3 downto 0) := X"5";
+	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"6";
 
 -- System-level constants
 
