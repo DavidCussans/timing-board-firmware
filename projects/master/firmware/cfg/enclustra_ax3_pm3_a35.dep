@@ -6,7 +6,7 @@
 
 setup settings_v7.tcl
 src top_enclustra_ax3_pm3.vhd
-include -c boards/enclustra_ax3_pm3/base_fw/synth enclustra_ax3_pm3_infra.dep
+include -c ipbus-firmware:boards/enclustra_ax3_pm3/base_fw/synth enclustra_ax3_pm3_infra.dep
 src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
 src -c components/pdts --cd ../ucf pc053_ax3_pm3.tcl
-src -c boards/enclustra_ax3_pm3/base_fw/synth --cd ../ucf enclustra_ax3_pm3.tcl
+src -c ipbus-firmware:boards/enclustra_ax3_pm3/base_fw/synth --cd ../ucf enclustra_ax3_pm3.tcl
