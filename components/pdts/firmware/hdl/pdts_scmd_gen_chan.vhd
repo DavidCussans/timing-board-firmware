@@ -88,7 +88,7 @@ begin
 	end process;
 	
 	src <= tstamp(27 downto 0) when ctrl_patt = '0' else rand(27 downto 0);
-	v <= '1' when (or_reduce(mask and src(27 downto 12)) = '0' and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and or_reduce(src(7 downto 0)) = '0' and ctrl_en = '1') or
+	v <= '1' when (or_reduce(mask and src(27 downto 12)) = '0' and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
 	
 	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst) when rising_edge(clk);		

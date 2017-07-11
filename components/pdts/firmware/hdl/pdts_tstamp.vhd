@@ -1,6 +1,6 @@
 -- pdts_tstamp
 --
--- Maintains the timestamp and event counters
+-- Maintains the endpoint timestamp and event counters
 --
 -- Dave Newbold, March 2017
 

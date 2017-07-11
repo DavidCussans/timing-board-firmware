@@ -1,6 +1,6 @@
 -- pdts_ts_gen
 --
--- Generates time stamp packets
+-- Generates time stamp commands
 --
 -- Dave Newbold, March 2017
 

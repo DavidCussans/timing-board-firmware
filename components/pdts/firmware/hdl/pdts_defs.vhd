@@ -50,7 +50,8 @@ package pdts_defs is
 	constant SCMD_RUN_STOP: std_logic_vector(3 downto 0) := X"3";
 	constant SCMD_TRIG: std_logic_vector(3 downto 0) := X"4";
 	constant SCMD_CALIB: std_logic_vector(3 downto 0) := X"5";
-	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"6";
+	constant SCMD_SAMP_SYNC: std_logic_vector(3 downto 0) := X"6";
+	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"7";
 
 -- System-level constants
 

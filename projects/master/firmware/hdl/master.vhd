@@ -34,7 +34,6 @@ architecture rtl of master is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
-	signal en: std_logic;
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
@@ -78,9 +77,22 @@ begin
 			clk => clk,
 			rst => rst,
 			tx_err => tx_err,
-			part_sel => sel,
-			en => en,
-			tstamp => tstamp
+			part_sel => sel
+		);
+		
+-- Timestamp
+
+	sgate: entity work.pdts_spill_gate
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TSTAMP),
+			ipb_out => ipbr(N_SLV_TSTAMP),
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			scmd_out => scmdw_v(N_CHAN + N_PART + 1),
+			scmd_in => scmdr_v(N_CHAN + N_PART + 1)
 		);
 		
 -- Strobe gen
@@ -110,7 +122,7 @@ begin
 		
 -- Spill gate
 
-	spgate: entity work.pdts_spill_gate
+	sgate: entity work.pdts_spill_gate
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -121,22 +133,6 @@ begin
 			spill => spill,
 			scmd_out => scmdw_v(N_CHAN + N_PART),
 			scmd_in => scmdr_v(N_CHAN + N_PART)
-		);
-
--- Timestamp
-
-	ts: entity work.pdts_ts_gen
-		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_TSTAMP),
-			ipb_out => ipbr(N_SLV_TSTAMP),		
-			clk => clk,
-			rst => rst,
-			tstamp => tstamp,
-			evtctr => evtctr,
-			scmd_out => scmdw_v(N_CHAN + N_PART + 1),
-			scmd_in => scmdr_v(N_CHAN + N_PART + 1)
 		);
 	
 -- Sync command gen

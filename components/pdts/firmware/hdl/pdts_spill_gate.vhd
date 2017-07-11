@@ -15,12 +15,8 @@ use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
 use work.pdts_defs.all;
-use work.master_defs.all;
 
 entity pdts_spill_gate is
-	generic(
-		N_CHAN: positive := 1
-	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;

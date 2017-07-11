@@ -13,6 +13,7 @@ package master_defs is
 	constant N_PART: integer := 1; -- Number of partitions (max 4 at present)
 	constant N_CHAN: integer := 1; -- Number of scmd generator channels
 	constant N_FIFO: integer := 1;
-	constant TS_DIV: unsigned(27 downto 0) := X"3200000"; -- Once per 1024 * 1024 * 2 cycles of 2MHz clock = 1.05s
+	constant TS_RATE_RADIX: positive := 26; -- Issue TS at a rate of 50MHz/(2^26) = 0.75Hz per partition. Never set to less than 15.
+	constant SAMP_SYNC_DIV: positive := 16#3200000; -- Sample sync on 2MHz edges, about once per second
 	
 end master_defs;
