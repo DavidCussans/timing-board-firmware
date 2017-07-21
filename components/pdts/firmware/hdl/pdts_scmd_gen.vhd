@@ -18,7 +18,7 @@ use work.master_defs.all;
 
 entity pdts_scmd_gen is
 	generic(
-		N_CHAN: positive := 1
+		N_CHAN: positive
 	);
 	port(
 		ipb_clk: in std_logic;
