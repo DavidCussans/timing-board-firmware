@@ -74,7 +74,7 @@ architecture rtl of pdts_fmc_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout, rec_d_i: std_logic;
 	signal gpin: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
@@ -235,12 +235,10 @@ begin
 			o => gpout_1_p,
 			ob => gpout_1_n
 		);
-		
-	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk_i);
-		
+				
 	obuf_sfp_dout: OBUFDS
 		port map(
-			i => sfp_dout_r,
+			i => sfp_dout,
 			o => sfp_dout_p,
 			ob => sfp_dout_n
 		);
