@@ -44,6 +44,8 @@ entity pdts_fmc_io is
 		clk_out_n: out std_logic;
 		rj45_din_p: in std_logic;
 		rj45_din_n: in std_logic;
+		rj45_din: out std_logic;
+		rj45_dout: in std_logic;
 		rj45_dout_p: out std_logic;
 		rj45_dout_n: out std_logic;
 		sfp_dout: in std_logic;
@@ -73,7 +75,7 @@ architecture rtl of pdts_fmc_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
-	signal gpin, rj45_din: std_logic;
+	signal gpin: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
@@ -138,26 +140,12 @@ begin
 --			o => gpout_1_p,
 --			ob => gpout_1_n
 --		);
-		
-	obuf_rj45_dout: OBUFDS
-		port map(
-			i => '0',
-			o => rj45_dout_p,
-			ob => rj45_dout_n
-		);
-		
+
 	ibufds_gpin_0: IBUFDS
 		port map(
 			i => gpin_0_p,
 			ib => gpin_0_n,
 			o => gpin
-		);
-		
-	ibufds_rj45: IBUFDS
-		port map(
-			i => rj45_din_p,
-			ib => rj45_din_n,
-			o => rj45_din
 		);
 
 -- Clocks
@@ -256,6 +244,13 @@ begin
 			o => sfp_dout_p,
 			ob => sfp_dout_n
 		);
+		
+	obuf_rj45_dout: OBUFDS
+		port map(
+			i => rj45_dout,
+			o => rj45_dout_p,
+			ob => rj45_dout_n
+		);
 
 -- Inputs
 
@@ -264,6 +259,13 @@ begin
 			i => rec_d_p,
 			ib => rec_d_n,
 			o => rec_d
+		);
+		
+	ibufds_rj45: IBUFDS
+		port map(
+			i => rj45_din_p,
+			ib => rj45_din_n,
+			o => rj45_din
 		);
 
 -- Frequency measurement
