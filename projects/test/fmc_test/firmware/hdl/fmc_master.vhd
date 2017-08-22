@@ -64,7 +64,7 @@ architecture rtl of payload is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(4 downto 0);
+	signal stat: ipb_reg_v(6 downto 0);
 	signal rst, fmc_clk, rec_clk, rec_d, sfp_dout, rj45_din, rj45_dout: std_logic;
 	signal ctrl_chk_init, rst_fmc_clk, rst_rec_clk, chk_init, chk_init_fmc, rec_d_r, rec_d_r_rj45, p: std_logic;
 	signal cyc_ctr, err_ctr, err_ctr_rj45: std_logic_vector(47 downto 0);
@@ -73,6 +73,8 @@ architecture rtl of payload is
 	attribute IOB: string;
 	attribute IOB of sfp_dout: signal is "TRUE";
 	attribute IOB of rec_d_r: signal is "TRUE";
+	attribute IOB of rj45_dout: signal is "TRUE";
+    attribute IOB of rec_d_r_rj45: signal is "TRUE";
 			
 begin
 
@@ -165,17 +167,22 @@ begin
 	stat(2) <= X"0000" & cyc_ctr(47 downto 32);
 	stat(3) <= err_ctr(31 downto 0);
 	stat(4) <= X"0000" & err_ctr(47 downto 32);
-	stat(3) <= err_ctr_rj45(31 downto 0);
-	stat(4) <= X"0000" & err_ctr_rj45(47 downto 32);
+	stat(5) <= err_ctr_rj45(31 downto 0);
+	stat(6) <= X"0000" & err_ctr_rj45(47 downto 32);
 	
 	ctrl_chk_init <= ctrl(0)(0);
 	
 	fmc_clk_s: entity work.pdts_synchro
+		generic map(
+            N => 2
+        )
 		port map(
 			clk => ipb_clk,
 			clks => fmc_clk,
 			d(0) => rst,
-			q(0) => rst_fmc_clk
+			d(1) => ctrl_chk_init,
+			q(0) => rst_fmc_clk,
+			q(1) => chk_init_fmc
 		);
 		
 	rec_clk_s: entity work.pdts_synchro
@@ -189,17 +196,6 @@ begin
 			d(1) => ctrl_chk_init,
 			q(0) => rst_rec_clk,
 			q(1) => chk_init
-		);
-		
-	fmc_clk_s: entity work.pdts_synchro
-		generic map(
-			N => 2
-		)
-		port map(
-			clk => ipb_clk,
-			clks => fmc_clk,
-			d(0) => ctrl_chk_init,
-			q(0) => chk_init_fmc
 		);
 		
 -- PRBS gen
@@ -234,7 +230,7 @@ begin
 	rj45_dout <= p when falling_edge(fmc_clk);
 	rec_d_r_rj45 <= rj45_din when falling_edge(fmc_clk);
 
-	prbs_chk_sfp: entity work.prbs7_chk
+	prbs_chk_rj45: entity work.prbs7_chk
 		port map(
 			clk => fmc_clk,
 			rst => rst_fmc_clk,
