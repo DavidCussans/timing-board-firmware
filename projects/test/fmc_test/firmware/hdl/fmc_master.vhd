@@ -174,8 +174,8 @@ begin
 	
 	fmc_clk_s: entity work.pdts_synchro
 		generic map(
-            N => 2
-        )
+			N => 2
+		)
 		port map(
 			clk => ipb_clk,
 			clks => fmc_clk,
@@ -221,7 +221,7 @@ begin
 			init => chk_init,
 			d => rec_d_r,
 			err_ctr => err_ctr,
-			cyc_ctr => cyc_ctr,
+			cyc_ctr => open,
 			zflag => zflag
 		);
 		
@@ -238,7 +238,7 @@ begin
 			init => chk_init_fmc,
 			d => rj45_din_rr,
 			err_ctr => err_ctr_rj45,
-			cyc_ctr => open,
+			cyc_ctr => cyc_ctr,
 			zflag => zflag_rj45
 		);
 		
