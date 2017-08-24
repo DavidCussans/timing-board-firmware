@@ -27,7 +27,7 @@ while True:
     for hw in hw_list:
         reg = hw.getNode("io.csr.stat").read()
         z_sfp = hw.getNode("csr.stat.zflag").read()
-        z_rj45 = hw.getNode("csr.stat.zflag").read()
+        z_rj45 = hw.getNode("csr.stat.zflag_rj45").read()
         cyc_l = hw.getNode("csr.cyc_ctr_l").read()
         cyc_h = hw.getNode("csr.cyc_ctr_h").read()
         sfp_l = hw.getNode("csr.sfp_ctr_l").read()
