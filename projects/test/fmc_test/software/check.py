@@ -2,6 +2,7 @@
 
 import uhal
 import time
+import sys
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
