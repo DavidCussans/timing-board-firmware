@@ -11,7 +11,7 @@
         <node id="cyc_ctr_h" address="0x0a"/>
         <node id="sfp_ctr_l" address="0x0b"/>
         <node id="sfp_ctr_h" address="0x0c"/>
-        <node id="rj45_ctr_l" address="0x0e"/>
+        <node id="rj45_ctr_l" address="0x0d"/>
         <node id="rj45_ctr_h" address="0x0e"/>
     </node>
     <node id="io" address="0x40" module="file://pdts_fmc_io.xml"/>
