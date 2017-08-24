@@ -236,7 +236,7 @@ begin
 			clk => fmc_clk,
 			rst => rst_fmc_clk,
 			init => chk_init_fmc,
-			d => rec_d_r_rj45,
+			d => rj45_din_rr,
 			err_ctr => err_ctr_rj45,
 			cyc_ctr => open,
 			zflag => zflag_rj45
