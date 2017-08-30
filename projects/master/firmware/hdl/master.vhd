@@ -84,6 +84,9 @@ begin
 -- Timestamp
 
 	sgate: entity work.pdts_tstamp_source
+		generic map(
+			N_PART => N_PART
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -131,28 +134,10 @@ begin
 			clk => clk,
 			rst => rst,
 			spill => spill,
-			scmd_out => scmdw_v(N_CHAN + N_PART),
-			scmd_in => scmdr_v(N_CHAN + N_PART)
+			scmd_out => scmdw_v(0),
+			scmd_in => scmdr_v(0)
 		);
-	
--- Sync command gen
 
-	gen: entity work.pdts_scmd_gen
-		generic map(
-			N_CHAN => N_CHAN
-		)
-		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_SCMD_GEN),
-			ipb_out => ipbr(N_SLV_SCMD_GEN),
-			clk => clk,
-			rst => rst,
-			tstamp => tstamp,
-			scmd_out => scmdw_v(N_CHAN - 1 downto 0),
-			scmd_in => scmdr_v(N_CHAN - 1 downto 0)
-		);
-		
 -- Partitions
 
 	fabric_p: entity work.ipbus_fabric_sel
@@ -181,22 +166,42 @@ begin
 				tstamp => tstamp,
 				psync => psync(i),
 				spill => spill,
-				scmd_out_ts => scmdw_v(i + N_CHAN),
-				scmd_in_ts => scmdr_v(i + N_CHAN),
-				scmd_out_rs => ???,
-				scmd_in_rs => ???,
+				scmd_out => scmdw_v(i + 1),
+				scmd_in => scmdr_v(i + 1),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
 			);
 			
 	end generate;
+	
+-- Trigger command input
+
+	scmdw_v(N_PART + 1) <= CMS_W_NULL;
+	
+-- Sync command gen
+
+	gen: entity work.pdts_scmd_gen
+		generic map(
+			N_CHAN => N_CHAN
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SCMD_GEN),
+			ipb_out => ipbr(N_SLV_SCMD_GEN),
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			scmd_out => scmdw_v(N_PART + 2 + N_CHAN - 1 downto N_PART + 2),
+			scmd_in => scmdr_v(N_PART + 2 + N_CHAN - 1 downto N_PART + 2)
+		);
 		
 -- Merge
 
 	merge: entity work.pdts_scmd_merge
 		generic map(
-			N_SRC => N_CHAN + N_PART + 2
+			N_SRC => N_CHAN + N_PART + 3
 		)
 		port map(
 			clk => clk,
@@ -217,7 +222,7 @@ begin
 			clk => clk,
 			rst => rst,
 			stb => stb,
-			addr => X"AA",
+			addr => X"00",
 			scmd_in => scmdw,
 			scmd_out => scmdr,
 			acmd_in => acmdw,

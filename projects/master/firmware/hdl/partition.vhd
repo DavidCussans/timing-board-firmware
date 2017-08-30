@@ -31,10 +31,8 @@ entity partition is
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		psync: in std_logic;
 		spill: in std_logic;
-		scmd_out_ts: out cmd_w;
-		scmd_in_ts: in cmd_r;
-		scmd_out_rs: out cmd_w;
-		scmd_in_rs: in cmd_r;
+		scmd_out: out cmd_w;
+		scmd_in: in cmd_r;
 		typ: in std_logic_vector(SCMD_W - 1 downto 0);
 		tv: in std_logic;
 		tack: out std_logic
@@ -150,14 +148,10 @@ begin
 			rst => rst,
 			tstamp => tstamp,
 			evtctr => evtctr,
-			scmd_out => scmd_out_ts,
-			scmd_in => scmd_in_ts
+			scmd_out => scmd_out,
+			scmd_in => scmd_in
 		);
-		
--- Run start / stop
 
-	scmd_out_rs <= CMD_W_NULL;
-		
 -- Event buffer
 
 	synchro: entity work.pdts_synchro
