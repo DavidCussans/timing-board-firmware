@@ -38,6 +38,6 @@ begin
 		end if;
 	end process;
 
-	q <= b;
+	q <= b when rising_edge(clk);
 	
 end rtl;

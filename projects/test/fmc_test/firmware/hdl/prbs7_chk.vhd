@@ -25,13 +25,14 @@ architecture rtl of prbs7_chk is
 
 	signal err_ctr_i, cyc_ctr_i: unsigned(47 downto 0);
 	signal ctr: unsigned(2 downto 0);
-	signal q, done, load, rst_d, z: std_logic;
+	signal dd, q, done, load, rst_d, z: std_logic;
 	
 begin
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
+			dd <= d;
 			rst_d <= rst;
 			load <= ((load and not done) or (init or rst_d)) and not rst;
 			z <= (z or d) and not (rst or init);
@@ -41,7 +42,7 @@ begin
 				cyc_ctr_i <= (others => '0');
 			else
 				ctr <= "000";
-				if d /= q then
+				if dd /= q then
 					err_ctr_i <= err_ctr_i + 1;
 				end if;
 				cyc_ctr_i <= cyc_ctr_i + 1;
