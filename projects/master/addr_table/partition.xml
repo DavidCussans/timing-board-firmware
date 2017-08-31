@@ -6,6 +6,7 @@
 				<node id="evtctr_rst" mask="0x4"/>
 				<node id="trig_ctr_rst" mask="0x8"/>
 				<node id="buf_en" mask="0x10"/>
+				<node id="run_req" mask="0x20"/>
 				<node id="cmd_mask" mask="0xffff0000"/>
 			</node>
 			<node id="stat" address="0x1">
@@ -13,7 +14,8 @@
 				<node id="buf_empty" mask="0x2"/>
 				<node id="rob_warn" mask="0x4"/>
 				<node id="rob_full" mask="0x8"/>
-				<node id="rob_empty" mask="0x10"/>				
+				<node id="rob_empty" mask="0x10"/>
+				<node id="run_stat" mask="0x20"/>
 			</node>
 		</node>
 		<node id="evtctr" address="0x2" fwinfo="endpoint;width=0"/>

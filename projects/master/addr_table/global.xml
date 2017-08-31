@@ -4,6 +4,8 @@
 			<node id="ctrl" address="0x0">
 				<node id="part_sel" mask="0xf"/>
 				<node id="lock" mask="0xf0"/>
+				<node id="ext_trig_en" mask="0x100"/>
+				<node id="warm_start_flag" mask="0x200"/>
 			</node>
 			<node id="stat" address="0x1">
 				<node id="tx_err" mask="0x1"/>
