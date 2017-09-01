@@ -25,8 +25,8 @@ entity spill_gate is
 		clk: in std_logic;
 		rst: in std_logic;
 		spill: out std_logic;
-		scmd_out: cmd_w;
-		scmd_in: cmd_r
+		scmd_out: out cmd_w;
+		scmd_in: in cmd_r
 	);
 
 end spill_gate;
@@ -38,7 +38,7 @@ architecture rtl of spill_gate is
 	signal ectr: unsigned(23 downto 0) := (others => '0');
 	signal cctr: unsigned(7 downto 0) := (others => '0');
 	signal sctr: unsigned(15 downto 0);
-	signal spill_i, ctrl_en, ctrl_en_fake: std_logic;
+	signal s, spill_i, ctrl_en, ctrl_en_fake: std_logic;
 	signal ctrl_fake_cyc_len, ctrl_fake_spill_len: std_logic_vector(7 downto 0);
 
 begin
@@ -67,17 +67,15 @@ begin
 
 -- Fake generator
 
-	ectr <= ectr + 1 when rising_edge(clk);
-	
 	process(clk)
 	begin
 		if rising_edge(clk) then
+			ectr <= ectr + 1;
 			s <= '0';
-			if rst = '1' or en_fake = '0' then
+			if rst = '1' or ctrl_en_fake = '0' then
 				spill_i <= '0';
 				sctr <= (others => '0');
 				cctr <= (others => '0');
-				scmd_out <= CMD_W_NULL;
 			elsif and_reduce(std_logic_vector(ectr)) = '1' then
 				if cctr = unsigned(ctrl_fake_cyc_len) then
 					cctr <= (others => '0');
