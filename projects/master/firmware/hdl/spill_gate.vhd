@@ -1,4 +1,4 @@
--- pdts_spill_gate
+-- spill_gate
 --
 -- Generates spill gate signal
 --
@@ -16,7 +16,7 @@ use work.ipbus_reg_types.all;
 
 use work.pdts_defs.all;
 
-entity pdts_spill_gate is
+entity spill_gate is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -29,9 +29,9 @@ entity pdts_spill_gate is
 		scmd_in: cmd_r
 	);
 
-end pdts_spill_gate;
+end spill_gate;
 
-architecture rtl of pdts_spill_gate is
+architecture rtl of spill_gate is
 
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);

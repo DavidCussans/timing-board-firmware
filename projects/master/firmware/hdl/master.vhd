@@ -125,7 +125,7 @@ begin
 		
 -- Spill gate
 
-	sgate: entity work.pdts_spill_gate
+	sgate: entity work.spill_gate
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -181,7 +181,7 @@ begin
 	
 -- Sync command gen
 
-	gen: entity work.pdts_scmd_gen
+	gen: entity work.scmd_gen
 		generic map(
 			N_CHAN => N_CHAN
 		)
@@ -199,7 +199,7 @@ begin
 		
 -- Merge
 
-	merge: entity work.pdts_scmd_merge
+	merge: entity work.scmd_merge
 		generic map(
 			N_SRC => N_CHAN + N_PART + 3
 		)
