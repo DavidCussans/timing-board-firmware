@@ -13,6 +13,6 @@ package master_defs is
 	constant N_PART: integer := 1; -- Number of partitions (max 4 at present)
 	constant N_CHAN: integer := 1; -- Number of scmd generator channels
 	constant N_FIFO: integer := 1;
-	constant TS_DIV: positive := 16#c800#
+	constant TS_DIV: positive := 16#c800#;
 
 end master_defs;
