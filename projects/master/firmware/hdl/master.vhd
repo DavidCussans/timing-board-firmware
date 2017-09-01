@@ -83,7 +83,7 @@ begin
 		
 -- Timestamp
 
-	sgate: entity work.pdts_tstamp_source
+	tssrc: entity work.ts_source
 		generic map(
 			N_PART => N_PART
 		)

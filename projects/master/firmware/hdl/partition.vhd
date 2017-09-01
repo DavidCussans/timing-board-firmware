@@ -148,6 +148,7 @@ begin
 			rst => rst,
 			tstamp => tstamp,
 			evtctr => evtctr,
+			sync => psync,
 			scmd_out => scmd_out,
 			scmd_in => scmd_in
 		);

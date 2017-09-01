@@ -21,6 +21,7 @@ entity pdts_ts_gen is
 		rst: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		evtctr: in std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
+		sync: in std_logic;
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r
 	);
@@ -31,14 +32,12 @@ architecture rtl of pdts_ts_gen is
 
 	signal cap: std_logic_vector(8 * (TSTAMP_WDS + EVTCTR_WDS + 1) - 1 downto 0);
 	signal ctr: unsigned(3 downto 0);
-	signal sync, go, s, done: std_logic;
+	signal go, s, done: std_logic;
 
 begin
 	
 -- Sending packet
 
-	sync <= '1' when tstamp(TS_RATE_RADIX - 1 downto TS_RATE_RADIX - 2) = std_logic_vector(to_unsigned(PARTITION_ID, 2)) and
-		or_reduce(std_logic_vector(tstamp(TS_RATE_RADIX - 3 downto 0))) = '0' and rst = '0' else '0';
 	go <= sync and scmd_in.ack;
 	
 -- Capture
