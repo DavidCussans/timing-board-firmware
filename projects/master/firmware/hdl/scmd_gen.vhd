@@ -59,7 +59,7 @@ begin
 		port map(
 			ipb_in => ipb_in,
 			ipb_out => ipb_out,
-			sel => ipbus_sel_pdts_scmd_gen(ipb_in.ipb_addr),
+			sel => ipbus_sel_scmd_gen(ipb_in.ipb_addr),
 			ipb_to_slaves => ipbw,
 			ipb_from_slaves => ipbr
 		);
