@@ -38,11 +38,7 @@ package pdts_defs is
 
 	constant TSTAMP_WDS: natural := 8; -- Number of words in timestamp
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
-	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"0008"; -- Which sync cmds cause evt ctr update
-
-	constant SCMD_MAX: integer := 7; -- Number of scmds in use (must be contiguous)
-	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
-	constant SCMD_LEN: SCMD_LEN_T := (SCMD_SYNC => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
+	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"0100"; -- Which sync cmds cause evt ctr update
 	
 	constant SCMD_SPILL_START: std_logic_vector(3 downto 0) := X"0";
 	constant SCMD_SPILL_STOP: std_logic_vector(3 downto 0) := X"1";
@@ -51,6 +47,10 @@ package pdts_defs is
 	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"7";
 	constant SCMD_TRIG: std_logic_vector(3 downto 0) := X"8"; -- Commands from 0x8 to 0xf reserved for triggers / calib
 
+	constant SCMD_MAX: integer := 8; -- Number of scmds in use (must be contiguous)
+	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
+	constant SCMD_LEN: SCMD_LEN_T := (to_integer(unsigned(SCMD_SYNC)) => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
+	
 -- System-level constants
 
 	constant SPS_CYCLE_LEN: real := 30.0; -- 30s cycle time
