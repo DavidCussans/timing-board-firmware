@@ -1,4 +1,4 @@
--- pdts_ts_gen
+-- ts_gen
 --
 -- Generates time stamp commands
 --
@@ -11,11 +11,7 @@ use ieee.std_logic_misc.all;
 
 use work.pdts_defs.all;
 
-entity pdts_ts_gen is
-	generic(
-		PARTITION_ID: integer;
-		TS_RATE_RADIX: positive
-	);
+entity ts_gen is
 	port(
 		clk: in std_logic;
 		rst: in std_logic;
@@ -26,9 +22,9 @@ entity pdts_ts_gen is
 		scmd_in: in cmd_r
 	);
 
-end pdts_ts_gen;
+end ts_gen;
 
-architecture rtl of pdts_ts_gen is
+architecture rtl of ts_gen is
 
 	signal cap: std_logic_vector(8 * (TSTAMP_WDS + EVTCTR_WDS + 1) - 1 downto 0);
 	signal ctr: unsigned(3 downto 0);
@@ -44,7 +40,7 @@ begin
 
 	s <= ((s and not (done and scmd_in.ren)) or go) and not rst when rising_edge(clk);
 	cap(8 * (TSTAMP_WDS + EVTCTR_WDS + 1) - 1 downto 8) <= evtctr & tstamp when go = '1' and rising_edge(clk);
-	cap(7 downto 0) <= (7 downto SCMD_W => '0') & std_logic_vector(to_unsigned(SCMD_SYNC, SCMD_W)); -- aux = PARTITION_ID, tcmd = 0xf
+	cap(7 downto 0) <= (7 downto SCMD_W => '0') & SCMD_SYNC;
 		
 	process(clk)
 	begin

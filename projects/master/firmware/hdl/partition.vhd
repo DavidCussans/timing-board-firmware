@@ -138,11 +138,7 @@ begin
 			q => evtctr
 		);
 
-	ts: entity work.pdts_ts_gen
-		generic map(
-			PARTITION_ID => PARTITION_ID,
-			TS_RATE_RADIX => TS_RATE_RADIX
-		)
+	ts: entity work.ts_gen
 		port map(
 			clk => clk,
 			rst => rst,
