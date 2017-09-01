@@ -40,7 +40,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctr <= (others => '0');
-			elsif (s_valid = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = std_logic_vector(to_unsigned(SCMD_SYNC, SCMD_W))) or ctr /= to_unsigned(0, ctr'length) then
+			elsif (s_valid = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
 				if ctr < (TSTAMP_WDS + EVTCTR_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
 					sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);
@@ -67,14 +67,12 @@ begin
 				end if;
 				if lock = '0' and init = '0' then
 					if pkt_end = '1' then
---						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"01");
 						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 0)) + 256 + 1;
 						lock <= '1';
 						init <= '1';
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
---					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9) & '1' & X"01") then
 					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9)) + 256 + 1 then
 						lock <= '0';
 					end if;
