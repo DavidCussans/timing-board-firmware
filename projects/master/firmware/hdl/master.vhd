@@ -36,6 +36,7 @@ architecture rtl of master is
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
+	signal spill: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal psync: std_logic_vector(N_PART - 1 downto 0);
 	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 1 downto 0);
@@ -177,7 +178,7 @@ begin
 	
 -- Trigger command input
 
-	scmdw_v(N_PART + 1) <= CMS_W_NULL;
+	scmdw_v(N_PART + 1) <= CMD_W_NULL;
 	
 -- Sync command gen
 
