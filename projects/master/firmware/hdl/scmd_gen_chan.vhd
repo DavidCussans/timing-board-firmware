@@ -1,4 +1,4 @@
--- pdts_scmd_gen_chan
+-- scmd_gen_chan
 --
 -- Generates random sync commands
 --
@@ -17,7 +17,7 @@ use work.ipbus_reg_types.all;
 use work.pdts_defs.all;
 
 
-entity pdts_scmd_gen_chan is
+entity scmd_gen_chan is
 	generic(
 		ID: natural
 	);
@@ -36,9 +36,9 @@ entity pdts_scmd_gen_chan is
 		rej: out std_logic
 	);
 
-end pdts_scmd_gen_chan;
+end scmd_gen_chan;
 
-architecture rtl of pdts_scmd_gen_chan is
+architecture rtl of scmd_gen_chan is
 
 	constant ID_V: std_logic_vector := std_logic_vector(to_unsigned(ID, 4));
 	signal ctrl: ipb_reg_v(0 downto 0);

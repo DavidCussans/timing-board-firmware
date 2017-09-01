@@ -1,4 +1,4 @@
--- pdts_scmd_gen
+-- scmd_gen
 --
 -- Generates random sync commands
 --
@@ -11,12 +11,12 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pdts_scmd_gen.all;
+use work.ipbus_decode_scmd_gen.all;
 
 use work.pdts_defs.all;
 use work.master_defs.all;
 
-entity pdts_scmd_gen is
+entity scmd_gen is
 	generic(
 		N_CHAN: positive
 	);
@@ -32,9 +32,9 @@ entity pdts_scmd_gen is
 		scmd_in: in cmd_r_array(N_CHAN - 1 downto 0)
 	);
 
-end pdts_scmd_gen;
+end scmd_gen;
 
-architecture rtl of pdts_scmd_gen is
+architecture rtl of scmd_gen is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
@@ -129,7 +129,7 @@ begin
 	tgen: for i in N_CHAN - 1 downto 0 generate	
 	begin
 		
-		gen: entity work.pdts_scmd_gen_chan
+		gen: entity work.scmd_gen_chan
 		  generic map(
 		  	ID => i
 		  )
