@@ -44,6 +44,8 @@ entity pdts_fmc_io_loopback is
 		clk_out_n: out std_logic;
 		rj45_din_p: in std_logic;
 		rj45_din_n: in std_logic;
+		rj45_din: out std_logic;
+		rj45_dout: in std_logic;
 		rj45_dout_p: out std_logic;
 		rj45_dout_n: out std_logic;
 		sfp_dout: in std_logic;
@@ -73,7 +75,7 @@ architecture rtl of pdts_fmc_io_loopback is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
-	signal gpin, rj45_din: std_logic;
+	signal gpin: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
@@ -248,13 +250,18 @@ begin
 			ob => gpout_1_n
 		);
 		
-	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk_i);
-		
 	obuf_sfp_dout: OBUFDS
 		port map(
 			i => sfp_dout_r,
 			o => sfp_dout_p,
 			ob => sfp_dout_n
+		);
+
+	obuf_rj45_dout: OBUFDS
+		port map(
+			i => rj45_dout,
+			o => rj45_dout_p,
+			ob => rj45_dout_n
 		);
 
 -- Inputs
@@ -264,6 +271,13 @@ begin
 			i => rec_d_p,
 			ib => rec_d_n,
 			o => open
+		);
+		
+	ibufds_rj45: IBUFDS
+		port map(
+			i => rj45_din_p,
+			ib => rj45_din_n,
+			o => rj45_din
 		);
 		
 	rec_d <= sfp_dout when rising_edge(fmc_clk_i);
