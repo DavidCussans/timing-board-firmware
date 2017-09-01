@@ -73,15 +73,14 @@ begin
 		)
 		port map(
 			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_CSR),
-			ipb_out => ipbr(N_SLV_CSR),
-			slv_clk => clk,
+			reset => ipb_rst,
+			ipbus_in => ipbw(N_SLV_CSR),
+			ipbus_out => ipbr(N_SLV_CSR),
 			d => stat,
 			q => ctrl
 		);
 
 	stat(0) <= X"0000000" & "000" & tx_err;
-	part_sel <= sel(0)(part_sel'range);
+	part_sel <= ctrl(0)(part_sel'range);
 
 end rtl;
