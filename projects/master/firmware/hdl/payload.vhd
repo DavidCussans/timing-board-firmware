@@ -61,7 +61,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, q, sfp_dout, rst_io, rsti, clk, stb, rst, locked: std_logic;
+	signal fmc_clk, rec_clk, rec_d, q, sfp_dout, rj45_dout, rst_io, rsti, clk, stb, rst, locked: std_logic;
 
 	attribute IOB: string;
 	attribute IOB of sfp_dout: signal is "TRUE";
@@ -114,7 +114,7 @@ begin
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
-			rj45_dout => '0', -- Replaced with connection to trigger at some point
+			rj45_dout => rj45_dout, -- Replaced with connection to trigger at some point
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
 			sfp_dout => sfp_dout,
@@ -173,5 +173,6 @@ begin
 		);
 
 	sfp_dout <= q when rising_edge(fmc_clk);
+	rj45_dout <= q when falling_edge(fmc_clk);
 	
 end rtl;
