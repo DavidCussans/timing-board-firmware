@@ -18,9 +18,6 @@ use work.pdts_defs.all;
 use work.master_defs.all;
 
 entity partition is
-	generic(
-		PARTITION_ID: integer
-	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
