@@ -141,13 +141,6 @@ begin
 --			ob => gpout_1_n
 --		);
 		
-	obuf_rj45_dout: OBUFDS
-		port map(
-			i => '0',
-			o => rj45_dout_p,
-			ob => rj45_dout_n
-		);
-		
 	ibufds_gpin_0: IBUFDS
 		port map(
 			i => gpin_0_p,
@@ -155,13 +148,6 @@ begin
 			o => gpin
 		);
 		
-	ibufds_rj45: IBUFDS
-		port map(
-			i => rj45_din_p,
-			ib => rj45_din_n,
-			o => rj45_din
-		);
-
 -- Clocks
 			
 	ibufg_in: IBUFGDS
