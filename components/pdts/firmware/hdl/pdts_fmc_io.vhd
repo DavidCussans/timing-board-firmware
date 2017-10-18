@@ -44,6 +44,7 @@ entity pdts_fmc_io is
 		clk_out_n: out std_logic;
 		rj45_din_p: in std_logic;
 		rj45_din_n: in std_logic;
+		rj45_dout: in std_logic;
 		rj45_dout_p: out std_logic;
 		rj45_dout_n: out std_logic;
 		sfp_dout: in std_logic;
@@ -141,7 +142,7 @@ begin
 		
 	obuf_rj45_dout: OBUFDS
 		port map(
-			i => '0',
+			i => rj45_dout,
 			o => rj45_dout_p,
 			ob => rj45_dout_n
 		);
