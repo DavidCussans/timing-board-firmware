@@ -256,7 +256,7 @@ begin
 
 	obuf_rj45_dout: OBUFDS
 		port map(
-			i => rj45_dout,
+			i => rj45_dout_r,
 			o => rj45_dout_p,
 			ob => rj45_dout_n
 		);

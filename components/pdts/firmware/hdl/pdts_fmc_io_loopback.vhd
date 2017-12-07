@@ -44,6 +44,7 @@ entity pdts_fmc_io_loopback is
 		clk_out_n: out std_logic;
 		rj45_din_p: in std_logic;
 		rj45_din_n: in std_logic;
+		rj45_dout: in std_logic;
 		rj45_dout_p: out std_logic;
 		rj45_dout_n: out std_logic;
 		sfp_dout: in std_logic;
@@ -79,6 +80,7 @@ architecture rtl of pdts_fmc_io_loopback is
 	
 	attribute IOB: string;
 	attribute IOB of sfp_dout_r: signal is "TRUE";
+	attribute IOB of rj45_dout_r: signal is "TRUE";
 			
 begin
 
@@ -265,7 +267,7 @@ begin
 	
 	obuf_rj45_dout: OBUFDS
 		port map(
-			i => rj45_dout,
+			i => rj45_dout_r,
 			o => rj45_dout_p,
 			ob => rj45_dout_n
 		);
