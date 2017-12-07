@@ -111,6 +111,7 @@ begin
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
+			rj45_dout => sfp_dout,
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
 			sfp_dout => sfp_dout,

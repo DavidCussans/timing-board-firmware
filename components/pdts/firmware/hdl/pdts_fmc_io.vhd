@@ -73,14 +73,15 @@ architecture rtl of pdts_fmc_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r, rec_d_i: std_logic;
 	signal gpin, rj45_din: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
 	attribute IOB: string;
 	attribute IOB of sfp_dout_r: signal is "TRUE";
-			
+	attribute IOB of rj45_dout_r: signal is "TRUE";
+
 begin
 
 -- ipbus address decode
@@ -139,13 +140,6 @@ begin
 --			o => gpout_1_p,
 --			ob => gpout_1_n
 --		);
-		
-	obuf_rj45_dout: OBUFDS
-		port map(
-			i => rj45_dout,
-			o => rj45_dout_p,
-			ob => rj45_dout_n
-		);
 		
 	ibufds_gpin_0: IBUFDS
 		port map(
@@ -258,6 +252,15 @@ begin
 			ob => sfp_dout_n
 		);
 
+	rj45_dout_r <= rj45_dout when falling_edge(fmc_clk_i);
+
+	obuf_rj45_dout: OBUFDS
+		port map(
+			i => rj45_dout,
+			o => rj45_dout_p,
+			ob => rj45_dout_n
+		);
+		
 -- Inputs
 
 	ibufds_rec_d: IBUFDS
