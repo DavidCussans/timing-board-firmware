@@ -1,0 +1,11 @@
+@device_family = "zynq7000"
+@device_name = "xc7z020"
+@device_package = "clg400"
+@device_speed = "-1"
+@boardname = "microzed_7020"
+
+setup settings_v7.tcl
+src microzed.vhd
+include microzed_infra.dep
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
+src --cd ../ucf microzed.tcl
