@@ -1,9 +1,4 @@
-@device_family = "zynq7000"
-@device_name = "xc7z020"
-@device_package = "clg400"
-@device_speed = "-1"
-@boardname = "microzed_7020"
-
-setup -c boards/microzed settings_v7.tcl
+setup -c boards/microzed/base_fw/synth settings_v7.tcl
+include -c board/microzed/base_fw/synth z7020.dep
 src reflect.vhd
-src -c boards/microzed --cd ../ucf microzed.tcl
+src -c boards/microzed/base_fw/synth --cd ../ucf microzed.tcl
