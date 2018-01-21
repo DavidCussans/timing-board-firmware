@@ -8,6 +8,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
+library unisim;
+use unisim.VComponents.all;
+
 use work.pdts_defs.all;
 
 entity endpoint_wrapper_standalone is
