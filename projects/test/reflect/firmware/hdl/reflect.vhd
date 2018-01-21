@@ -6,6 +6,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
+library unisim;
+use unisim.VComponents.all;
+
 entity top is port(
 		sysclk_p: in std_logic;
 		sysclk_n: in std_logic;
