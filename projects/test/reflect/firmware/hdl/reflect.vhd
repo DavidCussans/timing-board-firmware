@@ -27,11 +27,10 @@ end top;
 architecture rtl of top is
 
 	signal sysclk_u, sysclk, clk_u, clk, d_in, da, db: std_logic;
-	signal ctra, ctrb: unsigned(15 downto 0) := X"0000";
 	signal clkout: std_logic;
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of ctra, ctrb, da: signal is "TRUE";
+	attribute MARK_DEBUG of da: signal is "TRUE";
 
 begin
 
@@ -101,10 +100,5 @@ begin
 			o => d_out_p,
 			ob => d_out_n
 		);	
-
--- Debug counter
-
-	ctra <= ctra + 1 when rising_edge(clk);
-	ctrb <= ctrb + 1 when rising_edge(sysclk);
 
 end rtl;
