@@ -1,4 +1,4 @@
--- Simple reflector for PRBS test data
+-- Standalone endpoint top level design
 --
 -- Dave Newbold, 14/1/18
 
@@ -26,12 +26,8 @@ end top;
 
 architecture rtl of top is
 
-	signal sysclk_u, sysclk, clk_u, clk, d_in, da, db: std_logic;
-	signal ctra, ctrb: unsigned(15 downto 0) := X"0000";
+	signal sysclk_u, sysclk, clk_u, clk, d_in, d: std_logic;
 	signal clkout: std_logic;
-	
-	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of ctra, ctrb, da: signal is "TRUE";
 
 begin
 
@@ -72,8 +68,16 @@ begin
 		
 -- IOB registers
 
-	da <= d_in when rising_edge(clk);
-	db <= da when rising_edge(clk);
+	d <= d_in when rising_edge(clk);
+	
+-- Endpoint
+
+	ep: entity work.endpoint_wrapper_standalone
+		port map(
+			sysclk => sysclk,
+			rec_clk => clk,
+			rec_d => d
+		);
 	
 -- Clock and data out
 
@@ -97,14 +101,9 @@ begin
 		
 	obuf_d: OBUFDS
 		port map(
-			i => db,
+			i => '0',
 			o => d_out_p,
 			ob => d_out_n
 		);	
-
--- Debug counter
-
-	ctra <= ctra + 1 when rising_edge(clk);
-	ctrb <= ctrb + 1 when rising_edge(sysclk);
 
 end rtl;
