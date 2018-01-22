@@ -69,8 +69,8 @@ begin
 		
 -- IOB registers
 
-	da <= d_in when falling_edge(clk);
-	db <= da when falling_edge(clk);
+	da <= d_in when rising_edge(clk);
+	db <= da when rising_edge(clk);
 	
 -- Clock and data out
 
