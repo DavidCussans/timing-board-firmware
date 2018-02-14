@@ -74,13 +74,13 @@ architecture rtl of pdts_fmc_io_loopback is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rec_d_i: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r, rec_d_i: std_logic;
 	signal gpin: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
 	attribute IOB: string;
-	attribute IOB of sfp_dout_r: signal is "TRUE";
+	attribute IOB of sfp_dout_r, rj45_dout_r: signal is "TRUE";
 			
 begin
 
@@ -140,7 +140,7 @@ begin
 --			o => gpout_1_p,
 --			ob => gpout_1_n
 --		);
-		
+
 	ibufds_gpin_0: IBUFDS
 		port map(
 			i => gpin_0_p,
@@ -200,7 +200,7 @@ begin
 			ob => clk_out_n
 		);
 		
-	oddr_gp0: ODDR -- Feedback clock, not through MMCM
+	oddr_gp0: ODDR -- Monitoring pin
 		port map(
 			q => gp0out,
 			c => fmc_clk_i,
@@ -218,7 +218,7 @@ begin
 			ob => gpout_0_n
 		);
 		
-	oddr_gp1: ODDR -- Feedback clock, not through MMCM
+	oddr_gp1: ODDR -- Monitoring pin
 		port map(
 			q => gp1out,
 			c => fmc_clk_i,
@@ -236,38 +236,29 @@ begin
 			ob => gpout_1_n
 		);
 		
+	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk_i);
+		
 	obuf_sfp_dout: OBUFDS
 		port map(
 			i => sfp_dout_r,
 			o => sfp_dout_p,
 			ob => sfp_dout_n
 		);
+		
+	rj45_dout_r <= rj45_dout when falling_edge(fmc_clk_i);
 
 	obuf_rj45_dout: OBUFDS
 		port map(
-			i => rj45_dout,
+			i => rj45_dout_r,
 			o => rj45_dout_p,
 			ob => rj45_dout_n
 		);
 
 -- Inputs
 
-	ibufds_rec_d: IBUFDS
-		port map(
-			i => rec_d_p,
-			ib => rec_d_n,
-			o => open
-		);
-		
-	ibufds_rj45: IBUFDS
-		port map(
-			i => rj45_din_p,
-			ib => rj45_din_n,
-			o => rj45_din
-		);
-		
 	rec_d <= sfp_dout when rising_edge(fmc_clk_i);
-
+	rj45_din <= rj45_dout when falling_edge(fmc_clk_i);
+	
 -- Frequency measurement
 
 	div: entity work.freq_ctr_div
