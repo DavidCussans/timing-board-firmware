@@ -256,7 +256,22 @@ begin
 
 -- Inputs
 
+	ibufds_rec_d: IBUFDS -- Needed otherwise tools complain about non-differential pins
+		port map(
+			i => rec_d_p,
+			ib => rec_d_n,
+			o => open
+		);
+
 	rec_d <= sfp_dout when rising_edge(fmc_clk_i);
+	
+	ibufds_rj45: IBUFDS -- Needed otherwise tools complain about non-differential pins
+		port map(
+			i => rj45_din_p,
+			ib => rj45_din_n,
+			o => open
+		);	
+
 	rj45_din <= rj45_dout when falling_edge(fmc_clk_i);
 	
 -- Frequency measurement

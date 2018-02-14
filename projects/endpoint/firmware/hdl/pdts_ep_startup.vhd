@@ -231,7 +231,7 @@ begin
 
 	rec_rst_i <= '1' when state = W_RST or state = W_SFP or state = W_CDR or state = W_FREQ else '0';
 	rxphy_rst_i <= '1' when rec_rst_i = '1' or state = W_ALIGN else '0';
-	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK else '0';
+	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK or state = W_FREQ else '0';
 
 -- CDC into rec_clk / clk domain
 
