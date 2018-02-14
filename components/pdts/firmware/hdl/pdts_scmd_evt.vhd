@@ -53,7 +53,7 @@ architecture rtl of pdts_scmd_evt is
 	signal d, q: d_t;
 	signal empty_f, full_f: std_logic_vector(5 downto 0) := (others => '0');
 	signal rctr: unsigned(2 downto 0);
-	signal err_i, empty_i, v: std_logic;
+	signal err_i, empty_i, v, done: std_logic;
 	
 begin
 
@@ -97,15 +97,16 @@ begin
 	err_i <= (err_i or or_reduce(full_f)) and (rob_en and not rob_rst) when rising_edge(clk); -- err status is latched
 	err <= err_i;
 	
-	v <= not (rob_full or empty_i);
+	v <= (v or not empty_i) and not (done or rob_rst or not rob_en) when rising_edge(rob_clk);
+	done <= '1' when rctr = 5 else '0';
 	
 	process(rob_clk)
 	begin
 		if rising_edge(rob_clk) then
 			if rob_rst = '1' then
 				rctr <= (others => '0');
-			elsif v = '1' then
-				if rctr = 5 then
+			elsif v = '1' and rob_full = '0' then
+				if done = '1' then
 					rctr <= (others => '0');
 				else
 					rctr <= rctr + 1;
@@ -115,6 +116,6 @@ begin
 	end process;
 	
 	rob_q <= q(to_integer(rctr));
-	rob_we <= v;
+	rob_we <= v and not rob_full;
 	
 end rtl;

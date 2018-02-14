@@ -261,15 +261,15 @@ begin
 -- State output
 
 	with state select stat <=
-		"0000" when W_RST,
-		"0001" when W_SFP,
-		"0010" when W_CDR,
-		"0011" when W_ALIGN,
-		"0100" when W_FREQ,
-		"0101" when W_LOCK,
-		"0110" when W_RDY,
-		"1000" when RUN,
-		"1100" when ERR_R,
-		"1101" when ERR_T;
+		"0000" when W_RST, -- Starting state after reset
+		"0001" when W_SFP, -- Waiting for SFP LOS to go low
+		"0010" when W_CDR, -- Waiting for CDR lock
+		"0011" when W_ALIGN, -- Waiting for comma alignment, stable 50MHz phase
+		"0100" when W_FREQ, -- Waiting for good frequency check
+		"0101" when W_LOCK, -- Waiting for 8b10 decoder good packet
+		"0110" when W_RDY, -- Waiting for time stamp initialisation
+		"1000" when RUN, -- Good to go
+		"1100" when ERR_R, -- Error in rx
+		"1101" when ERR_T; -- Error in time stamp check
 
 end rtl;

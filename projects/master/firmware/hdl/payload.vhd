@@ -111,10 +111,10 @@ begin
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
-			rj45_dout => sfp_dout,
+			rj45_dout => q,
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
-			sfp_dout => sfp_dout,
+			sfp_dout => q,
 			sfp_dout_p => sfp_dout_p,
 			sfp_dout_n => sfp_dout_n,
 			uid_scl => uid_scl,
@@ -166,7 +166,7 @@ begin
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			q => sfp_dout
+			q => q
 		);
-		
+
 end rtl;

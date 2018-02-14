@@ -18,9 +18,6 @@ use work.pdts_defs.all;
 use work.master_defs.all;
 
 entity partition is
-	generic(
-		PARTITION_ID: integer
-	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -29,6 +26,8 @@ entity partition is
 		clk: in std_logic;
 		rst: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
+		psync: in std_logic;
+		spill: in std_logic;
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r;
 		typ: in std_logic_vector(SCMD_W - 1 downto 0);
@@ -136,20 +135,17 @@ begin
 			q => evtctr
 		);
 
-	ts: entity work.pdts_ts_gen
-		generic map(
-			PARTITION_ID => PARTITION_ID,
-			TS_RATE_RADIX => TS_RATE_RADIX
-		)
+	ts: entity work.ts_gen
 		port map(
 			clk => clk,
 			rst => rst,
 			tstamp => tstamp,
 			evtctr => evtctr,
+			sync => psync,
 			scmd_out => scmd_out,
 			scmd_in => scmd_in
 		);
-		
+
 -- Event buffer
 
 	synchro: entity work.pdts_synchro

@@ -1,17 +1,18 @@
 #!/usr/bin/python
 
-# -*- coding: utf-8 -*-
 import uhal
-from I2CuHal import I2CCore
 import time
-from si5344 import si5344
+import sys
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
-hw_tx = manager.getDevice("DUNE_FMC_TX")
-hw_rx = manager.getDevice("DUNE_FMC_RX")
+hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
 
-for hw in [hw_tx, hw_rx]:
+if len(hw_list) == 0:
+	print "No targets specified - I'm done"
+	sys.exit()
+
+for hw in hw_list:
     print hw.id()
     hw.getNode("csr.ctrl.prbs_init").write(1);
     hw.dispatch()
@@ -21,16 +22,18 @@ for hw in [hw_tx, hw_rx]:
     hw.dispatch()
     print hex(reg)
 
-
-for i in range(10000):
+while True:
 
     time.sleep(1)
-    for hw in [hw_tx, hw_rx]:
+    for hw in hw_list:
         reg = hw.getNode("io.csr.stat").read()
-        r2 = hw.getNode("csr.stat.zflag").read()
+        z_sfp = hw.getNode("csr.stat.zflag").read()
+        z_rj45 = hw.getNode("csr.stat.zflag_rj45").read()
         cyc_l = hw.getNode("csr.cyc_ctr_l").read()
         cyc_h = hw.getNode("csr.cyc_ctr_h").read()
         sfp_l = hw.getNode("csr.sfp_ctr_l").read()
         sfp_h = hw.getNode("csr.sfp_ctr_h").read()
+        rj45_l = hw.getNode("csr.rj45_ctr_l").read()
+        rj45_h = hw.getNode("csr.rj45_ctr_h").read()
         hw.dispatch()
-        print i, hw.id(), hex(reg), hex(r2), hex(int(cyc_l) + (int(cyc_h) << 32)), hex(int(sfp_l) +(int(sfp_h) << 32))
+        print i, hw.id(), hex(reg), hex(z_sfp), hex(z_rj45), hex(int(cyc_l) + (int(cyc_h) << 32)), hex(int(sfp_l) +(int(sfp_h) << 32)), hex(int(rj45_l) +(int(rj45_h) << 32))

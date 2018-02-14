@@ -34,12 +34,13 @@ architecture rtl of master is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
-	signal en: std_logic;
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
+	signal spill: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-	signal scmdw_v: cmd_w_array(N_CHAN + N_PART - 1 downto 0);
-	signal scmdr_v: cmd_r_array(N_CHAN + N_PART - 1 downto 0);
+	signal psync: std_logic_vector(N_PART - 1 downto 0);
+	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 2 downto 0);
+	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 2 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
@@ -78,9 +79,24 @@ begin
 			clk => clk,
 			rst => rst,
 			tx_err => tx_err,
-			part_sel => sel,
-			en => en,
-			tstamp => tstamp
+			part_sel => sel
+		);
+		
+-- Timestamp
+
+	tssrc: entity work.ts_source
+		generic map(
+			N_PART => N_PART
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TSTAMP),
+			ipb_out => ipbr(N_SLV_TSTAMP),
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			psync => psync
 		);
 		
 -- Strobe gen
@@ -107,25 +123,22 @@ begin
 			acmd_out => acmdw,
 			acmd_in => acmdr
 		);
+		
+-- Spill gate
 
--- Sync command gen
-
-	gen: entity work.pdts_scmd_gen
-		generic map(
-			N_CHAN => N_CHAN
-		)
+	sgate: entity work.spill_gate
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_SCMD_GEN),
-			ipb_out => ipbr(N_SLV_SCMD_GEN),
+			ipb_in => ipbw(N_SLV_SPILL),
+			ipb_out => ipbr(N_SLV_SPILL),
 			clk => clk,
 			rst => rst,
-			tstamp => tstamp,
-			scmd_out => scmdw_v(N_CHAN - 1 downto 0),
-			scmd_in => scmdr_v(N_CHAN - 1 downto 0)
+			spill => spill,
+			scmd_out => scmdw_v(0),
+			scmd_in => scmdr_v(0)
 		);
-		
+
 -- Partitions
 
 	fabric_p: entity work.ipbus_fabric_sel
@@ -144,9 +157,6 @@ begin
 	pgen: for i in N_PART - 1 downto 0 generate
 	
 		part: entity work.partition
-			generic map(
-				PARTITION_ID => i
-			)
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
@@ -155,20 +165,44 @@ begin
 				clk => clk,
 				rst => rst,
 				tstamp => tstamp,
-				scmd_out => scmdw_v(i + N_CHAN),
-				scmd_in => scmdr_v(i + N_CHAN),
+				psync => psync(i),
+				spill => spill,
+				scmd_out => scmdw_v(i + 1),
+				scmd_in => scmdr_v(i + 1),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
 			);
 			
 	end generate;
+	
+-- Trigger command input
+
+	scmdw_v(N_PART + 1) <= CMD_W_NULL;
+	
+-- Sync command gen
+
+	gen: entity work.scmd_gen
+		generic map(
+			N_CHAN => N_CHAN
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SCMD_GEN),
+			ipb_out => ipbr(N_SLV_SCMD_GEN),
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			scmd_out => scmdw_v(N_PART + 1 + N_CHAN downto N_PART + 2),
+			scmd_in => scmdr_v(N_PART + 1 + N_CHAN downto N_PART + 2)
+		);
 		
 -- Merge
 
-	merge: entity work.pdts_scmd_merge
+	merge: entity work.scmd_merge
 		generic map(
-			N_SRC => N_CHAN + N_PART
+			N_SRC => N_CHAN + N_PART + 3
 		)
 		port map(
 			clk => clk,
@@ -189,7 +223,7 @@ begin
 			clk => clk,
 			rst => rst,
 			stb => stb,
-			addr => X"AA",
+			addr => X"00",
 			scmd_in => scmdw,
 			scmd_out => scmdr,
 			acmd_in => acmdw,

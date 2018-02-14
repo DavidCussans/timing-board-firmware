@@ -1,0 +1,8 @@
+src scmd_gen.vhd scmd_gen_chan.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+src ipbus_decode_scmd_gen.vhd
+addrtab -t scmd_gen.xml
+src -c components/pdts pdts_prio_enc.vhd
+src -c components/mp7_ttc rng_wrapper.vhd rng_n1024_r32_t5_k32_s1c48.vhd
+src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd
+include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep ipbus_ctrs_v.dep

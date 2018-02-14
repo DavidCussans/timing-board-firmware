@@ -125,7 +125,7 @@ begin
 -- Temporary sync output
 
 	sync <= dr(3 downto 0);
-	sync_v <= s_valid and s_first;
+	sync_v <= s_valid and s_first and rdy_i;
 	
 -- Timestamp / event counter
 

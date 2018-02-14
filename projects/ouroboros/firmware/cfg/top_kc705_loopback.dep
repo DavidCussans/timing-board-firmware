@@ -1,0 +1,2 @@
+include -c projects/master kc705_gmii.dep
+include payload_loopback.dep

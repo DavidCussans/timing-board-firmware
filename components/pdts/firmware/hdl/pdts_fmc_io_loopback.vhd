@@ -44,6 +44,7 @@ entity pdts_fmc_io_loopback is
 		clk_out_n: out std_logic;
 		rj45_din_p: in std_logic;
 		rj45_din_n: in std_logic;
+		rj45_din: out std_logic;
 		rj45_dout: in std_logic;
 		rj45_dout_p: out std_logic;
 		rj45_dout_n: out std_logic;
@@ -74,13 +75,12 @@ architecture rtl of pdts_fmc_io_loopback is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r, rec_d_i: std_logic;
-	signal gpin, rj45_din: std_logic;
+	signal gpin: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
 	attribute IOB: string;
-	attribute IOB of sfp_dout_r: signal is "TRUE";
-	attribute IOB of rj45_dout_r: signal is "TRUE";
+	attribute IOB of sfp_dout_r, rj45_dout_r: signal is "TRUE";
 			
 begin
 
@@ -148,13 +148,6 @@ begin
 			o => gpin
 		);
 		
-	ibufds_rj45: IBUFDS
-		port map(
-			i => rj45_din_p,
-			ib => rj45_din_n,
-			o => rj45_din
-		);
-
 -- Clocks
 			
 	ibufg_in: IBUFGDS
@@ -207,7 +200,7 @@ begin
 			ob => clk_out_n
 		);
 		
-	oddr_gp0: ODDR -- Feedback clock, not through MMCM
+	oddr_gp0: ODDR -- Monitoring pin
 		port map(
 			q => gp0out,
 			c => fmc_clk_i,
@@ -225,7 +218,7 @@ begin
 			ob => gpout_0_n
 		);
 		
-	oddr_gp1: ODDR -- Feedback clock, not through MMCM
+	oddr_gp1: ODDR -- Monitoring pin
 		port map(
 			q => gp1out,
 			c => fmc_clk_i,
@@ -251,20 +244,9 @@ begin
 			o => sfp_dout_p,
 			ob => sfp_dout_n
 		);
-
--- Inputs
-
-	ibufds_rec_d: IBUFDS
-		port map(
-			i => rec_d_p,
-			ib => rec_d_n,
-			o => open
-		);
 		
-	rec_d <= sfp_dout when rising_edge(fmc_clk_i);
-	
 	rj45_dout_r <= rj45_dout when falling_edge(fmc_clk_i);
-	
+
 	obuf_rj45_dout: OBUFDS
 		port map(
 			i => rj45_dout_r,
@@ -272,6 +254,11 @@ begin
 			ob => rj45_dout_n
 		);
 
+-- Inputs
+
+	rec_d <= sfp_dout when rising_edge(fmc_clk_i);
+	rj45_din <= rj45_dout when falling_edge(fmc_clk_i);
+	
 -- Frequency measurement
 
 	div: entity work.freq_ctr_div

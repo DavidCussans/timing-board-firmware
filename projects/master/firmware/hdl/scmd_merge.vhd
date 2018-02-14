@@ -14,7 +14,7 @@ use work.ipbus_reg_types.all;
 use work.pdts_defs.all;
 use work.master_defs.all;
 
-entity pdts_scmd_merge is
+entity scmd_merge is
 	generic(
 		N_SRC: positive := 1
 	);
@@ -30,9 +30,9 @@ entity pdts_scmd_merge is
 		scmd_in: in cmd_r
 	);
 
-end pdts_scmd_merge;
+end scmd_merge;
 
-architecture rtl of pdts_scmd_merge is
+architecture rtl of scmd_merge is
 
 	signal valid: std_logic_vector(N_SRC - 1 downto 0);
 	signal p: std_logic_vector(calc_width(N_SRC) - 1 downto 0);

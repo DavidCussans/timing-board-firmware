@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-# -*- coding: utf-8 -*-
 import sys
 import uhal
-from I2CuHal import I2CCore
 import time
+from I2CuHal import I2CCore
 from si5344 import si5344
 
 brd_rev = {
@@ -15,6 +14,7 @@ brd_rev = {
 	0xd880395e7201: 1,
 	0xd880395e4fcc: 1,
 	0xd880395e5069: 1,
+	0xd880395e7206: 1,
 	0xd880395e1c86: 2,
 	0xd880395e2630: 2,
 	0xd880395e262b: 2,
@@ -28,12 +28,16 @@ brd_rev = {
 
 clk_cfg_files = {
 	1: "SI5344/PDTS0000.txt",
-	2: "SI5344/PDTS0000.txt"
+	2: "SI5344/PDTS0003.txt"
 }
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
 manager = uhal.ConnectionManager("file://connections.xml")
 hw_list = [manager.getDevice(i) for i in sys.argv[1:]]
+
+if len(hw_list) == 0:
+	print "No targets specified - I'm done"
+	sys.exit()
 
 for hw in hw_list:
 
@@ -52,10 +56,17 @@ for hw in hw_list:
     hw.dispatch()
 
     uid_I2C = I2CCore(hw, 10, 5, "io.uid_i2c", None)
-    uid_I2C.write(0x21, [0x01, 0x7f], True)
-    uid_I2C.write(0x21, [0x01], False)
-    res = uid_I2C.read(0x21, 1)
-    print "I2c enable lines: " , res
+
+    uid_I2C.write(0x0, [8 * 0x0], True) # Wake up AX3 EEPROM if present
+    time.sleep(0.1)
+    res = uid_I2C.read(0x64, 4)
+    if res == [0x04, 0x11, 0x33, 0x43]:
+        print "AX3 detected; setting I2C bus switch"
+        uid_I2C.write(0x21, [0x01, 0x7f], True) # Set up AX3 bus switch
+    else:
+        print "Not an AX3, assuming a Xilinx KX705; setting I2C bus switch"
+        uid_I2c.write(0x74, [0x10]) # Set up KC705 bus switch   
+
     uid_I2C.write(0x53, [0xfa], False)
     res = uid_I2C.read(0x53, 6)
     id = 0
