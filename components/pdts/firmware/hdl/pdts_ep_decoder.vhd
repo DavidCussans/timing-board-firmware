@@ -31,7 +31,7 @@ architecture rtl of pdts_ep_decoder is
 
 begin
 
-	process(clk40)
+	process(clk)
 	begin
 		if rst = '1' or rdy = '0' then
 			ins <= '0';
@@ -47,7 +47,7 @@ begin
 				evtctr_i <= (others => '0');
 			elsif scmd = SCMD_RUN_STOP then
 				inr <= '0';
-			elsif EVTCTR_MASK(to_integer(sync)) = '1' and inr = '1' then
+			elsif EVTCTR_MASK(to_integer(unsigned(scmd))) = '1' and inr = '1' then
 				evtctr_i <= evtctr_i + 1;
 			end if;
 		end if;

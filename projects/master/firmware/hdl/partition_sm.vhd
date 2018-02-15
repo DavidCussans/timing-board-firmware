@@ -61,7 +61,7 @@ begin
 				when RUN =>
 					if run_req = '0' or part_en_req = '0' then
 						state <= W_STOP;
-					endif;
+					end if;
 -- Wait for rxphy lock
 				when W_STOP =>
 					if scmd_in.ack = '1' then

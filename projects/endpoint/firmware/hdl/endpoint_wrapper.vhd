@@ -44,7 +44,7 @@ architecture rtl of endpoint_wrapper is
 	signal ep_scmd: std_logic_vector(SCMD_W - 1 downto 0);
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
-	signal buf_warn, buf_err: std_logic;
+	signal buf_warn, buf_err, in_run, in_spill: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal ctr_rst: std_logic;
 	signal t: std_logic_vector(SCMD_MAX downto 0);
@@ -152,7 +152,7 @@ begin
 			rst => ep_rsto,
 			rdy => ep_rdy,
 			scmd => ep_scmd,
-			scmd_v => scmd_v,
+			scmd_v => ep_v,
 			in_spill => in_spill,
 			in_run => in_run,
 			evtctr => evtctr
