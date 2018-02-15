@@ -19,7 +19,6 @@ entity pdts_tstamp is
 		s_valid: in std_logic;
 		s_first: in std_logic;
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-		evtctr: out std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 		rdy: out std_logic
 	);
 
@@ -27,9 +26,8 @@ end pdts_tstamp;
 
 architecture rtl of pdts_tstamp is
 
-	signal sr: std_logic_vector(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 0);
+	signal sr: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
-	signal evtctr_i: unsigned(8 * EVTCTR_WDS - 1 downto 0);
 	signal ctr: unsigned(7 downto 0);
 	signal lock, init, pkt_end, pkt_end_d: std_logic;
 
@@ -42,8 +40,8 @@ begin
 				ctr <= (others => '0');
 			elsif (s_valid = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
-				if ctr < (TSTAMP_WDS + EVTCTR_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
-					sr <= d & sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8);
+				if ctr < (TSTAMP_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
+					sr <= d & sr(sr'left downto 8);
 				end if;
 			end if;
 			pkt_end <= and_reduce(std_logic_vector(ctr));
@@ -56,24 +54,18 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				tstamp_i <= (others => '0');
-				evtctr_i <= (others => '0');
 				lock <= '0';
 				init <= '0';
 			else
-				if pkt_end = '1' then
-					evtctr_i <= unsigned(sr(8 * (TSTAMP_WDS + EVTCTR_WDS) - 1 downto 8 * TSTAMP_WDS));
-				elsif s_valid = '1' and EVTCTR_MASK(to_integer(unsigned(d(3 downto 0)))) = '1' then
-					evtctr_i <= evtctr_i + 1;
-				end if;
 				if lock = '0' and init = '0' then
 					if pkt_end = '1' then
-						tstamp_i <= unsigned(sr(8 * TSTAMP_WDS - 1 downto 0)) + 256 + 1;
+						tstamp_i <= unsigned(sr) + 256 + 1;
 						lock <= '1';
 						init <= '1';
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
-					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(8 * TSTAMP_WDS - 1 downto 9)) + 256 + 1 then
+					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(sr'left downto 9)) + 256 + 1 then
 						lock <= '0';
 					end if;
 				end if;
@@ -82,7 +74,6 @@ begin
 	end process;
 	
 	tstamp <= std_logic_vector(tstamp_i);
-	evtctr <= std_logic_vector(evtctr_i);
 	rdy <= lock;
 
 end rtl;

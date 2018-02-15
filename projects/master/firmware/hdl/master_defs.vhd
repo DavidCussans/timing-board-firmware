@@ -12,7 +12,6 @@ package master_defs is
 	constant MASTER_VERSION: std_logic_vector(31 downto 0) := X"00000305"; -- Version number
 	constant N_PART: integer := 1; -- Number of partitions (max 4 at present)
 	constant N_CHAN: integer := 1; -- Number of scmd generator channels
-	constant N_FIFO: integer := 1;
-	constant TS_DIV: positive := 16#c80000#; -- Approx every 4Hz, or 1Hz per partition
+	constant TS_DIV: positive := 50000000; -- 1Hz (must be divisible by 25)
 	
 end master_defs;

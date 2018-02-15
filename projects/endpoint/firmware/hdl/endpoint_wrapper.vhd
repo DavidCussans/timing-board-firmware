@@ -44,9 +44,7 @@ architecture rtl of endpoint_wrapper is
 	signal ep_scmd: std_logic_vector(SCMD_W - 1 downto 0);
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
-	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_rst_u, rob_rst, rob_en, rob_we, rob_warn: std_logic;
-	signal buf_empty, buf_err, rob_full, rob_empty: std_logic;
+	signal buf_warn, buf_err: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal ctr_rst: std_logic;
 	signal t: std_logic_vector(SCMD_MAX downto 0);
@@ -101,7 +99,7 @@ begin
 	ctrl_ctr_rst <= ctrl(0)(2);
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_addr <= ctrl(0)(15 downto 8);
-	stat(0) <= X"00000" & ep_stat & '0' & ep_rdy & ep_rsto & rob_empty & rob_full & rob_warn & buf_empty & buf_err;
+	stat(0) <= X"00000" & "00" & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
 	
 -- The endpoint
 
@@ -127,8 +125,7 @@ begin
 			rdy => ep_rdy,
 			sync => ep_scmd,
 			sync_v => ep_v,
-			tstamp => tstamp,
-			evtctr => evtctr
+			tstamp => tstamp
 		);
 		
 -- Timestamp
@@ -145,6 +142,20 @@ begin
 			ipb_out => ipbr(N_SLV_TSTAMP),
 			clk => ep_clk,
 			d => tstamp
+		);
+		
+-- Decoder
+
+	decode:entity work.pdts_ep_decoder
+		port map(
+			clk => ep_clk,
+			rst => ep_rsto,
+			rdy => ep_rdy,
+			scmd => ep_scmd,
+			scmd_v => scmd_v,
+			in_spill => in_spill,
+			in_run => in_run,
+			evtctr => evtctr
 		);
 
 -- Event counter
@@ -165,48 +176,23 @@ begin
 		
 -- Buffer
 
-	rob_rst_u <= ipb_rst or not ctrl_buf_en;
-		
-	rsts: entity work.pdts_rst_stretch
-		port map(
-			clk => ipb_clk,
-			rst => rob_rst_u,
-			rsto => rob_rst,
-			wen => rob_en
-		);
-
-	evt: entity work.pdts_scmd_evt
-		port map(
-			clk => ep_clk,
-			rst => ep_rsto,
-			scmd => ep_scmd,
-			valid => ep_v,
-			tstamp => tstamp,
-			evtctr => evtctr,
-			empty => buf_empty,
-			err => buf_err,
-			rob_clk => ipb_clk,
-			rob_rst => rob_rst,
-			rob_en => rob_en,
-			rob_q => rob_q,
-			rob_we => rob_we,
-			rob_full => rob_full
-		);
-		
-	rob: entity work.pdts_rob
+	rob: entity work.pdts_mon_buf
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_BUF),
 			ipb_out => ipbr(N_SLV_BUF),
-			rst => rob_rst,
-			d => rob_q,
-			we => rob_we,
-			full => rob_full,
-			empty => rob_empty,
-			warn => rob_warn
+			en => ctrl_buf_en,
+			clk => ep_clk,
+			rst => ep_rsto,
+			scmd => ep_scmd,
+			scmd_v => ep_v,
+			tstamp => tstamp,
+			evtctr => evtctr,
+			warn => buf_warn,
+			err => buf_err
 		);
-		
+
 -- Frequency counter
 
 	div: entity work.freq_ctr_div

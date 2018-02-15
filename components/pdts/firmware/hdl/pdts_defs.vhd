@@ -40,16 +40,17 @@ package pdts_defs is
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
 	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"0100"; -- Which sync cmds cause evt ctr update
 	
-	constant SCMD_SPILL_START: std_logic_vector(3 downto 0) := X"0";
-	constant SCMD_SPILL_STOP: std_logic_vector(3 downto 0) := X"1";
-	constant SCMD_RUN_START: std_logic_vector(3 downto 0) := X"2";
-	constant SCMD_RUN_STOP: std_logic_vector(3 downto 0) := X"3";
-	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"7";
-	constant SCMD_TRIG: std_logic_vector(3 downto 0) := X"8"; -- Commands from 0x8 to 0xf reserved for triggers / calib
+	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"0";
+	constant SCMD_ECHO: std_logic_vector(3 downto 0) := X"1";
+	constant SCMD_SPILL_START: std_logic_vector(3 downto 0) := X"2";
+	constant SCMD_SPILL_STOP: std_logic_vector(3 downto 0) := X"3";
+	constant SCMD_RUN_START: std_logic_vector(3 downto 0) := X"4";
+	constant SCMD_RUN_STOP: std_logic_vector(3 downto 0) := X"5";
+	constant SCMD_FAKE_TRIG: std_logic_vector(3 downto 0) := X"8"; -- Commands from 0x8 to 0xf reserved for triggers / calib
 
 	constant SCMD_MAX: integer := 8; -- Number of scmds in use (must be contiguous)
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
-	constant SCMD_LEN: SCMD_LEN_T := (to_integer(unsigned(SCMD_SYNC)) => 1 + TSTAMP_WDS + EVTCTR_WDS, others => 1);
+	constant SCMD_LEN: SCMD_LEN_T := (to_integer(unsigned(SCMD_SYNC)) => 1 + TSTAMP_WDS, others => 1);
 	
 -- System-level constants
 

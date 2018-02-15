@@ -2,20 +2,19 @@
 		<node id="csr" address="0x0" fwinfo="endpoint;width=1">
 			<node id="ctrl" address="0x0">
 				<node id="part_en" mask="0x1"/>
-				<node id="trig_en" mask="0x2"/>
-				<node id="evtctr_rst" mask="0x4"/>
-				<node id="trig_ctr_rst" mask="0x8"/>
-				<node id="buf_en" mask="0x10"/>
-				<node id="run_req" mask="0x20"/>
-				<node id="cmd_mask" mask="0xffff0000"/>
+				<node id="run_req" mask="0x2"/>
+				<node id="trig_en" mask="0x4"/>
+				<node id="buf_en" mask="0x8"/>
+				<node id="trig_ctr_rst" mask="0x10"/>
+				<node id="trig_mask" mask="0xff00"/>
 			</node>
 			<node id="stat" address="0x1">
 				<node id="buf_err" mask="0x1"/>
-				<node id="buf_empty" mask="0x2"/>
-				<node id="rob_warn" mask="0x4"/>
-				<node id="rob_full" mask="0x8"/>
-				<node id="rob_empty" mask="0x10"/>
-				<node id="run_stat" mask="0x20"/>
+				<node id="buf_warn" mask="0x2"/>
+				<node id="part_up" mask="0x4"/>
+				<node id="run_int" mask="0x8"/>
+				<node id="in_spill" mask="0x10"/>
+				<node id="in_run" mask="0x20"/>
 			</node>
 		</node>
 		<node id="evtctr" address="0x2" fwinfo="endpoint;width=0"/>

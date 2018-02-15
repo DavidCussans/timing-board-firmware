@@ -39,8 +39,8 @@ architecture rtl of master is
 	signal spill: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal psync: std_logic_vector(N_PART - 1 downto 0);
-	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 2 downto 0);
-	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 2 downto 0);
+	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 3 downto 0);
+	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 3 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
@@ -82,23 +82,6 @@ begin
 			part_sel => sel
 		);
 		
--- Timestamp
-
-	tssrc: entity work.ts_source
-		generic map(
-			N_PART => N_PART
-		)
-		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_TSTAMP),
-			ipb_out => ipbr(N_SLV_TSTAMP),
-			clk => clk,
-			rst => rst,
-			tstamp => tstamp,
-			psync => psync
-		);
-		
 -- Strobe gen
 
 	process(clk)
@@ -124,6 +107,34 @@ begin
 			acmd_in => acmdr
 		);
 		
+-- Timestamp source
+
+	tssrc: entity work.ts_source
+		generic map(
+			N_PART => N_PART
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_TSTAMP),
+			ipb_out => ipbr(N_SLV_TSTAMP),
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			psync => psync
+		);
+		
+-- Timestamp broadcast
+
+	ts: entity work.ts_bcast
+		port map(
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			scmd_out => scmdw_v(0),
+			scmd_in => scmdr_v(0)
+		);
+		
 -- Spill gate
 
 	sgate: entity work.spill_gate
@@ -135,10 +146,14 @@ begin
 			clk => clk,
 			rst => rst,
 			spill => spill,
-			scmd_out => scmdw_v(0),
-			scmd_in => scmdr_v(0)
+			scmd_out => scmdw_v(1),
+			scmd_in => scmdr_v(1)
 		);
 
+-- Trigger command input
+
+	scmdw_v(2) <= CMD_W_NULL;
+		
 -- Partitions
 
 	fabric_p: entity work.ipbus_fabric_sel
@@ -167,19 +182,15 @@ begin
 				tstamp => tstamp,
 				psync => psync(i),
 				spill => spill,
-				scmd_out => scmdw_v(i + 1),
-				scmd_in => scmdr_v(i + 1),
+				scmd_out => scmdw_v(i + 3),
+				scmd_in => scmdr_v(i + 3),
 				typ => typ,
 				tv => tv,
 				tack => tgrp(i)
 			);
 			
 	end generate;
-	
--- Trigger command input
-
-	scmdw_v(N_PART + 1) <= CMD_W_NULL;
-	
+		
 -- Sync command gen
 
 	gen: entity work.scmd_gen
@@ -194,8 +205,8 @@ begin
 			clk => clk,
 			rst => rst,
 			tstamp => tstamp,
-			scmd_out => scmdw_v(N_PART + 1 + N_CHAN downto N_PART + 2),
-			scmd_in => scmdr_v(N_PART + 1 + N_CHAN downto N_PART + 2)
+			scmd_out => scmdw_v(N_PART + 3 + N_CHAN downto N_PART + 4),
+			scmd_in => scmdr_v(N_PART + 3 + N_CHAN downto N_PART + 4)
 		);
 		
 -- Merge

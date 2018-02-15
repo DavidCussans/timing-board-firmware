@@ -12,6 +12,9 @@ use ieee.std_logic_misc.all;
 use work.pdts_defs.all;
 
 entity pdts_rx is
+	generic(
+		NO_GRP: boolean := false
+	);
 	port(
 		clk: in std_logic; -- 50MHz system clock
 		rst: in std_logic; -- synchronous reset
@@ -195,7 +198,7 @@ begin
 	end process;
 	
 	q <= d;
-	valid <= '1' when state = SYNC and s_match_r = '1' and stb = '1' else '0';
+	valid <= '1' when state = SYNC and (s_match_r = '1' or NO_GRP) and stb = '1' else '0';
 	first <= '1' when sctr = to_unsigned(1, sctr'length) else '0';
 	issue <= '1' when vctr = unsigned(ts) or SCLK_RATIO = 10 else '0';
 	pend <= (pend or valid) and not (issue or rst) when rising_edge(clk);

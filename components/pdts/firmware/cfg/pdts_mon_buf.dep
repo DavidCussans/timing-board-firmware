@@ -1,0 +1,5 @@
+src pdts_rob.vhd pdts_scmd_evt.vhd pdts_rst_stretch.vhd
+src -c components/pdts --cd ../cgn pdts_evt_fifo.xci
+src -c ipbus-firmware:components/ipbus_util big_fifo_36.vhd
+src pdts_defs.vhd
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd

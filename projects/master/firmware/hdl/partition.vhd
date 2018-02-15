@@ -26,7 +26,6 @@ entity partition is
 		clk: in std_logic;
 		rst: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-		psync: in std_logic;
 		spill: in std_logic;
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r;
@@ -45,12 +44,11 @@ architecture rtl of partition is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
 	signal ctrl_cmd_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
-	signal cok, tok, trig, tack_i, erst, trst: std_logic;
+	signal run_int, part_up: std_logic;
+	signal grab, trig, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
-	signal rob_en_s, buf_empty, buf_err, rob_full, rob_empty, rob_warn: std_logic;
-	signal rob_q: std_logic_vector(31 downto 0);
-	signal rob_rst_u, rob_rst, rob_en, rob_we: std_logic;
+	signal buf_warn, buf_err, in_spill, in_run: std_logic;
 	
 begin
 
@@ -87,20 +85,38 @@ begin
 		);
 
 	ctrl_part_en <= ctrl(0)(0);
-	ctrl_trig_en <= ctrl(0)(1);
-	ctrl_evtctr_rst <= ctrl(0)(2);
-	ctrl_trig_ctr_rst	<= ctrl(0)(3);
-	ctrl_buf_en <= ctrl(0)(4);
-	ctrl_cmd_mask <= ctrl(0)(31 downto 16);
-	stat(0) <= X"000000" & "000" & rob_empty & rob_full & rob_warn & buf_empty & buf_err;
+	ctrl_run_req <= ctrl(0)(1);
+	ctrl_trig_en <= ctrl(0)(2);
+	ctrl_buf_en <= ctrl(0)(3);
+	ctrl_trig_ctr_rst	<= ctrl(0)(4);
+	ctrl_trig_mask <= ctrl(0)(15 downto 8);
+	stat(0) <= X"000000" & "00" & in_run & in_spill & run_int & part_up & buf_warn & buf_err;
+
+-- Run start / stop
+
+	sm: entity work.partition_sm
+		port map(
+			clk => clk,
+			rst => rst,
+			part_en_req => ctrl_part_en,
+			run_req => ctrl_run_req,
+			spill => spill,
+			scmd_out => scmd_out,
+			scmd_in => scmd_in,
+			part_en => part_up,
+			run => run_int
+		);
 	
 -- Command masks
 
-	cok <= ctrl_cmd_mask(to_integer(unsigned(typ)));
-	tok <= EVTCTR_MASK(to_integer(unsigned(typ)));
-	tack_i <= tv and ctrl_part_en and (cok or scmd_in.ack) and (ctrl_trig_en or not tok);
-	trig <= tv and ctrl_part_en and ctrl_trig_en and tok;
-	tack <= tack_i;
+	grab <= '1' when part_up = '1' and tv = '1' and
+		(((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') or -- Grab run start or stop only if we issued it
+		(typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP and unsigned(typ) < 8) or -- Grab all other system commands if partition is running
+		(in_run and ctrl_trig_en and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1')) -- Otherwise apply trigger masks
+		else '0';
+		
+	tack <= grab;
+	trig <= grab when unsigned(typ) > 8 else '0';
 	
 	process(typ) -- Unroll typ
 	begin
@@ -113,37 +129,21 @@ begin
 		end loop;
 	end process;
 	
-	tacc <= t when (tv and tack_i) = '1' else (others => '0');
-	trej <= t when (tv and not tack_i) = '1' else (others => '0');
+	tacc <= t when (tv and grab) = '1' else (others => '0');
+	trej <= t when (tv and not grab) = '1' else (others => '0');
 
--- Timestamp / event counter
+-- Event counter etc
 
-	erst <= rst or ctrl_evtctr_rst or not ctrl_part_en;
-	
-	ereg: entity work.ipbus_ctrs_v
-		generic map(
-			CTR_WDS => EVTCTR_WDS / 4
-		)
-		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_EVTCTR),
-			ipb_out => ipbr(N_SLV_EVTCTR),
-			clk => clk,
-			rst => erst,
-			inc(0) => trig,
-			q => evtctr
-		);
-
-	ts: entity work.ts_gen
+	decode:entity work.pdts_ep_decoder
 		port map(
 			clk => clk,
 			rst => rst,
-			tstamp => tstamp,
-			evtctr => evtctr,
-			sync => psync,
-			scmd_out => scmd_out,
-			scmd_in => scmd_in
+			rdy => '1',
+			scmd => typ,
+			scmd_v => tv,
+			in_spill => in_spill,
+			in_run => in_run,
+			evtctr => evtctr
 		);
 
 -- Event buffer
@@ -159,51 +159,21 @@ begin
 			q(0) => rob_en_s
 		);
 		
-	rob_rst_u <= ipb_rst or not rob_en_s;
-		
-	rsts: entity work.pdts_rst_stretch
-		port map(
-			clk => ipb_clk,
-			rst => rob_rst_u,
-			rsto => rob_rst,
-			wen => rob_en
-		);
-	
-	evt: entity work.pdts_scmd_evt
-		port map(
-			clk => clk,
-			rst => rst,
-			scmd => typ,
-			valid => trig,
-			tstamp => tstamp,
-			evtctr => evtctr,
-			empty => buf_empty,
-			err => buf_err,
-			rob_clk => ipb_clk,
-			rob_rst => rob_rst,
-			rob_en => rob_en,
-			rob_q => rob_q,
-			rob_we => rob_we,
-			rob_full => rob_full
-		);
-		
-	rob: entity work.pdts_rob
-		generic map(
-			N_FIFO => N_FIFO,
-			WARN_HWM => N_FIFO * 1024 - 256,
-			WARN_LWM => N_FIFO * 1024 - 512
-		)
+	rob: entity work.pdts_mon_buf
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_BUF),
 			ipb_out => ipbr(N_SLV_BUF),
-			rst => rob_rst,
-			d => rob_q,
-			we => rob_we,
-			full => rob_full,
-			empty => rob_empty,
-			warn => rob_warn
+			en => rob_en_s,
+			clk => clk,
+			rst => rst,
+			scmd => typ,
+			scmd_v => trig,
+			tstamp => tstamp,
+			evtctr => evtctr,
+			warn => buf_warn,
+			err => buf_err
 		);
 
 -- Trigger counters

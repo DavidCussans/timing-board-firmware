@@ -30,8 +30,7 @@ entity pdts_endpoint is
 		rdy: out std_logic; -- Timestamp valid flag
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
 		sync_v: out std_logic; -- Sync command valid flag (clk domain)
-		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
-		evtctr: out std_logic_vector(8 * EVTCTR_WDS - 1 downto 0) -- Event counter out
+		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0) -- Timestamp out
 	);
 
 end pdts_endpoint;
@@ -88,7 +87,6 @@ begin
 		
 	clk <= clk_i;
 	rst <= rst_i;
-	rdy <= rdy_i;
 	
 -- Rx PHY
 
@@ -131,7 +129,7 @@ begin
 -- Temporary sync output
 
 	sync <= dr(3 downto 0);
-	sync_v <= s_valid and s_first;
+	sync_v <= s_valid and s_first and rdy_i;
 	
 -- Timestamp / event counter
 
@@ -143,8 +141,9 @@ begin
 			s_valid => s_valid,
 			s_first => s_first,
 			tstamp => tstamp,
-			evtctr => evtctr,
 			rdy => rdy_i
 		);
+		
+	rdy <= rdy_i;
 		
 end rtl;
