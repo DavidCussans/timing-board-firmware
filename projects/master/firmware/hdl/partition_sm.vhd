@@ -72,7 +72,7 @@ begin
 		end if;
 	end process;
 	
-	scmd_out.d <= SCMD_RUN_START when state = W_START else SCMD_RUN_STOP;
+	scmd_out.d <= (7 downto SCMD_W => '0') & SCMD_RUN_START when state = W_START else (7 downto SCMD_W => '0') & SCMD_RUN_STOP;
 	scmd_out.valid <= '1' when (state = W_START or state = W_STOP) and spill = '0' else '0';
 	scmd_out.last <= '1';
 	
