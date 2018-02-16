@@ -146,6 +146,22 @@ begin
 			evtctr => evtctr
 		);
 
+-- Event counter
+
+	esamp: entity work.ipbus_ctrs_samp
+		generic map(
+			N_CTRS => 1,
+			CTR_WDS => EVTCTR_WDS / 4
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_EVTCTR),
+			ipb_out => ipbr(N_SLV_EVTCTR),
+			clk => ep_clk,
+			d => evtctr
+		);
+		
 -- Event buffer
 
 	synchro: entity work.pdts_synchro
