@@ -28,14 +28,14 @@ end partition_sm;
 
 architecture rtl of partition_sm is
 
-	type state_t is (DIS, EN, W_START, RUN, W_STOP);
+	type state_t is (DIS, EN, W_START, RUNNING, W_STOP);
 	signal state: state_t;
 
 begin
 
-	process(sclk)
+	process(clk)
 	begin
-		if rising_edge(sclk) then
+		if rising_edge(clk) then
 			if rst = '1' then
 				state <= DIS;
 			elsif spill = '0' then
@@ -55,10 +55,10 @@ begin
 -- Wait for start command
 				when W_START =>
 					if scmd_in.ack = '1' then 
-						state <= RUN;
+						state <= RUNNING;
 					end if;
 -- Wait for frequency match
-				when RUN =>
+				when RUNNING =>
 					if run_req = '0' or part_en_req = '0' then
 						state <= W_STOP;
 					end if;
@@ -73,10 +73,10 @@ begin
 	end process;
 	
 	scmd_out.d <= SCMD_RUN_START when state = W_START else SCMD_RUN_STOP;
-	scmd_out.v <= '1' when (state = W_START or state = W_STOP) and spill = '0' else '0';
+	scmd_out.valid <= '1' when (state = W_START or state = W_STOP) and spill = '0' else '0';
 	scmd_out.last <= '1';
 	
 	part_en <= '0' when state = DIS else '1';
-	run <= '1' when state = RUN else '0';
+	run <= '1' when state = RUNNING else '0';
 
 end rtl;

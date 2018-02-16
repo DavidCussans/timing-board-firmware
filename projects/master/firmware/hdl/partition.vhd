@@ -42,13 +42,13 @@ architecture rtl of partition is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_part_en, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
-	signal ctrl_cmd_mask: std_logic_vector(2 ** SCMD_W - 1 downto 0);
+	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
+	signal ctrl_trig_mask: std_logic_vector(7 downto 0); -- Replace with constant
 	signal run_int, part_up: std_logic;
 	signal grab, trig, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
-	signal buf_warn, buf_err, in_spill, in_run: std_logic;
+	signal buf_warn, buf_err, in_spill, in_run, rob_en_s: std_logic;
 	
 begin
 
@@ -112,7 +112,7 @@ begin
 	grab <= '1' when part_up = '1' and tv = '1' and
 		(((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') or -- Grab run start or stop only if we issued it
 		(typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP and unsigned(typ) < 8) or -- Grab all other system commands if partition is running
-		(in_run and ctrl_trig_en and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1')) -- Otherwise apply trigger masks
+		(in_run and ctrl_trig_en and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0))))) = '1') -- Otherwise apply trigger masks
 		else '0';
 		
 	tack <= grab;

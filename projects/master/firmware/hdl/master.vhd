@@ -39,8 +39,8 @@ architecture rtl of master is
 	signal spill: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal psync: std_logic_vector(N_PART - 1 downto 0);
-	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 3 downto 0);
-	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 3 downto 0);
+	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 2 downto 0);
+	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 2 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal ipbw_p: ipb_wbus_array(N_PART - 1 downto 0);
@@ -180,7 +180,6 @@ begin
 				clk => clk,
 				rst => rst,
 				tstamp => tstamp,
-				psync => psync(i),
 				spill => spill,
 				scmd_out => scmdw_v(i + 3),
 				scmd_in => scmdr_v(i + 3),
@@ -205,8 +204,8 @@ begin
 			clk => clk,
 			rst => rst,
 			tstamp => tstamp,
-			scmd_out => scmdw_v(N_PART + 3 + N_CHAN downto N_PART + 4),
-			scmd_in => scmdr_v(N_PART + 3 + N_CHAN downto N_PART + 4)
+			scmd_out => scmdw_v(N_PART + 2 + N_CHAN downto N_PART + 3),
+			scmd_in => scmdr_v(N_PART + 2 + N_CHAN downto N_PART + 3)
 		);
 		
 -- Merge
