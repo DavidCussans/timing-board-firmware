@@ -7,4 +7,3 @@ src scmd_merge.vhd ts_bcast.vhd
 include -c components/pdts pdts_tx.dep
 src -c components/pdts pdts_idle_gen.vhd pdts_prio_enc.vhd pdts_defs.vhd
 src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_types.vhd
-src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
