@@ -87,7 +87,7 @@ begin
 
 -- master block
 
-	tx: entity work.master
+	master: entity work.master
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,

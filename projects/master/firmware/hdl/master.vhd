@@ -38,7 +38,6 @@ architecture rtl of master is
 	signal stb: std_logic;
 	signal spill: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-	signal psync: std_logic_vector(N_PART - 1 downto 0);
 	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 2 downto 0);
 	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 2 downto 0);
 	signal scmdw, acmdw: cmd_w;
@@ -120,8 +119,7 @@ begin
 			ipb_out => ipbr(N_SLV_TSTAMP),
 			clk => clk,
 			rst => rst,
-			tstamp => tstamp,
-			psync => psync
+			tstamp => tstamp
 		);
 		
 -- Timestamp broadcast

@@ -1,6 +1,8 @@
 -- ts_source
 --
--- Generates timestamp
+-- Maintains the timestamp counter
+--
+-- A simple resettable counter for now, might be more complex (e.g. time-of-day) later
 --
 -- Dave Newbold, June 2017
 
@@ -26,16 +28,12 @@ entity ts_source is
 		ipb_out: out ipb_rbus;		
 		clk: in std_logic;
 		rst: in std_logic;
-		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
-		psync: out std_logic_vector(N_PART - 1 downto 0)
+		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0)
 	);
 
 end ts_source;
 
 architecture rtl of ts_source is
-
-	signal tctr: unsigned(calc_width(TS_DIV) - 1 downto 0);
-	signal pctr: unsigned(3 downto 0);
 	
 begin
 
@@ -56,33 +54,5 @@ begin
 			inc(0) => '1',
 			q(8 * TSTAMP_WDS - 1 downto 0) => tstamp
 		);
-		
--- Sync counter
-		
-	process(clk)
-	begin
-		if rising_edge(clk) then
-			if rst = '1' then
-				tctr <= (others => '0');
-				pctr <= (others => '0');
-			else
-				tctr <= tctr + 1;
-				if tctr = TS_DIV then
-					pctr <= pctr + 1;
-				end if;
-			end if;
-		end if;
-	end process;
-	
-	process(pctr)
-	begin
-		for i in N_PART - 1 downto 0 loop
-			if pctr = i and or_reduce(std_logic_vector(tctr)) = '0' then
-				psync(i) <= '1';
-			else
-				psync(i) <= '0';
-			end if;
-		end loop;
-	end process;
 	
 end rtl;
