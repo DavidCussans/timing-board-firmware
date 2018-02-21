@@ -158,7 +158,7 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_EVTCTR),
 			ipb_out => ipbr(N_SLV_EVTCTR),
-			clk => ep_clk,
+			clk => clk,
 			d => evtctr
 		);
 		
