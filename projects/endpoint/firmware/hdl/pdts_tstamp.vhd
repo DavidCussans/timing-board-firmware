@@ -65,7 +65,7 @@ begin
 					end if;
 				else
 					tstamp_i <= tstamp_i + 1;
-					if pkt_end_d = '1' and tstamp_i /= unsigned(sr(sr'left downto 9)) + 256 + 1 then
+					if pkt_end_d = '1' and tstamp_i /= unsigned(sr) + 256 + 1 then
 						lock <= '0';
 					end if;
 				end if;
