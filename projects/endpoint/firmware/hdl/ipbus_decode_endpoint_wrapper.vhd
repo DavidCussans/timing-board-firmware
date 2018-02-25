@@ -17,15 +17,16 @@ package ipbus_decode_endpoint_wrapper is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_endpoint_wrapper(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Thu Apr 20 17:37:49 2017 
+-- START automatically  generated VHDL the Sun Feb 25 20:30:47 2018 
   constant N_SLV_VERSION: integer := 0;
   constant N_SLV_CSR: integer := 1;
   constant N_SLV_TSTAMP: integer := 2;
   constant N_SLV_EVTCTR: integer := 3;
   constant N_SLV_BUF: integer := 4;
   constant N_SLV_FREQ: integer := 5;
-  constant N_SLV_CTRS: integer := 6;
-  constant N_SLAVES: integer := 7;
+  constant N_SLV_CMD: integer := 6;
+  constant N_SLV_CTRS: integer := 7;
+  constant N_SLAVES: integer := 8;
 -- END automatically generated VHDL
 
     
@@ -37,7 +38,7 @@ package body ipbus_decode_endpoint_wrapper is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Thu Apr 20 17:37:49 2017 
+-- START automatically  generated VHDL the Sun Feb 25 20:30:47 2018 
     if    std_match(addr, "---------------------------0000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_VERSION, IPBUS_SEL_WIDTH)); -- version / base 0x00000000 / mask 0x0000001e
     elsif std_match(addr, "---------------------------0001-") then
@@ -50,6 +51,8 @@ package body ipbus_decode_endpoint_wrapper is
       sel := ipbus_sel_t(to_unsigned(N_SLV_BUF, IPBUS_SEL_WIDTH)); -- buf / base 0x00000008 / mask 0x0000001e
     elsif std_match(addr, "---------------------------0101-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_FREQ, IPBUS_SEL_WIDTH)); -- freq / base 0x0000000a / mask 0x0000001e
+    elsif std_match(addr, "---------------------------0110-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CMD, IPBUS_SEL_WIDTH)); -- cmd / base 0x0000000c / mask 0x0000001e
     elsif std_match(addr, "---------------------------1----") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CTRS, IPBUS_SEL_WIDTH)); -- ctrs / base 0x00000010 / mask 0x00000010
 -- END automatically generated VHDL
