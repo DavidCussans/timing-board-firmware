@@ -3,11 +3,14 @@
 			<node id="ctrl" address="0x0">
 				<node id="en" mask="0x1"/>
 				<node id="en_fake" mask="0x2"/>
+				<node id="force" mask="0x4"/>
 				<node id="fake_cyc_len" mask="0xff0000"/>
 				<node id="fake_spill_len" mask="0xff000000"/>
 			</node>
 			<node id="stat" address="0x1">
 				<node id="in_spill" mask="0x1"/>
+				<node id="spill_req" mask="0x2"/>
+				<node id="fake_spill_req" mask="0x4"/>
 				<node id="spill_ctr" mask="0xffff0000"/>
 			</node>
 		</node>
