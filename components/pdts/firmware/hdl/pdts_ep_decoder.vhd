@@ -33,22 +33,24 @@ begin
 
 	process(clk)
 	begin
-		if rst = '1' or rdy = '0' then
-			ins <= '0';
-			inr <= '0';
-			evtctr_i <= (others => '0');
-		elsif scmd_v = '1' then
-			if scmd = SCMD_SPILL_START then
-				ins <= '1';
-			elsif scmd = SCMD_SPILL_STOP then
+		if rising_edge(clk) then
+			if rst = '1' or rdy = '0' then
 				ins <= '0';
-			elsif scmd = SCMD_RUN_START then
-				inr <= '1';
-				evtctr_i <= (others => '0');
-			elsif scmd = SCMD_RUN_STOP then
 				inr <= '0';
-			elsif EVTCTR_MASK(to_integer(unsigned(scmd))) = '1' and inr = '1' then
-				evtctr_i <= evtctr_i + 1;
+				evtctr_i <= (others => '0');
+			elsif scmd_v = '1' then
+				if scmd = SCMD_SPILL_START then
+					ins <= '1';
+				elsif scmd = SCMD_SPILL_STOP then
+					ins <= '0';
+				elsif scmd = SCMD_RUN_START then
+					inr <= '1';
+					evtctr_i <= (others => '0');
+				elsif scmd = SCMD_RUN_STOP then
+					inr <= '0';
+				elsif EVTCTR_MASK(to_integer(unsigned(scmd))) = '1' and inr = '1' then
+					evtctr_i <= evtctr_i + 1;
+				end if;
 			end if;
 		end if;
 	end process;
