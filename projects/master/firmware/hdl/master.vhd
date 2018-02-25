@@ -208,9 +208,10 @@ begin
 		
 -- Merge
 
-	merge: entity work.scmd_merge
+	merge: entity work.pdts_scmd_merge
 		generic map(
-			N_SRC => N_CHAN + N_PART + 3
+			N_SRC => N_CHAN + N_PART + 3,
+			N_PART => N_PART
 		)
 		port map(
 			clk => clk,

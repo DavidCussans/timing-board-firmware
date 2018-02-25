@@ -12,11 +12,11 @@ use ieee.std_logic_misc.all;
 use work.ipbus_reg_types.all;
 
 use work.pdts_defs.all;
-use work.master_defs.all;
 
-entity scmd_merge is
+entity pdts_scmd_merge is
 	generic(
-		N_SRC: positive := 1
+		N_SRC: positive := 1;
+		N_PART: integer
 	);
 	port(
 		clk: in std_logic;
@@ -30,9 +30,9 @@ entity scmd_merge is
 		scmd_in: in cmd_r
 	);
 
-end scmd_merge;
+end pdts_scmd_merge;
 
-architecture rtl of scmd_merge is
+architecture rtl of pdts_scmd_merge is
 
 	signal valid: std_logic_vector(N_SRC - 1 downto 0);
 	signal p: std_logic_vector(calc_width(N_SRC) - 1 downto 0);

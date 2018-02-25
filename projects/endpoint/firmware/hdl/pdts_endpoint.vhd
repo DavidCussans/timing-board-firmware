@@ -12,7 +12,8 @@ use work.pdts_defs.all;
 
 entity pdts_endpoint is
 	generic(
-		SCLK_FREQ: real := 50.0
+		SCLK_FREQ: real := 50.0;
+		EN_TX: boolean := false
 	);
 	port(
 		sclk: in std_logic; -- Free-running system clock
@@ -20,17 +21,22 @@ entity pdts_endpoint is
 		addr: in std_logic_vector(7 downto 0); -- Endpoint address (async, sampled in clk domain)
 		tgrp: in std_logic_vector(1 downto 0); -- Timing group (async, sampled in clk domain)
 		stat: out std_logic_vector(3 downto 0); -- Status output (sclk domain)
-		rec_clk: in std_logic; -- CDR recovered clock
-		rec_d: in std_logic; -- CDR recovered data (rec_clk domain)
-		sfp_los: in std_logic; -- SFP LOS line (async, sampled in sclk domain)
-		cdr_los: in std_logic; -- CDR LOS line (async, sampled in sclk domain)
-		cdr_lol: in std_logic; -- CDR LOL line (async, sampled in sclk domain)
+		rec_clk: in std_logic; -- CDR recovered clock from timing link
+		rec_d: in std_logic; -- CDR recovered data from timing link (rec_clk domain)
+		txd: out std_logic; -- Output data to timing link (rec_clk domain)
+		sfp_los: in std_logic := '0'; -- SFP LOS line (async, sampled in sclk domain)
+		cdr_los: in std_logic := '0'; -- CDR LOS line (async, sampled in sclk domain)
+		cdr_lol: in std_logic := '0'; -- CDR LOL line (async, sampled in sclk domain)
+		sfp_tx_dis: out std_logic; -- SFP tx disable line (clk domain)
 		clk: out std_logic; -- 50MHz clock output
 		rst: out std_logic; -- 50MHz domain reset
 		rdy: out std_logic; -- Timestamp valid flag
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
 		sync_v: out std_logic; -- Sync command valid flag (clk domain)
-		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0) -- Timestamp out
+		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
+		sync_in: in std_logic_vector(SCMD_W - 1 downto 0) := (others => '0'); -- Sync command input (clk domain)
+		sync_in_v: in std_logic := '0'; -- Sync command input valid flag (clk domain)
+		sync_in_ack: out std_logic -- Sync command input acknowledge (clk domain)
 	);
 
 end pdts_endpoint;
@@ -43,6 +49,12 @@ architecture rtl of pdts_endpoint is
 	signal stb, k, s_valid, s_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
+	signal scmdw_v: cmd_w_array(1 downto 0);
+	signal scmdr_v: cmd_r_array(1 downto 0);
+	signal scmdw, acmdw: cmd_w;
+	signal scmdr, acmdr: cmd_r;
+	signal tx_q: std_logic_vector(7 downto 0);
+	signal tx_err, tx_stb, tx_k: std_logic;
 
 begin
 
@@ -140,5 +152,83 @@ begin
 		);
 		
 	rdy <= rdy_i;
+	
+-- Echo command; send it back to the master
+
+	scmdw_v(0).d <= dr;
+	scmdw_v(0).valid <= s_valid when dr(3 downto 0) = SCMD_ECHO else '0';
+	scmdw_v(0).last <= '1';
+
+-- Sync command input
+
+	scmdw_v(1).d <= sync_in;
+	scmdw_v(1).valid <= sync_in_v;
+	scmdw_v(1).last <= '1';
+
+	sync_in_ack <= scmdr_v(1).ack;
+
+-- Merge
+
+	merge: entity work.pdts_scmd_merge
+		generic map(
+			N_SRC => 2,
+			N_PART => 0
+		)
+		port map(
+			clk => clk,
+			rst => rst,
+			scmd_in_v => scmdw_v,
+			scmd_out_v => scmdr_v,
+			typ => open,
+			tv => open,
+			tgrp => (others => '0'),
+			scmd_out => scmdw,
+			scmd_in => scmdr
+		);
+		
+-- Idle pattern gen
+
+	idle: entity work.pdts_idle_gen
+		port map(
+			clk => clk,
+			rst => rst,
+			acmd_out => acmdw,
+			acmd_in => acmdr
+		);
+		
+-- Tx
+
+	tx: entity work.pdts_tx
+		port map(
+			clk => clk,
+			rst => rst,
+			stb => stb,
+			addr => addr,
+			scmd_in => scmdw,
+			scmd_out => scmdr,
+			acmd_in => acmdw,
+			acmd_out => acmdr,
+			q => tx_q,
+			k => tx_k,
+			stbo => tx_stb,
+			err => tx_err
+		);
+		
+-- Tx PHY
+
+	txphy: entity work.pdts_tx_phy
+		port map(
+			clk => clk,
+			rst => rst,
+			d => tx_q,
+			k => tx_k,
+			stb => tx_stb,
+			txclk => rec_clk,
+			q => txd
+		);
+		
+-- SFP control
+
+	sfp_tx_dis <= '0' when EN_TX else '1';
 		
 end rtl;

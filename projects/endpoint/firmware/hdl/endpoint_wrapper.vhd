@@ -23,9 +23,11 @@ entity endpoint_wrapper is
 		ipb_out: out ipb_rbus;
 		rec_clk: in std_logic; -- CDR recovered clock
 		rec_d: in std_logic; -- CDR recovered data (rec_clk domain)
+		txd: out std_logic; -- Output data to timing link (rec_clk domain)
 		sfp_los: in std_logic; -- SFP LOS line (async, sampled in sclk domain)
 		cdr_los: in std_logic; -- CDR LOS line (async, sampled in sclk domain)
-		cdr_lol: in std_logic -- CDR LOL line (async, sampled in sclk domain)
+		cdr_lol: in std_logic; -- CDR LOL line (async, sampled in sclk domain)
+		sfp_tx_dis: out std_logic -- SFP tx disable line (clk domain)
 	);
 		
 end endpoint_wrapper;
@@ -34,14 +36,17 @@ architecture rtl of endpoint_wrapper is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(0 downto 0);
+	signal ctrl, ctrl_cmd: ipb_reg_v(0 downto 0);
+	signal stat, stat_cmd: ipb_reg_v(0 downto 0);
+	signal stb_cmd: std_logic_vector(0 downto 0);
 	signal ctrl_ep_en, ctrl_buf_en, ctrl_ctr_rst: std_logic;
 	signal ctrl_addr: std_logic_vector(7 downto 0);
 	signal ctrl_tgrp: std_logic_vector(1 downto 0);
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_rst, ep_clk, ep_rsto, ep_rdy, ep_v: std_logic;
 	signal ep_scmd: std_logic_vector(SCMD_W - 1 downto 0);
+	signal sync_in: std_logic_vector(SCMD_W - 1 downto 0);
+	signal sync_in_v, sync_in_ack: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal buf_warn, buf_err, in_run, in_spill: std_logic;
@@ -100,6 +105,28 @@ begin
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_addr <= ctrl(0)(15 downto 8);
 	stat(0) <= X"00000" & "00" & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
+
+-- Sync command tx control
+
+	csr: entity work.ipbus_syncreg_v
+		generic map(
+			N_CTRL => 1,
+			N_STAT => 1
+		)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_CMD),
+			ipb_out => ipbr(N_SLV_CMD),
+			slv_clk => ep_clk,
+			d => stat_cmd,
+			q => ctrl_cmd,
+			stb => stb_cmd
+		);
+		
+	scmd <= ctrl_cmd(0)(SCMD_W - 1 downto 0);
+	sync_in_v <= stb(0);
+	stat_cmd(0) <= X"0000000" & "000" & sync_in_ack when rising_edge(ep_clk) and stb(0) = '1';
 	
 -- The endpoint
 
@@ -117,6 +144,7 @@ begin
 			stat => ep_stat,
 			rec_clk => rec_clk,
 			rec_d => rec_d,
+			txd => txd,
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
@@ -125,7 +153,10 @@ begin
 			rdy => ep_rdy,
 			sync => ep_scmd,
 			sync_v => ep_v,
-			tstamp => tstamp
+			tstamp => tstamp,
+			sync_in => sync_in,
+			sync_in_v => sync_in_v,
+			sync_in_ack => sync_in_ack
 		);
 		
 -- Timestamp
