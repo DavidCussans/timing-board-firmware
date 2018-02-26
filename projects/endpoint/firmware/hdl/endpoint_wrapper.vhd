@@ -108,7 +108,7 @@ begin
 
 -- Sync command tx control
 
-	csr: entity work.ipbus_syncreg_v
+	cmd: entity work.ipbus_syncreg_v
 		generic map(
 			N_CTRL => 1,
 			N_STAT => 1
@@ -124,9 +124,9 @@ begin
 			stb => stb_cmd
 		);
 		
-	scmd <= ctrl_cmd(0)(SCMD_W - 1 downto 0);
-	sync_in_v <= stb(0);
-	stat_cmd(0) <= X"0000000" & "000" & sync_in_ack when rising_edge(ep_clk) and stb(0) = '1';
+	sync_in <= ctrl_cmd(0)(SCMD_W - 1 downto 0);
+	sync_in_v <= stb_cmd(0);
+	stat_cmd(0) <= X"0000000" & "000" & sync_in_ack when rising_edge(ep_clk) and stb_cmd(0) = '1';
 	
 -- The endpoint
 

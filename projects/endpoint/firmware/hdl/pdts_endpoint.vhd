@@ -175,8 +175,8 @@ begin
 			N_PART => 0
 		)
 		port map(
-			clk => clk,
-			rst => rst,
+			clk => clk_i,
+			rst => rst_i,
 			scmd_in_v => scmdw_v,
 			scmd_out_v => scmdr_v,
 			typ => open,
@@ -190,8 +190,8 @@ begin
 
 	idle: entity work.pdts_idle_gen
 		port map(
-			clk => clk,
-			rst => rst,
+			clk => clk_i,
+			rst => rst_i,
 			acmd_out => acmdw,
 			acmd_in => acmdr
 		);
@@ -200,8 +200,8 @@ begin
 
 	tx: entity work.pdts_tx
 		port map(
-			clk => clk,
-			rst => rst,
+			clk => clk_i,
+			rst => rst_i,
 			stb => stb,
 			addr => addr,
 			scmd_in => scmdw,
@@ -218,8 +218,8 @@ begin
 
 	txphy: entity work.pdts_tx_phy
 		port map(
-			clk => clk,
-			rst => rst,
+			clk => clk_i,
+			rst => rst_i,
 			d => tx_q,
 			k => tx_k,
 			stb => tx_stb,
