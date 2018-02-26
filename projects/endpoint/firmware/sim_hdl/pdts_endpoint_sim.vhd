@@ -166,7 +166,7 @@ begin
 
 -- Sync command input
 
-	scmdw_v(1).d <= sync_in;
+	scmdw_v(1).d <= (7 downto SCMD_W => '0') & sync_in;
 	scmdw_v(1).valid <= sync_in_v;
 	scmdw_v(1).last <= '1';
 
