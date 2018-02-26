@@ -179,9 +179,11 @@ begin
 			ipb_out => ipbr(N_SLV_ENDPOINT),
 			rec_clk => rec_clk,
 			rec_d => rec_d,
+			txd => open,
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
-			cdr_lol => cdr_lol
+			cdr_lol => cdr_lol,
+			sfp_tx_dis => open
 		);
 
 end rtl;
