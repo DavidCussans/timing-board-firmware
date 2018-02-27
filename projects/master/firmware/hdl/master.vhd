@@ -24,7 +24,9 @@ entity master is
 		mclk: in std_logic;
 		clk: in std_logic;
 		rst: in std_logic;
-		q: out std_logic
+		q: out std_logic;
+		scmd_in: in cmd_r := CMD_W_NULL;
+		scmd_out out cmd_w
 	);
 		
 end master;
@@ -150,8 +152,9 @@ begin
 
 -- Trigger command input
 
-	scmdw_v(2) <= CMD_W_NULL;
-		
+	scmdw_v(2) <= scmd_in;
+	scmd_out <= scmdr_v(2);
+	
 -- Partitions
 
 	fabric_p: entity work.ipbus_fabric_sel

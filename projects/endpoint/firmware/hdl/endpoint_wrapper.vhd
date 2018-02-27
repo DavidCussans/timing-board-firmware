@@ -45,8 +45,8 @@ architecture rtl of endpoint_wrapper is
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_rst, ep_clk, ep_rsto, ep_rdy, ep_v: std_logic;
 	signal ep_scmd: std_logic_vector(SCMD_W - 1 downto 0);
-	signal sync_in: std_logic_vector(SCMD_W - 1 downto 0);
-	signal sync_in_v, sync_in_ack: std_logic;
+	signal trig_sync_in: cmd_w;
+	signal trig_sync_out: cmd_r;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal buf_warn, buf_err, in_run, in_spill: std_logic;
@@ -124,9 +124,8 @@ begin
 			stb => stb_cmd
 		);
 		
-	sync_in <= ctrl_cmd(0)(SCMD_W - 1 downto 0);
-	sync_in_v <= stb_cmd(0);
-	stat_cmd(0) <= X"0000000" & "000" & sync_in_ack when rising_edge(ep_clk) and stb_cmd(0) = '1';
+	trig_sync_in <= (ctrl_cmd(0)(SCMD_W - 1 downto 0), stb_cmd(0), '1');
+	stat_cmd(0) <= X"0000000" & "000" & trig_sync_out.ack when rising_edge(ep_clk) and stb_cmd(0) = '1';
 	
 -- The endpoint
 
@@ -154,9 +153,8 @@ begin
 			sync => ep_scmd,
 			sync_v => ep_v,
 			tstamp => tstamp,
-			sync_in => sync_in,
-			sync_in_v => sync_in_v,
-			sync_in_ack => sync_in_ack
+			trig_sync_in =>
+			trig_sync_out =>
 		);
 		
 -- Timestamp

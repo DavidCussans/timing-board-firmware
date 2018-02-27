@@ -43,7 +43,7 @@ architecture rtl of partition is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
-	signal ctrl_trig_mask: std_logic_vector(7 downto 0); -- Replace with constant
+	signal ctrl_trig_mask: std_logic_vector(7 downto 0);
 	signal run_int, part_up: std_logic;
 	signal grab, trig, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);

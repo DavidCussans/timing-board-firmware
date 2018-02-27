@@ -12,6 +12,9 @@ use ieee.std_logic_misc.all;
 use work.pdts_defs.all;
 
 entity pdts_rx_phy is
+	generic(
+		UPSTREAM_MODE: boolean := false
+	);
 	port(
 		fclk: in std_logic; -- free-running clock
 		rxclk: in std_logic; -- serial data clock
