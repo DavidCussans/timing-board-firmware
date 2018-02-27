@@ -26,7 +26,7 @@ entity master is
 		rst: in std_logic;
 		q: out std_logic;
 		scmd_in: in cmd_w := CMD_W_NULL;
-		scmd_out out cmd_r
+		scmd_out: out cmd_r
 	);
 		
 end master;
