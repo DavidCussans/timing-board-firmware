@@ -153,8 +153,8 @@ begin
 			sync => ep_scmd,
 			sync_v => ep_v,
 			tstamp => tstamp,
-			trig_sync_in =>
-			trig_sync_out =>
+			trig_sync_in => trig_sync_in,
+			trig_sync_out => trig_sync_out
 		);
 		
 -- Timestamp
