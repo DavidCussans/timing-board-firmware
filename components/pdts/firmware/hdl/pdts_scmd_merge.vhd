@@ -70,7 +70,7 @@ begin
 
 	ip <= to_integer(unsigned(p));
 	ipa <= ip when go = '1' and rising_edge(clk);
-	w <= scmd_in_v(ip).d when go = '1' or (src and scmd_in.ren) = '1' and rising_edge(clk);
+	w <= scmd_in_v(ip).d when (go = '1' or (src and scmd_in.ren) = '1') and rising_edge(clk);
 		
 	go <= or_reduce(req) and not active;
 	goq <= go and scmd_in.ack;
