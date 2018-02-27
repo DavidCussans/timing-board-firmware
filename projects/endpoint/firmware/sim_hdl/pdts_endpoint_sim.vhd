@@ -45,7 +45,7 @@ architecture rtl of pdts_endpoint is
 	signal rclk, rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
-	signal stb, k, s_valid, s_first: std_logic;
+	signal stb, k, s_valid: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
@@ -131,7 +131,6 @@ begin
 			k => k,
 			q => dr,
 			s_valid => s_valid,
-			s_first => s_first,
 			a_valid => open,
 			a_last => open,
 			err => rx_err
@@ -160,7 +159,7 @@ begin
 -- Echo command; send it back to the master
 
 	scmdw_v(0).d <= dr;
-	scmdw_v(0).valid <= s_valid when dr(3 downto 0) = SCMD_ECHO else '0';
+	scmdw_v(0).req <= s_valid when dr(3 downto 0) = SCMD_ECHO else '0';
 	scmdw_v(0).last <= '1';
 
 -- Sync command input
