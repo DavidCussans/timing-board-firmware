@@ -34,9 +34,8 @@ entity pdts_endpoint is
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
 		sync_v: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
-		sync_in: in std_logic_vector(SCMD_W - 1 downto 0) := (others => '0'); -- Sync command input (clk domain)
-		sync_in_v: in std_logic := '0'; -- Sync command input valid flag (clk domain)
-		sync_in_ack: out std_logic -- Sync command input acknowledge (clk domain)
+		trig_sync_in: in cmd_w;
+		trig_sync_out: out cmd_r
 	);
 
 end pdts_endpoint;
@@ -166,11 +165,8 @@ begin
 
 -- Sync command input
 
-	scmdw_v(1).d <= (7 downto SCMD_W => '0') & sync_in;
-	scmdw_v(1).valid <= sync_in_v;
-	scmdw_v(1).last <= '1';
-
-	sync_in_ack <= scmdr_v(1).ack;
+	scmdw_v(1) <= trig_sync_in;
+	trig_sync_out <= scmdr_v(1);
 
 -- Merge
 
