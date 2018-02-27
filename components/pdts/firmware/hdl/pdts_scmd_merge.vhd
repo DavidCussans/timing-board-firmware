@@ -2,6 +2,16 @@
 --
 -- Merge sync cmd streams from multiple sources, and send to tx block
 --
+-- To send a scmd request:
+--   Put your data onto the cmd_w.d, raise cmd_w.req
+--   When command is accepted, you receive cmd_r.ack on the same cycle and you must lower cmd_w.req
+--   You can then play the scmd in one word at a time, with cmd_r.ren indicating need for next word
+--   The last word must be accompanied by cmd_w.last
+--   You must keep cmd_w.d valid between cmd_r.ren assertions, or bad stuff will happen
+--
+-- It's guaranteed that you get a cmd_r.ren on same cycle as cmd_r.ack, so if you just want
+--   to issue a single-word command, you just set cmd_w.last and 'fire and forget'.
+--
 -- Dave Newbold, March 2017
 
 library IEEE;
@@ -34,17 +44,18 @@ end pdts_scmd_merge;
 
 architecture rtl of pdts_scmd_merge is
 
-	signal valid: std_logic_vector(N_SRC - 1 downto 0);
+	signal req: std_logic_vector(N_SRC - 1 downto 0);
 	signal p: std_logic_vector(calc_width(N_SRC) - 1 downto 0);
 	signal ip, ipa: integer range N_SRC - 1 downto 0 := 0;
+	signal w: std_logic_vector(7 downto 0);
 	signal go, goq, last, active, src: std_logic;
-
+	
 begin
 
 	process(scmd_in_v)
 	begin
 		for i in N_SRC - 1 downto 0 loop
-			valid(i) <= scmd_in_v(i).valid;
+			req(i) <= scmd_in_v(i).req;
 		end loop;
 	end process;
 	
@@ -53,14 +64,15 @@ begin
 			WIDTH => N_SRC
 		)
 		port map(
-			d => valid,
+			d => req,
 			sel => p
 		);
 
 	ip <= to_integer(unsigned(p));
 	ipa <= ip when go = '1' and rising_edge(clk);
+	w <= scmd_in_v(ip).d when go = '1' or (src and scmd_in.ren) = '1' and rising_edge(clk);
 		
-	go <= or_reduce(valid) and not active;
+	go <= or_reduce(req) and not active;
 	goq <= go and scmd_in.ack;
 	last <= src and scmd_in_v(ipa).last and scmd_in.ren;
 
@@ -69,7 +81,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				active <= '0';
-				src <= '0';
+				src <= "00";
 			else
 				active <= ((active and not last) or goq);
 				if scmd_in.ren = '1' then
@@ -78,16 +90,16 @@ begin
 			end if;
 		end if;
 	end process;
-	
-	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when src = '0' else scmd_in_v(ipa).d;
-	scmd_out.valid <= go or active;
+			
+	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when src = '0' else w; -- Insert grp / timeslot hdr
+	scmd_out.req <= go or active;
 	scmd_out.last <= src and scmd_in_v(ipa).last;
-	typ <= scmd_in_v(ip).d(3 downto 0);
+	typ <= scmd_in_v(ip).d(SCMD_W - 1 downto 0);
 	tv <= go;
 	
 	ogen: for i in N_SRC - 1 downto 0 generate
 		scmd_out_v(i).ack <= goq when ip = i else '0';
-		scmd_out_v(i).ren <= scmd_in.ren and src;
+		scmd_out_v(i).ren <= (scmd_in.ren and src) or go when ip = i else '0';
 	end generate;
 	
 end rtl;

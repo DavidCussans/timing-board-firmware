@@ -49,7 +49,7 @@ architecture rtl of scmd_gen_chan is
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
 	signal mask: std_logic_vector(15 downto 0);
 	signal src: std_logic_vector(27 downto 0);
-	signal v, valid: std_logic;
+	signal v: std_logic;
 
 begin
 
@@ -90,11 +90,9 @@ begin
 	src <= tstamp(27 downto 0) when ctrl_patt = '0' else rand(27 downto 0);
 	v <= '1' when (or_reduce(mask and src(27 downto 12)) = '0' and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
-	
-	valid <= (valid or (v and scmd_in.ack)) and not (scmd_in.ren or rst) when rising_edge(clk);		
-	
+		
 	scmd_out.d <= ctrl_type;
-	scmd_out.valid <= v or valid;
+	scmd_out.req <= v;
 	scmd_out.last <= '1';
 	
 	ack <= v and scmd_in.ack;

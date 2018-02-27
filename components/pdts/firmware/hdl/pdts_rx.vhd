@@ -13,19 +13,18 @@ use work.pdts_defs.all;
 
 entity pdts_rx is
 	generic(
-		NO_GRP: boolean := false
+		NO_TGRP: boolean := false
 	);
 	port(
 		clk: in std_logic; -- 50MHz system clock
 		rst: in std_logic; -- synchronous reset
 		stb: in std_logic; -- data strobe
-		grp: in std_logic_vector(GRP_W - 1 downto 0); -- timing group def (static)
+		tgrp: in std_logic_vector(GRP_W - 1 downto 0); -- timing group def (static)
 		addr: in std_logic_vector((8 * ADDR_WDS) - 1 downto 0); -- address (static)
 		d: in std_logic_vector(7 downto 0); -- data input
 		k: in std_logic; -- kchar input
 		q: out std_logic_vector(7 downto 0); -- data output
 		s_valid: out std_logic; -- sync cmd strobe
-		s_first: out std_logic;
 		a_valid: out std_logic; -- async cmd strobe
 		a_last: out std_logic; -- packet last word marker
 		err: out std_logic_vector(2 downto 0) -- error flag
@@ -125,7 +124,7 @@ begin
 
 -- Address match
 
-	s_match <= d(4 + to_integer(unsigned(grp)));
+	s_match <= d(4 + to_integer(unsigned(tgrp)));
 
 	process(clk)
 	begin
@@ -198,13 +197,12 @@ begin
 	end process;
 	
 	q <= d;
-	valid <= '1' when state = SYNC and (s_match_r = '1' or NO_GRP) and stb = '1' else '0';
+	valid <= '1' when state = SYNC and (s_match_r = '1' or NO_TGRP) and stb = '1' else '0';
 	first <= '1' when sctr = to_unsigned(1, sctr'length) else '0';
 	issue <= '1' when vctr = unsigned(ts) or SCLK_RATIO = 10 else '0';
 	pend <= (pend or valid) and not (issue or rst) when rising_edge(clk);
 	pend_f <= (pend_f or (valid and first)) and not (issue or rst) when rising_edge(clk);
 	s_valid <= (valid or pend) and issue;
-	s_first <= ((valid and first) or pend_f) and issue;
 	a_valid <= '1' when state = ASYNC and k = '0' and stb = '1' and a_match = '1' and actr >= ADDR_WDS - 1 else '0';
 	a_last <= pkt_end;
 	err <= err_c when rising_edge(clk);

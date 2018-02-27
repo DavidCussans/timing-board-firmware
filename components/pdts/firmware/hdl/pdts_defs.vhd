@@ -62,7 +62,7 @@ package pdts_defs is
 	type cmd_w is
 		record
 			d: std_logic_vector(7 downto 0);
-			valid: std_logic;
+			req: std_logic;
 			last: std_logic;
 		end record;
 

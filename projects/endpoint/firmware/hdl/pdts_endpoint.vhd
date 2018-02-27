@@ -34,8 +34,8 @@ entity pdts_endpoint is
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
 		sync_v: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
-		trig_sync_in: in cmd_w;
-		trig_sync_out: out cmd_r
+		tsync_in: in cmd_w := CMD_W_NULL;
+		tsync_out: out cmd_r
 	);
 
 end pdts_endpoint;
@@ -52,6 +52,7 @@ architecture rtl of pdts_endpoint is
 	signal scmdr_v: cmd_r_array(1 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
+	signal tp, tp_d: std_logic;
 	signal tx_q: std_logic_vector(7 downto 0);
 	signal tx_err, tx_stb, tx_k: std_logic;
 
@@ -120,7 +121,7 @@ begin
 			clk => clk_i,
 			rst => rst_i,
 			stb => stb,
-			grp => tgrp,
+			tgrp => tgrp,
 			addr => addr,
 			d => d,
 			k => k,
@@ -135,7 +136,7 @@ begin
 -- Temporary sync output
 
 	sync <= dr(3 downto 0);
-	sync_v <= s_valid and s_first and rdy_i;
+	sync_v <= s_valid and rdy_i;
 	
 -- Timestamp / event counter
 
@@ -160,8 +161,8 @@ begin
 
 -- Sync command input
 
-	scmdw_v(1) <= trig_sync_in;
-	trig_sync_out <= scmdr_v(1);
+	scmdw_v(1) <= tsync_in;
+	tsync_out <= scmdr_v(1);
 
 -- Merge
 

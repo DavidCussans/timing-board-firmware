@@ -28,7 +28,7 @@ architecture rtl of ts_bcast is
 	signal dctr: unsigned(31 downto 0);
 	signal cap: std_logic_vector(8 * (TSTAMP_WDS + 1) - 1 downto 0);
 	signal ctr: unsigned(3 downto 0);
-	signal sync, go, s, done: std_logic;
+	signal sync, go, done: std_logic;
 
 begin
 	
@@ -53,7 +53,6 @@ begin
 	
 -- Capture
 
-	s <= ((s and not (done and scmd_in.ren)) or go) and not rst when rising_edge(clk);
 	cap(cap'left downto 8) <= tstamp when go = '1' and rising_edge(clk);
 	cap(7 downto 0) <= (7 downto SCMD_W => '0') & SCMD_SYNC;
 		
@@ -62,7 +61,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctr <= X"0";
-			elsif s = '1' and scmd_in.ren = '1' then
+			elsif scmd_in.ren = '1' then
 				if done = '1' then
 					ctr <= X"0";
 				else
@@ -77,7 +76,7 @@ begin
 -- Output
 
 	scmd_out.d <= cap(8 * (to_integer(ctr) + 1) - 1 downto 8 * to_integer(ctr));
-	scmd_out.valid <= sync or s;
+	scmd_out.req <= sync;
 	scmd_out.last <= done;
 
 end rtl;

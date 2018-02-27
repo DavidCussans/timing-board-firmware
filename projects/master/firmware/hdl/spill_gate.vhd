@@ -107,7 +107,7 @@ begin
 				else
 					scmd_out.d <= X"0" & SCMD_SPILL_STOP;
 				end if;
-				scmd_out.valid <= '1';
+				scmd_out.req <= '1';
 				scmd_out.last <= '1';
 			end if;
 		end if;

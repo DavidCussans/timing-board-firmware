@@ -171,7 +171,7 @@ begin
 		end if;
 	end process;
 	
-	smode <= (scmd_in.valid and s_ok) or smode_r;
+	smode <= (scmd_in.req and s_ok) or smode_r;
 	
 	scmd_out.ren <= stb and smode when spctr > 0 else '0';
 	scmd_out.ack <= smode and not smode_r;
