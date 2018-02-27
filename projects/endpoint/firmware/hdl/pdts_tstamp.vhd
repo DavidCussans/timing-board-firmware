@@ -28,7 +28,7 @@ architecture rtl of pdts_tstamp is
 	signal sr: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
 	signal ctr: unsigned(7 downto 0);
-	signal lock, init, pkt_end, pkt_end_d. s_valid_d: std_logic;
+	signal lock, init, pkt_end, pkt_end_d, s_valid_d: std_logic;
 
 begin
 		
