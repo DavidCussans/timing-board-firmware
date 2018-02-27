@@ -149,7 +149,6 @@ begin
 			rst => rst_i,
 			d => dr,
 			s_valid => s_valid,
-			s_first => s_first,
 			tstamp => tstamp,
 			rdy => rdy_i
 		);

@@ -127,7 +127,6 @@ begin
 			k => k,
 			q => dr,
 			s_valid => s_valid,
-			s_first => s_first,
 			a_valid => open,
 			a_last => open,
 			err => rx_err

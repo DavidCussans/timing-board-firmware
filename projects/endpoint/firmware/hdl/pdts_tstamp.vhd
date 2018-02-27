@@ -17,7 +17,6 @@ entity pdts_tstamp is
 		rst: in std_logic;
 		d: in std_logic_vector(7 downto 0);
 		s_valid: in std_logic;
-		s_first: in std_logic;
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		rdy: out std_logic
 	);
@@ -29,7 +28,7 @@ architecture rtl of pdts_tstamp is
 	signal sr: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
 	signal ctr: unsigned(7 downto 0);
-	signal lock, init, pkt_end, pkt_end_d: std_logic;
+	signal lock, init, pkt_end, pkt_end_d. s_valid_d: std_logic;
 
 begin
 		
@@ -38,7 +37,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctr <= (others => '0');
-			elsif (s_valid = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
+			elsif (s_valid = '1' and s_valid_d = '0' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
 				if ctr < (TSTAMP_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
 					sr <= d & sr(sr'left downto 8);
@@ -46,6 +45,7 @@ begin
 			end if;
 			pkt_end <= and_reduce(std_logic_vector(ctr));
 			pkt_end_d <= pkt_end;
+			s_valid_d <= s_valid;
 		end if;
 	end process;
 	
