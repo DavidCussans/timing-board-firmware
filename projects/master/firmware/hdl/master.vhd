@@ -25,8 +25,8 @@ entity master is
 		clk: in std_logic;
 		rst: in std_logic;
 		q: out std_logic;
-		scmd_in: in cmd_r := CMD_W_NULL;
-		scmd_out out cmd_w
+		scmd_in: in cmd_w := CMD_W_NULL;
+		scmd_out out cmd_r
 	);
 		
 end master;
