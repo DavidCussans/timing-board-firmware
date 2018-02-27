@@ -32,7 +32,8 @@ entity pdts_endpoint is
 		rst: out std_logic; -- 50MHz domain reset
 		rdy: out std_logic; -- Timestamp valid flag
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
-		sync_v: out std_logic; -- Sync command valid flag (clk domain)
+		sync_stb: out std_logic; -- Sync command strobe (clk domain)
+		sync_valid: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		tsync_in: in cmd_w := CMD_W_NULL;
 		tsync_out: out cmd_r
@@ -45,7 +46,7 @@ architecture rtl of pdts_endpoint is
 	signal rclk, rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
-	signal stb, k, s_valid: std_logic;
+	signal stb, k, s_valid, s_stb, s_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
@@ -130,7 +131,9 @@ begin
 			d => d,
 			k => k,
 			q => dr,
+			s_stb => s_stb,
 			s_valid => s_valid,
+			s_first => s_first,
 			a_valid => open,
 			a_last => open,
 			err => rx_err
@@ -139,7 +142,8 @@ begin
 -- Temporary sync output
 
 	sync <= dr(3 downto 0);
-	sync_v <= s_valid and rdy_i;
+	sync_stb <= s_stb;
+	sync_valid <= s_valid and rdy_i;
 	
 -- Timestamp / event counter
 
@@ -148,7 +152,8 @@ begin
 			clk => clk_i,
 			rst => rst_i,
 			d => dr,
-			s_valid => s_valid,
+			s_stb => s_stb,
+			s_first => s_first,
 			tstamp => tstamp,
 			rdy => rdy_i
 		);

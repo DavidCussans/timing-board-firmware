@@ -16,7 +16,8 @@ entity pdts_tstamp is
 		clk: in std_logic;
 		rst: in std_logic;
 		d: in std_logic_vector(7 downto 0);
-		s_valid: in std_logic;
+		s_stb: in std_logic;
+		s_first: in std_logic;
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		rdy: out std_logic
 	);
@@ -37,9 +38,9 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				ctr <= (others => '0');
-			elsif (s_valid = '1' and s_valid_d = '0' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
+			elsif (s_stb = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
-				if ctr < (TSTAMP_WDS + 1) * (10 / SCLK_RATIO) and s_valid = '1' then
+				if ctr < (TSTAMP_WDS + 1) * (10 / SCLK_RATIO) and s_ = '1' then
 					sr <= d & sr(sr'left downto 8);
 				end if;
 			end if;
