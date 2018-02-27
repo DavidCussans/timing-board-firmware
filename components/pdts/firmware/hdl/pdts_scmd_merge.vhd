@@ -81,7 +81,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				active <= '0';
-				src <= "00";
+				src <= '0';
 			else
 				active <= ((active and not last) or goq);
 				if scmd_in.ren = '1' then
