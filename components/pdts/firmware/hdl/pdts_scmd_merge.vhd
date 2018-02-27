@@ -71,6 +71,7 @@ begin
 	ip <= to_integer(unsigned(p));
 	ipa <= ip when go = '1' and rising_edge(clk);
 	w <= scmd_in_v(ip).d when (go = '1' or (src and scmd_in.ren) = '1') and rising_edge(clk);
+	wl <= scmd_in_v(ip).last when (go = '1' or (src and scmd_in.ren) = '1') and rising_edge(clk);
 		
 	go <= or_reduce(req) and not active;
 	goq <= go and scmd_in.ack;
@@ -93,7 +94,7 @@ begin
 			
 	scmd_out.d <= (3 downto N_PART => '0') & tgrp & X"0" when src = '0' else w; -- Insert grp / timeslot hdr
 	scmd_out.req <= go or active;
-	scmd_out.last <= src and scmd_in_v(ipa).last;
+	scmd_out.last <= src and wl;
 	typ <= scmd_in_v(ip).d(SCMD_W - 1 downto 0);
 	tv <= go;
 	
