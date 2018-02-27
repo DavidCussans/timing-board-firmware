@@ -64,6 +64,6 @@ begin
 	last_i <= '1' when ctr = ADDR_WDS + IDLE_DATA_WDS - 1 else '0';
 	acmd_out.last <= last_i;
 	acmd_out.d <= X"FF" when ctr < ADDR_WDS else r;
-	acmd_out.valid <= '1';
+	acmd_out.req <= '1' when ctr = X"00" else '0';
 	
 end rtl;
