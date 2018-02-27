@@ -29,7 +29,7 @@ architecture rtl of pdts_tstamp is
 	signal sr: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal tstamp_i: unsigned(8 * TSTAMP_WDS - 1 downto 0);
 	signal ctr: unsigned(7 downto 0);
-	signal lock, init, pkt_end, pkt_end_d, s_valid_d: std_logic;
+	signal lock, init, pkt_end, pkt_end_d: std_logic;
 
 begin
 		
@@ -40,13 +40,12 @@ begin
 				ctr <= (others => '0');
 			elsif (s_stb = '1' and s_first = '1' and d(SCMD_W - 1 downto 0) = SCMD_SYNC) or ctr /= to_unsigned(0, ctr'length) then
 				ctr <= ctr + 1;
-				if ctr < (TSTAMP_WDS + 1) * (10 / SCLK_RATIO) and s_ = '1' then
+				if ctr < (TSTAMP_WDS + 1) * (10 / SCLK_RATIO) and s_stb = '1' then
 					sr <= d & sr(sr'left downto 8);
 				end if;
 			end if;
 			pkt_end <= and_reduce(std_logic_vector(ctr));
 			pkt_end_d <= pkt_end;
-			s_valid_d <= s_valid;
 		end if;
 	end process;
 	
