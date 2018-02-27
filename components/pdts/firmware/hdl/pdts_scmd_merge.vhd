@@ -84,9 +84,9 @@ begin
 				active <= '0';
 				src <= '0';
 			else
-				active <= ((active and not last) or goq);
+				active <= ((active and not (wl and scmd_in.ren)) or goq);
 				if scmd_in.ren = '1' then
-					src <= (src or (active or goq)) and not last;
+					src <= (src or (active or goq)) and not wl;
 				end if;
 			end if;
 		end if;
