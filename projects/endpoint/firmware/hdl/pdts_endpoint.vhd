@@ -137,9 +137,8 @@ begin
 	
 -- Temporary sync output
 
-	sync <= dr(3 downto 0);
-	sync_stb <= s_stb;
-	sync_valid <= s_valid and rdy_i;
+	sync <= dr(SCMD_W - 1 downto 0);
+	sync_valid <= s_first and rdy_i;
 	
 -- Timestamp / event counter
 

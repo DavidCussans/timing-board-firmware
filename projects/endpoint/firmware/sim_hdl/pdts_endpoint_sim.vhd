@@ -32,7 +32,6 @@ entity pdts_endpoint is
 		rst: out std_logic; -- 50MHz domain reset
 		rdy: out std_logic; -- Timestamp valid flag
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
-		sync_stb: out std_logic; -- Sync command strobe (clk domain)
 		sync_valid: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		tsync_in: in cmd_w := CMD_W_NULL;
@@ -141,9 +140,8 @@ begin
 		
 -- Temporary sync output
 
-	sync <= dr(3 downto 0);
-	sync_stb <= s_stb;
-	sync_valid <= s_valid and rdy_i;
+	sync <= dr(SCMD_W - 1 downto 0);
+	sync_valid <= s_first and rdy_i;
 	
 -- Timestamp / event counter
 
