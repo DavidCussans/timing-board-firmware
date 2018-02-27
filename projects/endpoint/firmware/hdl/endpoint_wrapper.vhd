@@ -124,7 +124,7 @@ begin
 			stb => stb_cmd
 		);
 		
-	trig_sync_in <= (ctrl_cmd(0)(SCMD_W - 1 downto 0), stb_cmd(0), '1');
+	trig_sync_in <= (ctrl_cmd(0)(7 downto 0), stb_cmd(0), '1');
 	stat_cmd(0) <= X"0000000" & "000" & trig_sync_out.ack when rising_edge(ep_clk) and stb_cmd(0) = '1';
 	
 -- The endpoint
