@@ -39,7 +39,7 @@ architecture rtl of endpoint_wrapper is
 	signal ctrl, ctrl_cmd: ipb_reg_v(0 downto 0);
 	signal stat, stat_cmd: ipb_reg_v(0 downto 0);
 	signal stb_cmd: std_logic_vector(0 downto 0);
-	signal ctrl_ep_en, ctrl_buf_en, ctrl_ctr_rst: std_logic;
+	signal ctrl_ep_en, ctrl_buf_en, ctrl_ctr_rst, ctrl_mask_dis: std_logic;
 	signal ctrl_addr: std_logic_vector(7 downto 0);
 	signal ctrl_tgrp: std_logic_vector(1 downto 0);
 	signal ep_stat: std_logic_vector(3 downto 0);
@@ -103,6 +103,7 @@ begin
 	ctrl_buf_en <= ctrl(0)(1);
 	ctrl_ctr_rst <= ctrl(0)(2);
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
+	ctrl_mask_dis <= ctrl(0)(6);
 	ctrl_addr <= ctrl(0)(15 downto 8);
 	stat(0) <= X"00000" & "00" & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
 
@@ -205,6 +206,8 @@ begin
 		
 -- Buffer
 
+	trig <= ep_v and (EVTCTR_MASK(to_integer(unsigned(ep_scmd(3 downto 0)))) or ctrl_mask_dis);
+
 	rob: entity work.pdts_mon_buf
 		port map(
 			ipb_clk => ipb_clk,
@@ -215,7 +218,7 @@ begin
 			clk => ep_clk,
 			rst => ep_rsto,
 			scmd => ep_scmd,
-			scmd_v => ep_v,
+			scmd_v => trig,
 			tstamp => tstamp,
 			evtctr => evtctr,
 			warn => buf_warn,

@@ -116,7 +116,7 @@ begin
 		else '0';
 		
 	tack <= grab;
-	trig <= grab when unsigned(typ) > 7 else '0';
+	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ)));
 	
 	process(typ) -- Unroll typ
 	begin

@@ -10,19 +10,21 @@ use ieee.numeric_std.all;
 
 package pdts_defs is
 
--- L0 constants
+-- L0 constants (signalling layer)
+
+-- Allowed values for SCLK_RATIO are 10 (500Mb/s IO), 5 (250Mb/s IO), 2 (100Mb/s IO), 1 (50Mb/s IO)
 
 	constant CLK_FREQ: real := 50.0; -- System clock frequency
-	constant SCLK_RATIO: integer := 5; -- Ratio of IO clock to base clock (5 = 250Mb/s IO)
+	constant SCLK_RATIO: integer := 5; -- Ratio of IO clock to base clock
+
+-- L1 constants (encoding layer)
 	
--- L1 constants
-	
-	constant CCHAR: std_logic_vector(7 downto 0) := X"BC"; -- K28.5
+	constant CCHAR: std_logic_vector(7 downto 0) := X"bc"; -- Async pkt marker and comma: K28.5
 	constant CCHAR_PD: std_logic_vector(9 downto 0) := "1010000011"; -- K28.5 encoded RD = +1
 	constant CCHAR_ND: std_logic_vector(9 downto 0) := "0101111100"; -- K28.5 encoded RD = -1
-	constant SCHAR: std_logic_vector(7 downto 0) := X"3C"; -- K28.1
+	constant SCHAR: std_logic_vector(7 downto 0) := X"3c"; -- Sync pkt marker: K28.1
 
--- L2	constants
+-- L2	constants (protocol layer)
 	
 	constant GRP_W: positive := 2; -- Bitwidth of group ID
 	constant ADDR_WDS: positive := 1; -- Number of address words	
@@ -34,17 +36,17 @@ package pdts_defs is
 	constant CMD_LEN_MAX: natural := IDLE_DATA_WDS + ACMD_LEN_MIN; -- Maximum command length
 	constant COMMA_TIMEOUT_W: positive := 8; -- Bitwidth of timeout counter
 	
--- L3 constants
+-- L3 constants (application layer)
 
 	constant TSTAMP_WDS: natural := 8; -- Number of words in timestamp
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
-	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"0100"; -- Which sync cmds cause evt ctr update
+	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"ff00"; -- Which sync cmds cause evt ctr update
 	
-	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"0";
-	constant SCMD_ECHO: std_logic_vector(3 downto 0) := X"1";
-	constant SCMD_SPILL_START: std_logic_vector(3 downto 0) := X"2";
+	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"0"; -- Set the timestamp
+	constant SCMD_ECHO: std_logic_vector(3 downto 0) := X"1"; -- Echo for loop delay measurement
+	constant SCMD_SPILL_START: std_logic_vector(3 downto 0) := X"2"; -- Start / stop spill
 	constant SCMD_SPILL_STOP: std_logic_vector(3 downto 0) := X"3";
-	constant SCMD_RUN_START: std_logic_vector(3 downto 0) := X"4";
+	constant SCMD_RUN_START: std_logic_vector(3 downto 0) := X"4"; -- Start / stop run
 	constant SCMD_RUN_STOP: std_logic_vector(3 downto 0) := X"5";
 	constant SCMD_FAKE_TRIG: std_logic_vector(3 downto 0) := X"8"; -- Commands from 0x8 to 0xf reserved for triggers / calib
 

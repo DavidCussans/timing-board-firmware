@@ -6,6 +6,7 @@
 				<node id="buf_en" mask="0x2"/>
 				<node id="ctr_rst" mask="0x4"/>
 				<node id="tgrp" mask="0x30"/>
+				<node id="mask_dis" mask="0x40"/>
 				<node id="addr" mask="0xff00"/>
 			</node>
 			<node id="stat" address="0x1">
