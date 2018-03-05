@@ -35,7 +35,7 @@ architecture rtl of global is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
 	
-	constant MASTER_CONF: std_logic_vector(31 downto 0) := X"000000" std_logic_vector(to_unsigned(N_CHAN, 4)) & std_logic_vector(to_unsigned(N_PART, 4));
+	constant MASTER_CONF: std_logic_vector(31 downto 0) := X"000000" & std_logic_vector(to_unsigned(N_CHAN, 4)) & std_logic_vector(to_unsigned(N_PART, 4));
 	
 begin
 
