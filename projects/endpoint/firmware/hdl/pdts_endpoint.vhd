@@ -139,6 +139,7 @@ begin
 
 	sync <= dr(SCMD_W - 1 downto 0);
 	sync_valid <= s_first and rdy_i;
+	sync_stb <= s_stb and rdy_i;
 	
 -- Timestamp / event counter
 
