@@ -66,7 +66,7 @@ begin
 
 -- Config
 
-	ver: entity work.ipbus_roreg_v
+	config: entity work.ipbus_roreg_v
 		generic map(
 			N_REG => 1,
 			DATA => X"000000" & std_logic_vector(to_unsigned(N_CHAN, 4)) & std_logic_vector(to_unsigned(N_PART, 4))
