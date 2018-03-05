@@ -64,6 +64,18 @@ begin
 			ipb_out => ipbr(N_SLV_VERSION)
 		);
 
+-- Config
+
+	ver: entity work.ipbus_roreg_v
+		generic map(
+			N_REG => 1,
+			DATA => X"000000" & std_logic_vector(to_unsigned(N_CHAN, 4)) & std_logic_vector(to_unsigned(N_PART, 4))
+		)
+		port map(
+			ipb_in => ipbw(N_SLV_CONFIG),
+			ipb_out => ipbr(N_SLV_CONFIG)
+		);
+
 -- CSR
 
 	csr: entity work.ipbus_ctrlreg_v

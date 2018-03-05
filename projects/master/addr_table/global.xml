@@ -1,5 +1,9 @@
 <node id="global" description="PDTS master global registers" fwinfo="endpoint">
 		<node id="version" address="0x0" fwinfo="endpoint;width=0"/>
+		<node id="config" address="0x1" fwinfo="endpoint;width=0">
+		    <node id="n_part" mask="0xf"/>
+		    <node id="n_chan" mask="0xf0"/>
+		</node>
 		<node id="csr" address="0x2" fwinfo="endpoint;width=1">
 			<node id="ctrl" address="0x0">
 				<node id="part_sel" mask="0xf"/>
