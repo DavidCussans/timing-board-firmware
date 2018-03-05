@@ -12,7 +12,7 @@ use work.pdts_defs.all;
 
 entity pdts_endpoint is
 	generic(
-		SCLK_FREQ: real := 50.0;
+		SCLK_FREQ: real := 50.0; -- Frequency (MHz) of the supplied sclk
 		EN_TX: boolean := false
 	);
 	port(
@@ -35,8 +35,8 @@ entity pdts_endpoint is
 		sync_stb: out std_logic; -- Sync command strobe (clk domain)
 		sync_valid: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
-		tsync_in: in cmd_w := CMD_W_NULL;
-		tsync_out: out cmd_r
+		tsync_in: in cmd_w := CMD_W_NULL; -- Tx sync command input
+		tsync_out: out cmd_r -- Tx sync command handshake
 	);
 
 end pdts_endpoint;
