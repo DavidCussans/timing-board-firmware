@@ -44,8 +44,6 @@ architecture rtl of master is
 	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 2 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
-	signal ipbw_p: ipb_wbus_array(3 downto 0); -- Size fixed by flat address table
-	signal ipbr_p: ipb_rbus_array(3 downto 0);
 	signal typ: std_logic_vector(SCMD_W - 1 downto 0);
 	signal tv: std_logic;
 	signal tgrp: std_logic_vector(N_PART - 1 downto 0);
@@ -155,18 +153,15 @@ begin
 	scmd_out <= scmdr_v(2);
 	
 -- Partitions
-		
-	ipbw_p <= ipbw(N_SLV_PARTITION3 downto N_SLV_PARTITION0);
-	ipbr(N_SLV_PARTITION3 downto N_SLV_PARTITION0) <= ipbr_p;
-	
+
 	pgen: for i in N_PART - 1 downto 0 generate
 	
 		part: entity work.partition
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
-				ipb_in => ipbw_p(i),
-				ipb_out => ipbr_p(i),
+				ipb_in => ipbw(i + N_SLV_PARTITION0),
+				ipb_out => ipbr(i + N_SLV_PARTITION0),
 				clk => clk,
 				rst => rst,
 				tstamp => tstamp,
@@ -180,9 +175,9 @@ begin
 			
 	end generate;
 	
-	npgen: for i in 3 downto N_PART generate
+	npgen: for i in 3 downto N_PART generate -- Corresponds to address table max partitions
 	
-		ipbr_p(i) <= IPBUS_RBUS_NULL;
+		ipbr(i + N_SLV_PARTITION0) <= IPB_RBUS_NULL;
 			
 	end generate;
 
