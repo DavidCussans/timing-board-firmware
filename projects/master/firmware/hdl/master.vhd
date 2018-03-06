@@ -182,7 +182,7 @@ begin
 	
 	npgen: for i in 3 downto N_PART generate
 	
-		ipbr_p(i) <= IPBUS_RBUS_NULL;
+		ipbr_p(i) <= IPB_RBUS_NULL;
 			
 	end generate;
 
