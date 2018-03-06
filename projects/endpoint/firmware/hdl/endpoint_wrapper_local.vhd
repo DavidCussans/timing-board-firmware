@@ -1,6 +1,6 @@
--- endpoint_wrapper
+-- endpoint_wrapper_local
 --
--- System-level wrapper for the PDTS endpoint block
+-- System-level wrapper for the PDTS endpoint block - local version
 --
 -- Dave Newbold, April 2017
 
@@ -15,7 +15,7 @@ use work.ipbus_decode_endpoint_wrapper.all;
 use work.pdts_defs.all;
 use work.wrapper_defs.all;
 
-entity endpoint_wrapper is
+entity endpoint_wrapper_local is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -27,9 +27,9 @@ entity endpoint_wrapper is
 		txd: out std_logic -- Output data to timing link (rec_clk domain)
 	);
 		
-end endpoint_wrapper;
+end endpoint_wrapper_local;
 
-architecture rtl of endpoint_wrapper is
+architecture rtl of endpoint_wrapper_local is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
