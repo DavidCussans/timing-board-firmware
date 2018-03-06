@@ -12,6 +12,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
+library unisim;
+use unisim.VComponents.all;
+
 use work.pdts_defs.all;
 
 entity pdts_rx_phy is
@@ -42,7 +45,7 @@ end pdts_rx_phy;
 architecture rtl of pdts_rx_phy is
 
 	signal rxdd, c: std_logic;
-	signal fdel_i: std_logic_vector(3 downto 0);
+	signal fdel_i: std_logic_vector(4 downto 0);
 	signal wa, w, t: std_logic_vector(9 downto 0) := "0000000000";
 	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu: std_logic;
 	signal ctr: unsigned(4 downto 0) := (others => '0');
@@ -56,8 +59,8 @@ begin
 
 -- Input delay and shift register
 
-	fdel_i <= dctr when UPSTREAM_MODE else fdel;
-	fdel_out <= fdel_i;
+	fdel_i <= '0' & std_logic_vector(dctr) when UPSTREAM_MODE else '0' & fdel;
+	fdel_out <= fdel_i(3 downto 0);
 
 	f_del: SRLC32E
 		port map(

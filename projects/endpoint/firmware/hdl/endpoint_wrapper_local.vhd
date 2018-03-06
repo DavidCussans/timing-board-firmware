@@ -128,7 +128,7 @@ begin
 -- The endpoint
 
 	ep_rst <= ipb_rst or not ctrl_ep_en;
-	ep_ck <= clk;
+	ep_clk <= clk;
 
 	ep: entity work.pdts_endpoint_local
 		generic map(
