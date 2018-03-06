@@ -23,8 +23,7 @@ entity global is
 		ipb_out: out ipb_rbus;
 		clk: in std_logic;
 		rst: in std_logic;
-		tx_err: in std_logic;
-		part_sel: out std_logic_vector(calc_width(N_PART) - 1 downto 0)
+		tx_err: in std_logic
 	);
 		
 end global;
@@ -95,6 +94,5 @@ begin
 		);
 
 	stat(0) <= X"0000000" & "000" & tx_err;
-	part_sel <= ctrl(0)(part_sel'range);
 
 end rtl;

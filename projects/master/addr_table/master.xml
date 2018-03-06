@@ -3,5 +3,8 @@
 		<node id="spill" address="0x8" module="file://spill.xml"/>
 		<node id="tstamp" address="0xc" module="file://tstamp.xml"/>
 		<node id="scmd_gen" address="0x40" module="file://scmd_gen.xml"/>
-		<node id="partition" address="0x100" module="file://partition.xml"/>
+		<node id="partition0" address="0x100" module="file://partition.xml"/>
+		<node id="partition1" address="0x140" module="file://partition.xml"/>
+		<node id="partition2" address="0x180" module="file://partition.xml"/>
+		<node id="partition3" address="0x1c0" module="file://partition.xml"/>
 </node>
