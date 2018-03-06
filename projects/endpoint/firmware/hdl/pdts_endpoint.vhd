@@ -101,6 +101,8 @@ begin
 	rxphy: entity work.pdts_rx_phy
 		port map(
 			fclk => sclk,
+			fdel => "0000",
+			cdel => "00000",
 			rxclk => rec_clk,
 			rxrst => rec_rst,
 			rxd => rec_d,

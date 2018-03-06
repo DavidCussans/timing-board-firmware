@@ -2,6 +2,9 @@
 --
 -- The receive PHY
 --
+-- In 'downstream mode', the PHY realigns clk to the incoming data stream
+-- In 'upstream mode', the PHY delays the data stream to match clk
+--
 -- Dave Newbold, March 2017
 
 library IEEE;
@@ -17,11 +20,14 @@ entity pdts_rx_phy is
 	);
 	port(
 		fclk: in std_logic; -- free-running clock
+		fdel: in std_logic_vector(3 downto 0); -- Fine delay setting (rxclk cycles)
+		cdel: in std_logic_vector(4 downto 0); -- Coarse delay setting (clk cycles)
+		fdel_out: out std_logic_vector(3 downto 0); -- Actual fine delay (upstream mode)
 		rxclk: in std_logic; -- serial data clock
 		rxrst: in std_logic; -- reset (rxclk domain)
 		rxd: in std_logic; -- serial data (rxclk domain)
 		phase_rst: out std_logic; -- pll reset (clk domain)
-		phase_locked: in std_logic; -- pll locked (async)
+		phase_locked: in std_logic := '1'; -- pll locked (async)
 		aligned: out std_logic; -- data aligned flag (clk domain)
 		clk: in std_logic; -- base clock
 		rst: in std_logic; -- base clock rst (clk domain)
@@ -35,21 +41,34 @@ end pdts_rx_phy;
 
 architecture rtl of pdts_rx_phy is
 
-	signal c: std_logic;
+	signal rxdd, c: std_logic;
+	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, t: std_logic_vector(9 downto 0) := "0000000000";
-	signal tr, f, fr, done, m, stb, aligned_i: std_logic;
+	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu: std_logic;
 	signal ctr: unsigned(4 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
-	signal fctr: unsigned(3 downto 0) := X"0";
+	signal fctr, dctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, ki, lock, ldone, kerr, cerr, derr: std_logic;
 	
 begin
 
--- Input shift register
+-- Input delay and shift register
 
-	wa <= rxd & wa(9 downto 1) when rising_edge(rxclk);
+	fdel_i <= dctr when UPSTREAM_MODE else fdel;
+	fdel_out <= fdel_i;
+
+	f_del: SRLC32E
+		port map(
+			q => rxdd,
+			d => rxd,
+			clk => rxclk,
+			ce => '1',
+			a => fdel_i
+		);
+	
+	wa <= rxdd & wa(9 downto 1) when rising_edge(rxclk);
 	
 -- Comma det
 
@@ -66,7 +85,7 @@ begin
 			else
 				t <= t(0) & t(9 downto 1);
 			end if;
-			f <= (f or c) and not rxrst;
+			f <= (f or c) and not (rxrst or rstu);
 		end if;
 	end process;
 
@@ -100,7 +119,23 @@ begin
 		
 	stb <= not or_reduce(std_logic_vector(sctr));
 	done <= and_reduce(std_logic_vector(ctr));
+	done_d <= done when rising_edge(clk);
 	phase_rst <= done and not m and phase_locked;
+	rstu <= done and not m when UPSTREAM_MODE else '0';
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if done = '1' and done_d = '0' and m = '0' then
+				if dctr = SCLK_RATIO - 1 then
+					dctr <= X"0";
+				else
+					dctr <= dctr + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+
 	aligned_i <= done and m;
 	aligned <= aligned_i;
 	
