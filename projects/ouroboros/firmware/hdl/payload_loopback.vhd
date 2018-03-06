@@ -175,7 +175,7 @@ begin
 
 	egen: for i in N_EP - 1 downto 0 generate
 
-		wrapper: entity work.endpoint_wrapper
+		wrapper: entity work.endpoint_wrapper_local
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
@@ -183,11 +183,7 @@ begin
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
 				rec_clk => rec_clk,
 				rec_d => rec_d,
-				txd => open,
-				sfp_los => sfp_los,
-				cdr_los => cdr_los,
-				cdr_lol => cdr_lol,
-				sfp_tx_dis => open
+				clk => clk
 			);
 			
 	end generate;
