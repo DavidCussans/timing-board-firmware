@@ -63,6 +63,8 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal fmc_clk, rec_clk, rec_d, q, rst_io, rsti, clk, stb, rst, locked: std_logic;
 	
+	constant N_EP: positive := 1;
+	
 begin
 
 -- ipbus address decode
@@ -171,19 +173,29 @@ begin
 	
 -- Endpoint wrapper
 
-	wrapper: entity work.endpoint_wrapper
-		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_ENDPOINT),
-			ipb_out => ipbr(N_SLV_ENDPOINT),
-			rec_clk => rec_clk,
-			rec_d => rec_d,
-			txd => open,
-			sfp_los => '0',
-			cdr_los => '0',
-			cdr_lol => '0',
-			sfp_tx_dis => open
-		);
+	egen: for i in N_EP - 1 downto 0 generate
+
+		wrapper: entity work.endpoint_wrapper
+			port map(
+				ipb_clk => ipb_clk,
+				ipb_rst => ipb_rst,
+				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
+				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+				rec_clk => rec_clk,
+				rec_d => rec_d,
+				txd => open,
+				sfp_los => sfp_los,
+				cdr_los => cdr_los,
+				cdr_lol => cdr_lol,
+				sfp_tx_dis => open
+			);
+			
+	end generate;
+	
+	negen: for i in 3 downto N_EP generate
+	
+		ipbr(i + N_SLV_ENDPOINT0) <= IPB_RBUS_NULL;
+		
+	end generate;
 
 end rtl;
