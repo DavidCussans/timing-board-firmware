@@ -38,11 +38,11 @@ architecture rtl of pdts_rx is
 
 	type state_t is (START, ASYNC, SYNC, ERRS);
 	signal state: state_t;
-	signal actr, sctr, slen, slen_r: unsigned(4 downto 0);
-	signal ts: std_logic_vector(3 downto 0);
+	signal actr, sctr, slen, slen_r: unsigned(4 downto 0) := "00000";
+	signal ts: std_logic_vector(3 downto 0) := X"0";
 	signal ka, ks, a_match, s_match, s_match_r, err_i, s_done, pkt_end, cstb: std_logic;
 	signal err_c: std_logic_vector(2 downto 0);
-	signal csum: std_logic_vector(15 downto 0);
+	signal csum: std_logic_vector(15 downto 0) := X"0000";
 	signal vctr: unsigned(3 downto 0);
 	signal valid, first, issue, pend, pend_f: std_logic;
 	
