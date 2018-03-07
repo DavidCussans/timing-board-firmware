@@ -115,8 +115,8 @@ begin
 				ipb_rst => ipb_rst,
 				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
-				rec_clk => rec_clk,
-				rec_d => rec_d,
+				rec_clk => fmc_clk,
+				rec_d => d,
 				clk => clk
 			);
 			
