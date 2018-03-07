@@ -58,10 +58,10 @@ begin
 			else
 				case state is
 				when W_RST =>
-					if not SIM
-						state <= W_SFP;
-					else
+					if SIM then
 						state <= W_ALIGN;
+					else
+						state <= W_SFP;
 					end if;
 -- Startup; wait for SFP signal
 				when W_SFP =>
@@ -77,7 +77,7 @@ begin
 				when W_FREQ =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
-					elsif f_ok = '1' or SIM then -- Don't want simulation to wait for freq lock
+					elsif f_ok = '1' then -- Don't want simulation to wait for freq lock
 						state <= W_ALIGN;
 					end if;
 -- Wait for rxphy alignment
