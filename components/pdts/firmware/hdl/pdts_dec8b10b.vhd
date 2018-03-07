@@ -31,28 +31,27 @@ architecture rtl of pdts_dec8b10b is
 begin
 	
 	process(clk)
-	
 		variable qv: std_logic_vector(7 downto 0);
 		variable dispout, kv, cerrv, derrv: std_logic;
-	
 	begin
-	
 		if rising_edge(clk) then
+			decode8b10b(
+				datain => d,
+				dispin => disp,
+				dataout => qv,
+				datakout => kv,
+				dispout => dispout,
+				codeerr => cerrv,
+				disperr => derrv
+			);		
 			if rst = '1' then
 				disp <= '0';
 			elsif en = '1' then
-				decode8b10b(
-					datain => d,
-					dispin => disp,
-					dataout => qv,
-					datakout => kv,
-					dispout => dispout,
-					codeerr => cerrv,
-					disperr => derrv
-				);
+				disp <= dispout;
+			end if;
+			if en = '1' then
 				q <= qv;
 				k <= kv;
-				disp <= dispout;
 				cerr <= cerrv;
 				derr <= derrv;
 			end if;

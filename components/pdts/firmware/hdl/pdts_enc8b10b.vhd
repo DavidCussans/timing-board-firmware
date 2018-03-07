@@ -29,24 +29,24 @@ architecture rtl of pdts_enc8b10b is
 begin
 	
 	process(clk)
-	
 		variable qv: std_logic_vector(9 downto 0);
 		variable dispout: std_logic;
-	
 	begin	
 		if rising_edge(clk) then
+			encode8b10b(
+				datain => d,
+				datakin => k,
+				dispin => disp,
+				dataout => qv,
+				dispout => dispout
+			);
 			if rst = '1' then
 				disp <= '0';
 			elsif en = '1' then
-				encode8b10b(
-					datain => d,
-					datakin => k,
-					dispin => disp,
-					dataout => qv,
-					dispout => dispout
-				);
-				q <= qv;
 				disp <= dispout;
+			end if;
+			if en = '1' then
+				q <= qv;
 			end if;
 		end if;
 	end process;
