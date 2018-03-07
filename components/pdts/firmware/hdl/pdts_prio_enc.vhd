@@ -16,7 +16,7 @@ entity pdts_prio_enc is
 	);
 	port(
 		d: in std_logic_vector(WIDTH - 1 downto 0);
-		sel: out std_logic_vector(calc_width(WIDTH) - 1 downto 0)
+		sel: out std_logic_vector(3 downto 0)
 	);
 
 end pdts_prio_enc;

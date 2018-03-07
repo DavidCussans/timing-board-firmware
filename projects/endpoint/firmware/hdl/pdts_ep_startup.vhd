@@ -194,8 +194,8 @@ begin
 		end if;
 	end process;
 
-	sfp_los_ok <= and_reduce(std_logic_vector(sfp_los_ctr));
-	cdr_ok <= and_reduce(std_logic_vector(cdr_ctr));
+	sfp_los_ok <= and_reduce(std_logic_vector(sfp_los_ctr)) when not SIM else '1';
+	cdr_ok <= and_reduce(std_logic_vector(cdr_ctr)) when not SIM else '1';
 
 -- CDC into sclk domain
 
