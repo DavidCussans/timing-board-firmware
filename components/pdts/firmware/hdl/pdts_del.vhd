@@ -37,7 +37,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			s(s'left downto 1) <= del_array(s'left - 1 downto 0);
+			s(s'left downto 1) <= s(s'left - 1 downto 0);
 		end if;
 	end process;
 	
