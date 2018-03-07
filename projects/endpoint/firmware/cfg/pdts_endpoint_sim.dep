@@ -1,7 +1,7 @@
 src --cd ../sim_hdl pdts_endpoint_sim.vhd
 src pdts_ep_startup.vhd pdts_tstamp.vhd
 src -c components/pdts --cd ../sim_hdl pdts_rx_div_sim.vhd
-src -c components/pdts pdts_rx_phy.vhd pdts_rx.vhd pdts_cksum.vhd outputlogic_crc16.vhd pdts_synchro.vhd pdts_dec8b10b.vhd pdts_code8b10bpkg.vhd
+src -c components/pdts pdts_rx_phy.vhd pdts_rx.vhd pdts_cksum.vhd outputlogic_crc16.vhd pdts_synchro.vhd pdts_dec8b10b.vhd pdts_code8b10bpkg.vhd pdts_del.vhd
 src -c components/pdts pdts_idle_gen.vhd pdts_scmd_merge.vhd pdts_prio_enc.vhd
 include -c components/pdts pdts_tx.dep
 src -c components/pdts pdts_defs.vhd

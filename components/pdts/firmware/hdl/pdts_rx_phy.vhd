@@ -46,7 +46,7 @@ architecture rtl of pdts_rx_phy is
 
 	signal rxdd, c: std_logic;
 	signal fdel_i: std_logic_vector(4 downto 0);
-	signal wa, w, t: std_logic_vector(9 downto 0) := "0000000000";
+	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
 	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu: std_logic;
 	signal ctr: unsigned(4 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
@@ -57,18 +57,21 @@ architecture rtl of pdts_rx_phy is
 	
 begin
 
--- Input delay and shift register
+-- Fine delay and shift register
 
 	fdel_i <= '0' & std_logic_vector(dctr) when UPSTREAM_MODE else '0' & fdel;
 	fdel_out <= fdel_i(3 downto 0);
-
-	f_del: SRLC32E
+	
+	f_del: entity work.pdts_del
+		generic map(
+			WIDTH => 1,
+			DEL_RADIX => 4
+		)
 		port map(
-			q => rxdd,
-			d => rxd,
 			clk => rxclk,
-			ce => '1',
-			a => fdel_i
+			a => fdel_i,
+			d => rxd,
+			q => rxdd
 		);
 	
 	wa <= rxdd & wa(9 downto 1) when rising_edge(rxclk);
@@ -141,6 +144,20 @@ begin
 
 	aligned_i <= done and m;
 	aligned <= aligned_i;
+
+-- Coarse delay
+
+	c_del: entity work.pdts_del
+		generic map(
+			WIDTH => 10,
+			DEL_RADIX => 5
+		)
+		port map(
+			clk => rxclk,
+			a => cdel, -- CDC, treat cdel as static signal
+			d => w,
+			q => wd
+		);
 	
 -- Decoder
 	
@@ -149,7 +166,7 @@ begin
 			clk => clk,
 			rst => rst,
 			en => stb,
-			d => w,
+			d => wd,
 			q => di,
 			k => ki,
 			cerr => cerr,
