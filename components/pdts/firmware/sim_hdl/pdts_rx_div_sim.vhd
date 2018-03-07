@@ -27,7 +27,8 @@ end pdts_rx_div_sim;
 
 architecture tb of pdts_rx_div_sim is
 
-	signal sclk, sclk_d, lock: std_logic;
+	signal sclk, sclk_d: std_logic;
+	signal lock: std_logic := '0';
 	signal bclk, clki: std_logic := '1';
 	signal ctr: unsigned(3 downto 0) := X"0";
 	
