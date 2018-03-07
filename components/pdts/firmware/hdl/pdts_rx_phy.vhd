@@ -45,7 +45,7 @@ end pdts_rx_phy;
 architecture rtl of pdts_rx_phy is
 
 	signal rxdd, c: std_logic;
-	signal fdel_i: std_logic_vector(4 downto 0);
+	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
 	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu: std_logic;
 	signal ctr: unsigned(4 downto 0) := (others => '0');
@@ -59,8 +59,8 @@ begin
 
 -- Fine delay and shift register
 
-	fdel_i <= '0' & std_logic_vector(dctr) when UPSTREAM_MODE else '0' & fdel;
-	fdel_out <= fdel_i(3 downto 0);
+	fdel_i <= std_logic_vector(dctr) when UPSTREAM_MODE else fdel;
+	fdel_out <= fdel_i;
 	
 	f_del: entity work.pdts_del
 		generic map(
