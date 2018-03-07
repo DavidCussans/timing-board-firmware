@@ -25,7 +25,7 @@ entity pdts_del is
 	
 end pdts_del;
 
-architecture rtl of pdts_rx_phy is
+architecture rtl of pdts_del is
 
 	type s_t is array(2 ** DEL_RADIX - 1 downto 0) of std_logic_vector(WIDTH - 1 downto 0);
 	signal s: s_t;
