@@ -44,7 +44,7 @@ architecture rtl of pdts_ep_startup is
 	signal f_ok, t, td: std_logic;
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
-	signal sfp_los_ok, cdr_ok: std_logic;
+	signal sfp_los_ok, cdr_ok, f_en: std_logic;
 	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, rdy_i: std_logic;
 	signal rec_rst_i, rxphy_rst_i, rst_i, rst_u: std_logic;
 
@@ -58,7 +58,11 @@ begin
 			else
 				case state is
 				when W_RST =>
-					state <= W_SFP;
+					if not SIM
+						state <= W_SFP;
+					else
+						state <= W_ALIGN;
+					end if;
 -- Startup; wait for SFP signal
 				when W_SFP =>
 					if sfp_los_ok = '1' then
@@ -69,21 +73,20 @@ begin
 					if cdr_ok = '1' then
 						state <= W_ALIGN;
 					end if;
--- Wait for rxphy alignment
-				when W_ALIGN =>
-					if sfp_los_ok = '0' or cdr_ok = '0' then
-						state <= W_SFP;
-					elsif rxphy_aligned_i = '1' then
-						state <= W_FREQ;
-					end if;
 -- Wait for frequency match
 				when W_FREQ =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
 					elsif f_ok = '1' or SIM then -- Don't want simulation to wait for freq lock
+						state <= W_ALIGN;
+					end if;
+-- Wait for rxphy alignment
+				when W_ALIGN =>
+					if sfp_los_ok = '0' or cdr_ok = '0' then
+						state <= W_SFP;
+					elsif rxphy_aligned_i = '1' then
 						state <= W_LOCK;
 					end if;
-				state <= W_LOCK;
 -- Wait for rxphy lock
 				when W_LOCK =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
@@ -113,7 +116,7 @@ begin
 					elsif rdy_i = '0' then
 						state <= ERR_T;
 					end if;
--- Error stats. Doomed.
+-- Error states. Doomed.
 				when ERR_R =>
 				when ERR_T =>
 				end case;
@@ -123,10 +126,21 @@ begin
 
 -- Freq check
 
+	sync_c: entity work.pdts_synchro
+		generic map(
+			N => 1
+		)
+		port map(
+			clk => sclk,
+			clks => clk,
+			d(0) => cdr_ok,
+			q(0) => f_en
+		);
+
 	process(clk) -- Predivide by 32
 	begin
 		if rising_edge(clk) then
-			if rxphy_locked = '0' then
+			if f_en = '0' then
 				rctr <= (others => '0');
 			else
 				rctr <= rctr + 1;
@@ -194,8 +208,8 @@ begin
 		end if;
 	end process;
 
-	sfp_los_ok <= and_reduce(std_logic_vector(sfp_los_ctr)) when not SIM else '1';
-	cdr_ok <= and_reduce(std_logic_vector(cdr_ctr)) when not SIM else '1';
+	sfp_los_ok <= and_reduce(std_logic_vector(sfp_los_ctr));
+	cdr_ok <= and_reduce(std_logic_vector(cdr_ctr));
 
 -- CDC into sclk domain
 
@@ -231,7 +245,7 @@ begin
 
 	rec_rst_i <= '1' when state = W_RST or state = W_SFP or state = W_CDR or state = W_FREQ else '0';
 	rxphy_rst_i <= '1' when rec_rst_i = '1' or state = W_ALIGN else '0';
-	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK or state = W_FREQ else '0';
+	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK else '0';
 
 -- CDC into rec_clk / clk domain
 
