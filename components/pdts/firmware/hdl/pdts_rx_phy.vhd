@@ -70,8 +70,8 @@ begin
 		port map(
 			clk => rxclk,
 			a => fdel_i,
-			d => rxd,
-			q => rxdd
+			d(0) => rxd,
+			q(0) => rxdd
 		);
 	
 	wa <= rxdd & wa(9 downto 1) when rising_edge(rxclk);
