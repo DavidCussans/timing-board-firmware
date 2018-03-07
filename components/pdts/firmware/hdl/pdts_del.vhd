@@ -41,6 +41,6 @@ begin
 		end if;
 	end process;
 	
-	q <= del_array(to_integer(unsigned(a)));
+	q <= s(to_integer(unsigned(a)));
 
 end rtl;
