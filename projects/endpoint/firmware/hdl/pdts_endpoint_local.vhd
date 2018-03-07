@@ -81,6 +81,8 @@ begin
 			rx_err => rx_err,
 			rdy => rdy_i
 		);
+		
+	rst <= rst_i;
 				
 -- Rx PHY
 
