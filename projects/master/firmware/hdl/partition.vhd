@@ -45,7 +45,7 @@ architecture rtl of partition is
 	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
 	signal ctrl_trig_mask: std_logic_vector(7 downto 0);
 	signal run_int, part_up: std_logic;
-	signal grab, trig, trst: std_logic;
+	signal v, grab, trig, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
 	signal buf_warn, buf_err, in_spill, in_run, rob_en_s: std_logic;
@@ -109,10 +109,12 @@ begin
 	
 -- Command masks
 
-	grab <= '1' when part_up = '1' and tv = '1' and
+	v <= '1' when tv = '1' and part_up = '1' and (in_run = '1' or unsigned(typ) < 8) else '0';
+
+	grab <= v when
 		(((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') or -- Grab run start or stop only if we issued it
 		(typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP and unsigned(typ) < 8) or -- Grab all other system commands if partition is running
-		(in_run and ctrl_trig_en and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0))))) = '1') -- Otherwise apply trigger masks
+		(ctrl_trig_en and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0))))) = '1') -- Otherwise apply trigger masks
 		else '0';
 		
 	tack <= grab;
@@ -129,8 +131,8 @@ begin
 		end loop;
 	end process;
 	
-	tacc <= t when (tv and grab) = '1' else (others => '0');
-	trej <= t when (tv and not grab) = '1' else (others => '0');
+	tacc <= t when v = '1' and grab = '1' else (others => '0');
+	trej <= t when v = '1' and grab = '0' else (others => '0');
 
 -- Event counter etc
 
