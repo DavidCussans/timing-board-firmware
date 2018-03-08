@@ -19,8 +19,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
-use work.ipbus_reg_types.all;
-
 use work.pdts_defs.all;
 
 entity pdts_scmd_merge is
