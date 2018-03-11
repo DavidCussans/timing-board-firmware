@@ -69,7 +69,7 @@ begin
 		)
 		port map(
 			clk => rxclk,
-			a => fdel_i,
+			a => fdel_i, -- CDC (in downstream mode), treat cdel as static signal
 			d(0) => rxd,
 			q(0) => rxdd
 		);
