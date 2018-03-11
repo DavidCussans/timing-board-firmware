@@ -7,7 +7,6 @@
 --   When command is accepted, you receive cmd_r.ack on the same cycle and you must lower cmd_w.req
 --   You can then play the scmd in one word at a time, with cmd_r.ren indicating need for next word
 --   The last word must be accompanied by cmd_w.last
---   You must keep cmd_w.d valid between cmd_r.ren assertions, or bad stuff will happen
 --
 -- It's guaranteed that you get a cmd_r.ren on same cycle as cmd_r.ack, so if you just want
 --   to issue a single-word command, you just set cmd_w.last and 'fire and forget'.
