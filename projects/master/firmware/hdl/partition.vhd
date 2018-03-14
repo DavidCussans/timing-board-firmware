@@ -111,8 +111,8 @@ begin
 
 	v <= '1' when tv = '1' and part_up = '1' and (in_run = '1' or unsigned(typ) < 8) else '0';
 
-	grab <= v when ((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP ) and scmd_in.ack = '1') -- Grab run start or stop only if we issued it
-		or unsigned(typ) < 8 -- Grab all other system commands if partition is running
+	grab <= v when ((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') -- Grab run start or stop only if we issued it
+		or (unsigned(typ) < 8 and typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP) -- Grab all other system commands if partition is running
 		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1') -- Otherwise apply trigger masks
 		else '0';
 		
