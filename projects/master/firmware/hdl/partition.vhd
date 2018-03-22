@@ -141,7 +141,7 @@ begin
 			rst => rst,
 			rdy => '1',
 			scmd => typ,
-			scmd_v => tv,
+			scmd_v => grab,
 			in_spill => in_spill,
 			in_run => in_run,
 			evtctr => evtctr
