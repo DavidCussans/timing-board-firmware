@@ -175,7 +175,7 @@ begin
 --			o => gpio_p(0)
 --		);
 
-	gpio_n(0) <= '0';
+--	gpio_n(0) <= '0';
 
 	obufds_g1: OBUFDS
 		port map(
