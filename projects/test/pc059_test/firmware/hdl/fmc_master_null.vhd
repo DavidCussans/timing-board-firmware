@@ -64,67 +64,101 @@ entity payload is
 end payload;
 
 architecture rtl of payload is
+
+	signal clk_u, clk, p: std_logic;
 			
 begin
 
-	ipb_out <= IPB_RBUS_NULL;
+	ipb_out <= IPB_RBUS_NULL;	
 	nuke <= '0';
 	soft_rst <= '0';
 	userled <= '0';
-	rstb_clk <= '1'; -- active low
+	
+-- Clock input
 
+	ibufg_0: IBUFGDS
+		port map(
+			i => clk_p,
+			ib => clk_n,
+			o => clk_u
+		);
+		
+	bufg_0: BUFG
+		port map(
+			i => clk_u,
+			o => clk
+		);
+
+-- PRBS gen
+		
+	prbs: entity work.prbs7_ser
+		port map(
+			clk => clk,
+			rst => '0',
+			load => '0',
+			d => '0',
+			q => p
+		);
+		
+-- Outputs
+	
 	obufds_0: OBUFDS
 		port map(
-			i => '0',
+			i => p,
 			o => q_p,
 			ob => q_n
 		);
 		
-	inmux <= "000";
-	rstb_i2cmux <= '1'; -- active low
-	
 	obufds_1: OBUFDS
 		port map(
-			i => '0',
+			i => p,
 			o => q_hdmi_p,
 			ob => q_hdmi_n
 		);
 	
 	obufds_2: OBUFDS
 		port map(
-			i => '0',
+			i => p,
 			o => q_usfp_p,
 			ob => q_usfp_n
 		);
-	
-	usfp_txdis <= '0';
-	usfp_sda <= '0';
-	usfp_scl <= '0';
-	ledb <= "111"; -- active low
-	scl <= '0';
-	sda <= '0';
-	rstb_i2c <= '1'; -- active low
-
+		
 	obufds_g0: OBUFDS
 		port map(
-			i => '0',
+			i => p,
 			o => gpio_p(0),
 			ob => gpio_n(0)
 		);
 
 	obufds_g1: OBUFDS
 		port map(
-			i => '0',
+			i => p,
 			o => gpio_p(1),
 			ob => gpio_n(1)
 		);
 		
 	obufds_g2: OBUFDS
 		port map(
-			i => '0',
+			i => p,
 			o => gpio_p(2),
 			ob => gpio_n(2)
 		);
+
+-- Unused outputs
+		
+	rstb_clk <= '1'; -- active low
+	inmux <= "000";
+	rstb_i2cmux <= '1'; -- active low
+	
+	usfp_txdis <= '0';
+	usfp_sda <= '0';
+	usfp_scl <= '0';
+	ledb <= "010";
+	scl <= '0';
+	sda <= '0';
+	rstb_i2c <= '1'; -- active low
+
+-- Unused inputs
 
 	ibufg_0: IBUFGDS
 		port map(
@@ -171,5 +205,9 @@ begin
 			ib => d_usfp_n,
 			o => open
 		);	
+		
+
+		
+
 		
 end rtl;
