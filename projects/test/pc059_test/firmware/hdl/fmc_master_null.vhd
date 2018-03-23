@@ -83,12 +83,14 @@ begin
 			o => clk_u
 		);
 		
-	bufg_0: BUFG
-		port map(
-			i => clk_u,
-			o => clk
-		);
-		
+--	bufg_0: BUFG
+--		port map(
+--			i => clk_u,
+--			o => clk
+--		);
+
+	clk <= clk125;
+
 	ibufg_1: IBUFGDS
 		port map(
 			i => clk_cdr_p,
@@ -197,8 +199,6 @@ begin
 
 -- Unused inputs
 
-
-
 	bgen: for i in 7 downto 0 generate
 		
 		ibufds_bgen: IBUFDS
@@ -230,9 +230,5 @@ begin
 			ib => d_usfp_n,
 			o => open
 		);	
-		
-
-		
-
 		
 end rtl;
