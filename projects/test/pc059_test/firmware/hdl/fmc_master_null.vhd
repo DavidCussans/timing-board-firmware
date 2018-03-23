@@ -83,13 +83,13 @@ begin
 			o => clk_u
 		);
 		
---	bufg_0: BUFG
---		port map(
---			i => clk_u,
---			o => clk
---		);
+	bufg_0: BUFG
+		port map(
+			i => clk_u,
+			o => clk
+		);
 
-	clk <= clk125;
+--	clk <= clk125;
 
 	ibufg_1: IBUFGDS
 		port map(
