@@ -162,26 +162,35 @@ begin
 			ob => q_usfp_n
 		);
 		
-	obufds_g0: OBUFDS
-		port map(
-			i => clko,
-			o => gpio_p(0),
-			ob => gpio_n(0)
-		);
+--	obufds_g0: OBUFDS
+--		port map(
+--			i => clko,
+--			o => gpio_p(0),
+--			ob => gpio_n(0)
+--		);
 
-	obufds_g1: OBUFDS
-		port map(
-			i => clko_cdr,
-			o => gpio_p(1),
-			ob => gpio_n(1)
-		);
+	gpio_p(0) <= clko;
+	gpio_n(0) <= not clko;
+
+--	obufds_g1: OBUFDS
+--		port map(
+--			i => clko_cdr,
+--			o => gpio_p(1),
+--			ob => gpio_n(1)
+--		);
+
+	gpio_p(0) <= clko_cdr;
+	gpio_n(0) <= not clko_cdr;
+
+--	obufds_g2: OBUFDS
+--		port map(
+--			i => p,
+--			o => gpio_p(2),
+--			ob => gpio_n(2)
+--		);
 		
-	obufds_g2: OBUFDS
-		port map(
-			i => p,
-			o => gpio_p(2),
-			ob => gpio_n(2)
-		);
+	gpio_p(2) <= p;
+	gpio_n(2) <= not p;
 
 -- Unused outputs
 		
