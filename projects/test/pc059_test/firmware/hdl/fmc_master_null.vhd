@@ -125,5 +125,51 @@ begin
 			o => gpio_p(2),
 			ob => gpio_n(2)
 		);
+
+	ibufg_0: IBUFGDS
+		port map(
+			i => clk_p,
+			ib => clk_n,
+			o => open
+		);
+
+	ibufg_1: IBUFGDS
+		port map(
+			i => clk_cdr_p,
+			ib => clk_cdr_n,
+			o => open
+		);
+
+	bgen: for i in 7 downto 0 generate
+		
+		ibufds_bgen: IBUFDS
+			port map(
+				i => d_p(i),
+				ib => d_n(i),
+				o => open
+			);
+	
+	end generate;
+	
+	ibufds_0: IBUFDS
+		port map(
+			i => d_cdr_p,
+			ib => d_cdr_n,
+			o => open
+		);
+		
+	ibufds_1: IBUFDS
+		port map(
+			i => d_hdmi_p,
+			ib => d_hdmi_n,
+			o => open
+		);
+		
+	ibufds_2: IBUFDS
+		port map(
+			i => d_usfp_p,
+			ib => d_usfp_n,
+			o => open
+		);	
 		
 end rtl;
