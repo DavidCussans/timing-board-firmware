@@ -179,8 +179,8 @@ begin
 --			ob => gpio_n(1)
 --		);
 
-	gpio_p(0) <= clko_cdr;
-	gpio_n(0) <= not clko_cdr;
+	gpio_p(1) <= clko_cdr;
+	gpio_n(1) <= not clko_cdr;
 
 --	obufds_g2: OBUFDS
 --		port map(
