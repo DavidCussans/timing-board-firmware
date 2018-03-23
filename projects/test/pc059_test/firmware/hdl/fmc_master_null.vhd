@@ -7,8 +7,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
-use work.ipbus_reg_types.all;
-use work.ipbus_decode_top.all;
 
 library unisim;
 use unisim.VComponents.all;
@@ -72,7 +70,7 @@ begin
 	ipb_out <= IPB_RBUS_NULL;
 	nuke <= '0';
 	soft_rst <= '0';
-	useled <= '0';
+	userled <= '0';
 	rstb_clk <= '1'; -- active low
 
 	obufds_0: OBUFDS

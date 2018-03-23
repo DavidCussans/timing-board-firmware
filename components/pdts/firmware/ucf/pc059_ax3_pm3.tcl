@@ -6,7 +6,7 @@ create_clock -period 4.000 -name clk_cdr [get_ports clk_cdr_p]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk] -group [get_clocks -include_generated_clocks clk_cdr] -group [get_clocks -include_generated_clocks -of_obj [get_pins -of_obj [get_cells infra/clocks/mmcm] -filter {NAME =~ *CLKOUT*}]]
 
-set_property IOSTANDARD LVDS_25 [get_port {clk_* d_p[*] d_n[*] q_p q_n d_cdr_* clk_cdr_* d_hdmi_* q_hdmi_* d_usfp_* q_usfp_* gpio[0]}]
+set_property IOSTANDARD LVDS_25 [get_port {clk_* d_p[*] d_n[*] q_p q_n d_cdr_* clk_cdr_* d_hdmi_* q_hdmi_* d_usfp_* q_usfp_* gpio_*}]
 set_property DIFF_TERM TRUE [get_port {clk_* d_p_* d_n_* q_p q_n d_cdr_* clk_cdr_* d_hdmi_* q_hdmi_* d_usfp_* q_usfp_* gpio_*}]
 set_property PACKAGE_PIN N5 [get_ports {clk_p}]
 set_property PACKAGE_PIN P5 [get_ports {clk_n}]
@@ -46,7 +46,7 @@ set_property PACKAGE_PIN P2 [get_ports {gpio_p[1]}]
 set_property PACKAGE_PIN R2 [get_ports {gpio_n[1]}]
 set_property PACKAGE_PIN U4 [get_ports {gpio_p[2]}]
 set_property PACKAGE_PIN U3 [get_ports {gpio_n[2]}]
-false_path {clk_* d_p_* d_n_* q_p q_n d_cdr_* clk_cdr_* d_hdmi_* q_hdmi_* d_usfp_* q_usfp_* gpio_*} sysclk
+false_path {d_p_* d_n_* q_p q_n d_cdr_* d_hdmi_* q_hdmi_* d_usfp_* q_usfp_* gpio_*} sysclk
 
 set_property IOSTANDARD LVCMOS25 [get_port {rstb_clk clk_lolb sfp_los[*] cdr_los cdr_lol inmux[*] rstb_i2cmux usfp_* ucdr_* ledb[*] scl sda rstb_i2c}]
 set_property PACKAGE_PIN [get_ports {rstb_clk}]
