@@ -65,7 +65,7 @@ end payload;
 
 architecture rtl of payload is
 
-	signal clk_u, clk, p: std_logic;
+	signal clk_u, clk, clk_cdr_u, clk_cdr, clko, clko_cdr, p: std_logic;
 			
 begin
 
@@ -88,6 +88,19 @@ begin
 			i => clk_u,
 			o => clk
 		);
+		
+	ibufg_1: IBUFGDS
+		port map(
+			i => clk_cdr_p,
+			ib => clk_cdr_n,
+			o => clk_cdr_u
+		);
+		
+	bufg_1: BUFG
+		port map(
+			i => clk_cdr_u,
+			o => clk_cdr
+		);
 
 -- PRBS gen
 		
@@ -98,6 +111,30 @@ begin
 			load => '0',
 			d => '0',
 			q => p
+		);
+		
+-- Clock copy
+
+	oddr_clk: ODDR -- Feedback clock, not through MMCM
+		port map(
+			q => clko,
+			c => clk,
+			ce => '1',
+			d1 => '0',
+			d2 => '1',
+			r => '0',
+			s => '0'
+		);
+		
+	oddr_clk_cdr: ODDR -- Feedback clock, not through MMCM
+		port map(
+			q => clko_cdr,
+			c => clk_cdr,
+			ce => '1',
+			d1 => '0',
+			d2 => '1',
+			r => '0',
+			s => '0'
 		);
 		
 -- Outputs
@@ -125,14 +162,14 @@ begin
 		
 	obufds_g0: OBUFDS
 		port map(
-			i => p,
+			i => clko,
 			o => gpio_p(0),
 			ob => gpio_n(0)
 		);
 
 	obufds_g1: OBUFDS
 		port map(
-			i => p,
+			i => clko_cdr,
 			o => gpio_p(1),
 			ob => gpio_n(1)
 		);
@@ -159,6 +196,8 @@ begin
 	rstb_i2c <= '1'; -- active low
 
 -- Unused inputs
+
+
 
 	bgen: for i in 7 downto 0 generate
 		
