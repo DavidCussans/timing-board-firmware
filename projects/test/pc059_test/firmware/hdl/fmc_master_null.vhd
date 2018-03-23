@@ -175,11 +175,7 @@ begin
 			o => gpio_p(0)
 		);
 
-	obuf_g0n: OBUF
-		port map(
-			i => clko,
-			o => gpio_n(0)
-		);
+	gpio_n(0) <= '0';
 
 --	obufds_g1: OBUFDS
 --		port map(
@@ -194,12 +190,8 @@ begin
 			o => gpio_p(1)
 		);
 
-	obuf_g1n: OBUF
-		port map(
-			i => clko_cdr,
-			o => gpio_n(1)
-		);
-
+	gpio_n(1) <= '1';
+	
 --	obufds_g2: OBUFDS
 --		port map(
 --			i => p,
