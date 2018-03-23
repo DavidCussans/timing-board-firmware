@@ -1,4 +1,4 @@
-src fmc_master_null.vhd
+src fmc_master_null.vhd prbs7_ser.vhd
 #src fmc_master.vhd prbs7_ser.vhd prbs7_chk.vhd
 #src -c components/pdts pdts_synchro.vhd
 #include -c components/pdts pdts_fmc_io.dep
