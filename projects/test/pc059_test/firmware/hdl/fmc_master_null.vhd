@@ -94,7 +94,7 @@ begin
 	prbs: entity work.prbs7_ser
 		port map(
 			clk => clk,
-			rst => '0',
+			rst => std_logic'('0'),
 			load => '0',
 			d => '0',
 			q => p
@@ -159,20 +159,6 @@ begin
 	rstb_i2c <= '1'; -- active low
 
 -- Unused inputs
-
-	ibufg_0: IBUFGDS
-		port map(
-			i => clk_p,
-			ib => clk_n,
-			o => open
-		);
-
-	ibufg_1: IBUFGDS
-		port map(
-			i => clk_cdr_p,
-			ib => clk_cdr_n,
-			o => open
-		);
 
 	bgen: for i in 7 downto 0 generate
 		
