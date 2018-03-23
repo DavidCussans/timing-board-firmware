@@ -170,7 +170,7 @@ begin
 --		);
 
 	gpio_p(0) <= clko;
-	gpio_n(0) <= not clko;
+	gpio_n(0) <= clko;
 
 --	obufds_g1: OBUFDS
 --		port map(
@@ -180,7 +180,7 @@ begin
 --		);
 
 	gpio_p(1) <= clko_cdr;
-	gpio_n(1) <= not clko_cdr;
+	gpio_n(1) <= clko_cdr;
 
 --	obufds_g2: OBUFDS
 --		port map(
@@ -190,7 +190,7 @@ begin
 --		);
 		
 	gpio_p(2) <= p;
-	gpio_n(2) <= not p;
+	gpio_n(2) <= p;
 
 -- Unused outputs
 		
