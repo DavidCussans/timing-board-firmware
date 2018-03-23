@@ -20,7 +20,7 @@ end prbs7_ser;
 
 architecture rtl of prbs7_ser is
 
-	signal r: std_logic_vector(6 downto 0);
+	signal r: std_logic_vector(6 downto 0) := "0000001";
 	signal b: std_logic;
 	
 begin
