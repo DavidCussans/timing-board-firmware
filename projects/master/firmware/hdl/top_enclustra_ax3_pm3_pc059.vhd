@@ -13,8 +13,7 @@ use work.ipbus.ALL;
 
 entity top is port(
 		sysclk: in std_logic;
-		leds: out std_logic_vector(3 downto 0); -- status LEDs
-		cfg: in std_logic_vector(3 downto 0); -- switches
+		leds: out std_logic_vector(3 downto 0); -- Enclustra status LEDs
 		rgmii_txd: out std_logic_vector(3 downto 0); -- Enclustra ethernet
 		rgmii_tx_ctl: out std_logic;
 		rgmii_txc: out std_logic;

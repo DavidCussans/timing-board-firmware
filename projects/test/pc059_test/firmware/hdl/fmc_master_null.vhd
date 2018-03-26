@@ -89,8 +89,6 @@ begin
 			o => clk
 		);
 
---	clk <= clk125;
-
 	ibufg_1: IBUFGDS
 		port map(
 			i => clk_cdr_p,
@@ -109,7 +107,7 @@ begin
 	prbs: entity work.prbs7_ser
 		port map(
 			clk => clk,
-			rst => std_logic'('0'),
+			rst => '0',
 			load => '0',
 			d => '0',
 			q => p
@@ -117,7 +115,7 @@ begin
 		
 -- Clock copy
 
-	oddr_clk: ODDR -- Feedback clock, not through MMCM
+	oddr_clk: ODDR
 		port map(
 			q => clko,
 			c => clk,
@@ -128,7 +126,7 @@ begin
 			s => '0'
 		);
 		
-	oddr_clk_cdr: ODDR -- Feedback clock, not through MMCM
+	oddr_clk_cdr: ODDR
 		port map(
 			q => clko_cdr,
 			c => clk_cdr,

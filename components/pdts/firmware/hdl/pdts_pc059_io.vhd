@@ -1,4 +1,4 @@
--- pdts_fmc_io.vhd
+-- pdts_pc059_io
 --
 -- Various functions for talking to the FMC board chipset
 --
@@ -15,7 +15,7 @@ use work.ipbus_decode_pdts_fmc_io.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity pdts_fmc_io is
+entity pdts_pc059_io is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -25,62 +25,70 @@ entity pdts_fmc_io is
 		nuke: out std_logic;
 		rst: out std_logic;
 		locked: in std_logic;
-		cdr_lol: in std_logic;
-		cdr_los: in std_logic;
-		sfp_los: in std_logic;
-		sfp_tx_dis: out std_logic;
-		sfp_flt: in std_logic;
-		userled: out std_logic;
-		fmc_clk_p: in std_logic;
-		fmc_clk_n: in std_logic;
-		fmc_clk: out std_logic;
-		rec_clk_p: in std_logic;
-		rec_clk_n: in std_logic;
-		rec_clk: out std_logic;
-		rec_d_p: in std_logic;
-		rec_d_n: in std_logic;
-		rec_d: out std_logic;
-		clk_out_p: out std_logic;
-		clk_out_n: out std_logic;
-		rj45_din_p: in std_logic;
-		rj45_din_n: in std_logic;
-		rj45_din: out std_logic;
-		rj45_dout: in std_logic;
-		rj45_dout_p: out std_logic;
-		rj45_dout_n: out std_logic;
-		sfp_dout: in std_logic;
-		sfp_dout_p: out std_logic;
-		sfp_dout_n: out std_logic;
-		uid_scl: out std_logic;
-		uid_sda: inout std_logic;
-		sfp_scl: out std_logic;
-		sfp_sda: inout std_logic;
-		pll_scl: out std_logic;
-		pll_sda: inout std_logic;
-		pll_rstn: out std_logic;
-		gpin_0_p: in std_logic;
-		gpin_0_n: in std_logic;
-		gpout_0_p: out std_logic;
-		gpout_0_n: out std_logic;
-		gpout_1_p: out std_logic;
-		gpout_1_n: out std_logic		
+		clk_p: in std_logic; -- 50MHz master clock from PLL
+		clk_n: in std_logic;
+		clk: out std_logic;
+		rstb_clk: out std_logic; -- reset for PLL
+		clk_lolb: in std_logic; -- PLL LOL
+		d_p: in std_logic_vector(7 downto 0); -- data from fanout SFPs
+		d_n: in std_logic_vector(7 downto 0);
+		d: out std_logic_vector(7 downto 0);
+		q_p: out std_logic; -- output to fanout
+		q_n: out std_logic;
+		q: in std_logic;
+		sfp_los: in std_logic_vector(7 downto 0); -- fanout SFP LOS
+		d_cdr_p: in std_logic; -- data input from CDR
+		d_cdr_n: in std_logic;
+		d_cdr: out std_logic;
+		clk_cdr_p: in std_logic; -- clock from CDR
+		clk_cdr_n: in std_logic;
+		clk_cdr: out std_logic;
+		cdr_los: in std_logic; -- CDR LOS
+		cdr_lol: in std_logic; -- CDR LOL
+		inmux: out std_logic_vector(2 downto 0); -- mux control
+		rstb_i2cmux: out std_logic; -- reset for mux
+		d_hdmi_p: in std_logic; -- data from upstream HDMI
+		d_hdmi_n: in std_logic;
+		d_hdmi: out std_logic;
+		q_hdmi_p: out std_logic; -- output to upstream HDMI
+		q_hdmi_n: out std_logic;
+		q_hdmi: in std_logic;
+		d_usfp_p: in std_logic; -- input from upstream SFP
+		d_usfp_n: in std_logic;		
+		d_usfp: out std_logic;
+		q_usfp_p: out std_logic; -- output to upstream SFP
+		q_usfp_n: out std_logic;
+		q_usfp: in std_logic;
+		usfp_fault: in std_logic; -- upstream SFP fault
+		usfp_los: in std_logic; -- upstream SFP LOS
+		usfp_txdis: out std_logic; -- upstream SFP tx_dis
+		usfp_sda: inout std_logic; -- upstream SFP I2C
+		usfp_scl: out std_logic;
+		ucdr_los: in std_logic; -- upstream CDR LOS
+		ucdr_lol: in std_logic; -- upstream CDR LOL
+		ledb: out std_logic_vector(2 downto 0); -- FMC LEDs
+		scl: out std_logic; -- main I2C
+		sda: inout std_logic;
+		rstb_i2c: out std_logic; -- reset for I2C expanders
+		gpio_p: out std_logic_vector(2 downto 0); -- GPIO
+		gpio_n: out std_logic_vector(2 downto 0)
 	);
 
-end pdts_fmc_io;
+end pdts_pc059_io;
 
-architecture rtl of pdts_fmc_io is
+architecture rtl of pdts_pc059_io is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r, rec_d_i: std_logic;
-	signal gpin, rj45_din_u, rec_d_u: std_logic;
+	signal ctrl_gpio: std_logic_vector(2 downto 0);
+	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_hdmi_i, d_usfp_i, q_i, q_hdmi_i, q_usfp_i: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
-	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
+	signal sda_o, usfp_sda_o: std_logic;
 	
-	attribute IOB: string;
-	attribute IOB of sfp_dout_r, rj45_dout_r, rec_d_u, rj45_din_u: signal is "TRUE";
+  attribute IOB: string;
+  attribute IOB of d_cdr, d_hdmi, d_usfp, q_i, q_hdmi_i, q_usfp_i: signal is "TRUE";
 
 begin
 
@@ -115,164 +123,139 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"000000" & "000" & locked & cdr_lol & cdr_los & sfp_flt & sfp_los;
+	stat(0) <= X"000" & "000" & locked & sfp_los & '0' & not clk_lolb & cdr_lol & cdr_los & ucdr_lol & ucdr_los & usfp_fault & usfp_los;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
 	rst <= ctrl(0)(2);
-	sfp_tx_dis <= ctrl(0)(3);
-	pll_rstn <= not ctrl(0)(4);
-	
-	userled <= not (cdr_lol or cdr_los or sfp_los);
-	
--- Unused signals
-	
---	obufds_0: OBUFDS
---		port map(
---			i => '0',
---			o => gpout_0_p,
---			ob => gpout_0_n
---		);
-	
---	obufds_1: OBUFDS
---		port map(
---			i => '0',
---			o => gpout_1_p,
---			ob => gpout_1_n
---		);
-
-	ibufds_gpin_0: IBUFDS
-		port map(
-			i => gpin_0_p,
-			ib => gpin_0_n,
-			o => gpin
-		);
+	rstb_clk <= not ctrl(0)(3);
+	rstb_i2cmux <= not ctrl(0)(4);
+	rstb_i2c <= not ctrl(0)(5);
+	inmux <= ctrl(0)(10 downto 8);
+	ctrl_gpio <= ctrl(0)(14 downto 12);
+	ledb <= not ctrl(0)(18 downto 16);
 
 -- Clocks
 			
-	ibufg_in: IBUFGDS
+	ibufg_clk: IBUFGDS
 		port map(
-			i => fmc_clk_p,
-			ib => fmc_clk_n,
-			o => fmc_clk_u
+			i => clk_p,
+			ib => clk_n,
+			o => clk_u
 		);
 		
 	bufg_in: BUFG
 		port map(
-			i => fmc_clk_u,
-			o => fmc_clk_i
+			i => clk_u,
+			o => clk_i
 		);
 		
-	fmc_clk <= fmc_clk_i;
+	clk <= clk_i;
 	
-	ibufds_rec_clk: IBUFDS
+	ibufds_clk_cdr: IBUFDS
 		port map(
-			i => rec_clk_p,
-			ib => rec_clk_n,
-			o => rec_clk_u
+			i => cdr_clk_p,
+			ib => cdr_clk_n,
+			o => cdr_clk_u
 		);
 		
-	bufh_rec_clk: BUFG
+	bufh_clk_cdr: BUFG
 		port map(
-			i => rec_clk_u,
-			o => rec_clk_i
+			i => clk_cdr_u,
+			o => clk_cdr_i
 		);
 		
-	rec_clk <= rec_clk_i;
+	clk_cdr <= clk_cdr_i;
 
--- Outputs
+-- Data inputs
+
+	d_g: for i in 7 downto 0 generate
+	
+		signal di: std_logic;
+		attribute IOB: string;
+		attribute IOB of di: signal is "TRUE";
 		
-	oddr_clkout: ODDR -- Feedback clock, not through MMCM
+	begin
+	
+		ibufds_d: IBUFDS
+			port map(
+				i => d_p(i),
+				ib => d_n(i),
+				o => di
+			);
+ 	
+		d(i) <= di when rising_edge(clk_i); -- SFP input data registered on rising edge of clk (selectable edge later)
+		
+	end generate;
+	
+	ibufds_cdr: IBUFDS
 		port map(
-			q => clkout,
-			c => fmc_clk_i,
-			ce => '1',
-			d1 => '0',
-			d2 => '1',
-			r => '0',
-			s => '0'
+			i => d_cdr_p,
+			ib => d_cdr_n,
+			o => d_cdr_i
 		);
 		
-	obuf_clkout: OBUFDS
+	d_cdr <= d_cdr_i when rising_edge(clk_cdr_i); -- CDR input data registered on rising edge of clk_cdr
+	
+	ibufds_hdmi: IBUFDS
 		port map(
-			i => clkout,
-			o => clk_out_p,
-			ob => clk_out_n
+			i => d_hdmi_p,
+			ib => d_hdmi_n,
+			o => d_hdmi_i
 		);
 		
-	oddr_gp0: ODDR -- Monitoring pin
+	d_hdmi <= d_hdmi_i when rising_edge(clk_i); -- HDMI input data registered on rising edge of clk
+	
+	ibufds_usfp: IBUFDS
 		port map(
-			q => gp0out,
-			c => fmc_clk_i,
-			ce => '1',
-			d1 => '0',
-			d2 => '1',
-			r => '0',
-			s => '0'
+			i => d_usfp_p,
+			ib => d_usfp_n,
+			o => d_usfp_i
 		);
 		
-	obuf_gp0: OBUFDS
+	d_usfp <= d_usfp_i when rising_edge(clk_i); -- uSFP input data registered on rising edge of clk
+	
+-- Data outputs
+
+	q_i <= q when rising_edge(clk_i); -- SFP output data registered on rising edge of clk
+
+	obuf_q: OBUFDS
 		port map(
-			i => gp0out,
-			o => gpout_0_p,
-			ob => gpout_0_n
-		);
-		
-	oddr_gp1: ODDR -- Monitoring pin
-		port map(
-			q => gp1out,
-			c => fmc_clk_i,
-			ce => '1',
-			d1 => '0',
-			d2 => '1',
-			r => '0',
-			s => '0'
-		);
-		
-	obuf_gp1: OBUFDS
-		port map(
-			i => gp1out,
-			o => gpout_1_p,
-			ob => gpout_1_n
+			i => q_i,
+			o => q_p,
+			ob => q_n
 		);
 
-	sfp_dout_r <= sfp_dout when rising_edge(fmc_clk_i);
-		
-	obuf_sfp_dout: OBUFDS
-		port map(
-			i => sfp_dout_r,
-			o => sfp_dout_p,
-			ob => sfp_dout_n
-		);
-		
-	rj45_dout_r <= rj45_dout when falling_edge(fmc_clk_i);
+	q_hdmi_i <= q_hdmi when rising_edge(clk_i); -- HDMI output data registered on rising edge of clk
 
-	obuf_rj45_dout: OBUFDS
+	obuf_q: OBUFDS
 		port map(
-			i => rj45_dout_r,
-			o => rj45_dout_p,
-			ob => rj45_dout_n
+			i => q_hdmi_i,
+			o => q_hdmi_p,
+			ob => q_hdmi_n
 		);
-		
--- Inputs
 
-	ibufds_rec_d: IBUFDS
+	q_usfp_i <= q_usfp when rising_edge(clk_i); -- uSFP output data registered on rising edge of clk
+
+	obuf_q: OBUFDS
 		port map(
-			i => rec_d_p,
-			ib => rec_d_n,
-			o => rec_d
+			i => q_usfp_i,
+			o => q_usfp_p,
+			ob => q_usfp_n
 		);
+
+-- GPIO outputs
 		
-	rec_d <= rec_d_u when rising_edge(rec_clk_i); -- Register CDR data on CDR recovered clock
+	gpio_g: for i in 2 downto 0 generate
 		
-	ibufds_rj45: IBUFDS
-		port map(
-			i => rj45_din_p,
-			ib => rj45_din_n,
-			o => rj45_din
-		);
-		
-	rj45_din <= rj45_din_u when falling_edge(fmc_clk_i); -- Register RJ45 data on tx clock
+		obuf_g: OBUFDS
+			port map(
+				i => ctrl_gpio(i),
+				o => gpio_p(i),
+				ob => gpio_n(i)
+			);
+			
+	end generate;
 
 -- Frequency measurement
 
@@ -281,8 +264,8 @@ begin
 			N_CLK => 2
 		)
 		port map(
-			clk(0) => fmc_clk_i,
-			clk(1) => rec_clk_i,
+			clk(0) => clk_i,
+			clk(1) => clk_cdr_i,
 			clkdiv => clkdiv
 		);
 
@@ -304,39 +287,26 @@ begin
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_UID_I2C),
-			ipb_out => ipbr(N_SLV_UID_I2C),
-			scl => uid_scl,
-			sda_o => uid_sda_o,
-			sda_i => uid_sda
+			ipb_in => ipbw(N_SLV_I2C),
+			ipb_out => ipbr(N_SLV_I2C),
+			scl => scl,
+			sda_o => sda_o,
+			sda_i => sda
 		);
 	
-	uid_sda <= '0' when uid_sda_o = '0' else 'Z';
+	sda <= '0' when sda_o = '0' else 'Z';
 	
 	i2c_sfp: entity work.ipbus_i2c_master
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_SFP_I2C),
-			ipb_out => ipbr(N_SLV_SFP_I2C),
-			scl => sfp_scl,
-			sda_o => sfp_sda_o,
-			sda_i => sfp_sda
+			ipb_in => ipbw(N_SLV_USFP_I2C),
+			ipb_out => ipbr(N_SLV_USFP_I2C),
+			scl => usfp_scl,
+			sda_o => usfp_sda_o,
+			sda_i => usfp_sda
 		);
 	
-	sfp_sda <= '0' when sfp_sda_o = '0' else 'Z';
-
-	i2c_pll: entity work.ipbus_i2c_master
-		port map(
-			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_PLL_I2C),
-			ipb_out => ipbr(N_SLV_PLL_I2C),
-			scl => pll_scl,
-			sda_o => pll_sda_o,
-			sda_i => pll_sda
-		);
-	
-	pll_sda <= '0' when pll_sda_o = '0' else 'Z';
+	usfp_sda <= '0' when usfp_sda_o = '0' else 'Z';
 				
 end rtl;
