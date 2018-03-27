@@ -156,9 +156,9 @@ begin
 	
 	ibufds_clk_cdr: IBUFDS
 		port map(
-			i => cdr_clk_p,
-			ib => cdr_clk_n,
-			o => cdr_clk_u
+			i => clk_cdr_p,
+			ib => clk_cdr_n,
+			o => clk_cdr_u
 		);
 		
 	bufh_clk_cdr: BUFG
@@ -230,7 +230,7 @@ begin
 
 	q_hdmi_i <= q_hdmi when rising_edge(clk_i); -- HDMI output data registered on rising edge of clk
 
-	obuf_q: OBUFDS
+	obuf_q_hdmi: OBUFDS
 		port map(
 			i => q_hdmi_i,
 			o => q_hdmi_p,
@@ -239,7 +239,7 @@ begin
 
 	q_usfp_i <= q_usfp when rising_edge(clk_i); -- uSFP output data registered on rising edge of clk
 
-	obuf_q: OBUFDS
+	obuf_q_usfp: OBUFDS
 		port map(
 			i => q_usfp_i,
 			o => q_usfp_p,

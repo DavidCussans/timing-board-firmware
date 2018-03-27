@@ -67,11 +67,11 @@ architecture rtl of payload is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(6 downto 0);
+	signal stat: ipb_reg_v(0 downto 0);
 	signal clk, q, d_cdr, clk_cdr, d_hdmi, q_hdmi, d_usfp, q_usfp: std_logic;
 	signal d: std_logic_vector(7 downto 0);
 	signal rst, ctrl_chk_init: std_logic;
-	signal zflag_sfp, zflag_hdmi, zflag_usfp, chk_init_pll, chk_init_cdr, rst_pll, rst_cdr: std_logic;
+	signal zflag_cdr, zflag_hdmi, zflag_usfp, chk_init_pll, chk_init_cdr, rst_pll, rst_cdr: std_logic;
 	signal p: std_logic;
 	signal err_sfp, err_hdmi, err_usfp: std_logic;
 	
@@ -170,7 +170,7 @@ begin
 		);
 		
 	ctrl_chk_init <= ctrl(0)(0);
-	stat(0) <= X"0000000" & '0' & zflag_usfp & zflag_hdmi & zflag_sfp;
+	stat(0) <= X"0000000" & '0' & zflag_usfp & zflag_hdmi & zflag_cdr;
 	
 	fmc_clk_s: entity work.pdts_synchro
 		generic map(
@@ -235,7 +235,7 @@ begin
 			ipb_out => ipbr(N_SLV_SFP_CTRS),
 			clk => clk_cdr,
 			rst => chk_init_cdr,
-			inc => err_sfp
+			inc(0) => err_sfp
 		);
 		
 -- HDMI (data out and data in on PLL clk)
@@ -256,7 +256,7 @@ begin
 
 	q_usfp <= p;
 	
-	chk_hdmi: entity work.prbs7_chk_noctr
+	chk_usfp: entity work.prbs7_chk_noctr
 		port map(
 			clk => clk,
 			rst => rst_pll,
@@ -268,7 +268,7 @@ begin
 		
 -- Counters
 		
-	ctrs_sfp: entity work.ipbus_ctrs_v
+	ctrs: entity work.ipbus_ctrs_v
 		generic map(
 			N_CTRS => 3,
 			CTR_WDS => 2
