@@ -105,7 +105,7 @@ begin
 			rst => rst,
 			locked => '1',
 			clk_p => clk_p,
-			clk_n -> clk_n,
+			clk_n => clk_n,
 			clk => clk,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
