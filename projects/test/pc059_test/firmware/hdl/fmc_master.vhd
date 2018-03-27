@@ -10,9 +10,6 @@ use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_top.all;
 
-library unisim;
-use unisim.VComponents.all;
-
 entity payload is
 	port(
 		ipb_clk: in std_logic;
@@ -71,17 +68,13 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(6 downto 0);
-	signal rst, fmc_clk, rec_clk, rec_d, sfp_dout, rj45_din, rj45_dout: std_logic;
-	signal ctrl_chk_init, rst_fmc_clk, rst_rec_clk, chk_init, chk_init_fmc, rec_d_r, rj45_din_r, rj45_din_rr, p: std_logic;
-	signal cyc_ctr, err_ctr, err_ctr_rj45: std_logic_vector(47 downto 0);
-	signal zflag, zflag_rj45: std_logic;
+	signal clk, q, d_cdr, clk_cdr, d_hdmi, q_hdmi, d_usfp, q_usfp: std_logic;
+	signal d: std_logic_vector(7 downto 0);
+	signal rst, ctrl_chk_init: std_logic;
+	signal zflag_sfp, zflag_hdmi, zflag_usfp, chk_init_pll, chk_init_cdr, rst_pll, rst_cdr: std_logic;
+	signal p: std_logic;
+	signal err_sfp, err_hdmi, err_usfp: std_logic;
 	
-	attribute IOB: string;
-	attribute IOB of sfp_dout: signal is "TRUE";
-	attribute IOB of rec_d_r: signal is "TRUE";
-	attribute IOB of rj45_dout: signal is "TRUE";
-  attribute IOB of rj45_din_r: signal is "TRUE";
-			
 begin
 
 -- ipbus address decode
@@ -101,7 +94,7 @@ begin
 
 -- IO
 
-	io: entity work.pdts_fmc_io
+	io: entity work.pdts_pc059_io
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -111,45 +104,53 @@ begin
 			nuke => nuke,
 			rst => rst,
 			locked => '1',
-			cdr_lol => cdr_lol,
-			cdr_los => cdr_los,
+			clk_p => clk_p,
+			clk_n -> clk_n,
+			clk => clk,
+			rstb_clk => rstb_clk,
+			clk_lolb => clk_lolb,
+			d_p => d_p,
+			d_n => d_n,
+			d => d,
+			q_p => q_p,
+			q_n => q_n,
+			q => q,
 			sfp_los => sfp_los,
-			sfp_tx_dis => sfp_tx_dis,
-			sfp_flt => sfp_flt,
-			userled => userled,
-			fmc_clk_p => fmc_clk_p,
-			fmc_clk_n => fmc_clk_n,
-			fmc_clk => fmc_clk,
-			rec_clk_p => rec_clk_p,
-			rec_clk_n => rec_clk_n,
-			rec_clk => rec_clk,
-			rec_d_p => rec_d_p,
-			rec_d_n => rec_d_n,
-			rec_d => rec_d,
-			clk_out_p => clk_out_p,
-			clk_out_n => clk_out_n,
-			rj45_din_p => rj45_din_p,
-			rj45_din_n => rj45_din_n,
-			rj45_din => rj45_din,
-			rj45_dout => rj45_dout,
-			rj45_dout_p => rj45_dout_p,
-			rj45_dout_n => rj45_dout_n,
-			sfp_dout => sfp_dout,
-			sfp_dout_p => sfp_dout_p,
-			sfp_dout_n => sfp_dout_n,
-			uid_scl => uid_scl,
-			uid_sda => uid_sda,
-			sfp_scl => sfp_scl,
-			sfp_sda => sfp_sda,
-			pll_scl => pll_scl,
-			pll_sda => pll_sda,
-			pll_rstn => pll_rstn,
-			gpin_0_p => gpin_0_p,
-			gpin_0_n => gpin_0_n,
-			gpout_0_p => gpout_0_p,
-			gpout_0_n => gpout_0_n,
-			gpout_1_p => gpout_1_p,
-			gpout_1_n => gpout_1_n
+			d_cdr_p => d_cdr_p,
+			d_cdr_n => d_cdr_n,
+			d_cdr => d_cdr,
+			clk_cdr_p => clk_cdr_p,
+			clk_cdr_n => clk_cdr_n,
+			clk_cdr => clk_cdr,
+			cdr_los => cdr_los,
+			cdr_lol => cdr_lol,
+			inmux => inmux,
+			rstb_i2cmux => rstb_i2cmux,
+			d_hdmi_p => d_hdmi_p,
+			d_hdmi_n => d_hdmi_n,
+			d_hdmi => d_hdmi,
+			q_hdmi_p => q_hdmi_p,
+			q_hdmi_n => q_hdmi_n,
+			q_hdmi => q_hdmi,
+			d_usfp_p => d_usfp_p,
+			d_usfp_n => d_usfp_n,
+			d_usfp => d_usfp,
+			q_usfp_p => q_usfp_p,
+			q_usfp_n => q_usfp_n,
+			q_usfp => q_usfp,
+			usfp_fault => usfp_fault,
+			usfp_los => usfp_los,
+			usfp_txdis => usfp_txdis,
+			usfp_sda => usfp_sda,
+			usfp_scl => usfp_scl,
+			ucdr_los => ucdr_los,
+			ucdr_lol => ucdr_lol,
+			ledb => ledb,
+			scl => scl,
+			sda => sda,
+			rstb_i2c => rstb_i2c,
+			gpio_p => gpio_p,
+			gpio_n => gpio_n
 		);
     
 -- CSR
@@ -157,7 +158,7 @@ begin
 	csr: entity work.ipbus_ctrlreg_v
 		generic map(
 			N_CTRL => 1,
-			N_STAT => 7
+			N_STAT => 1
 		)
 		port map(
 			clk => ipb_clk,
@@ -168,15 +169,8 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"0000000" & "00" & zflag_rj45 & zflag;
-	stat(1) <= cyc_ctr(31 downto 0);
-	stat(2) <= X"0000" & cyc_ctr(47 downto 32);
-	stat(3) <= err_ctr(31 downto 0);
-	stat(4) <= X"0000" & err_ctr(47 downto 32);
-	stat(5) <= err_ctr_rj45(31 downto 0);
-	stat(6) <= X"0000" & err_ctr_rj45(47 downto 32);
-	
 	ctrl_chk_init <= ctrl(0)(0);
+	stat(0) <= X"0000000" & '0' & zflag_usfp & zflag_hdmi & zflag_sfp;
 	
 	fmc_clk_s: entity work.pdts_synchro
 		generic map(
@@ -184,11 +178,11 @@ begin
 		)
 		port map(
 			clk => ipb_clk,
-			clks => fmc_clk,
+			clks => clk,
 			d(0) => rst,
 			d(1) => ctrl_chk_init,
-			q(0) => rst_fmc_clk,
-			q(1) => chk_init_fmc
+			q(0) => rst_pll,
+			q(1) => chk_init_pll
 		);
 		
 	rec_clk_s: entity work.pdts_synchro
@@ -197,55 +191,98 @@ begin
 		)
 		port map(
 			clk => ipb_clk,
-			clks => rec_clk,
+			clks => clk_cdr,
 			d(0) => rst,
 			d(1) => ctrl_chk_init,
-			q(0) => rst_rec_clk,
-			q(1) => chk_init
+			q(0) => rst_cdr,
+			q(1) => chk_init_cdr
 		);
 		
 -- PRBS gen
 		
 	prbs: entity work.prbs7_ser
 		port map(
-			clk => fmc_clk,
-			rst => rst_fmc_clk,
+			clk => clk,
+			rst => rst_pll,
 			load => '0',
 			d => '0',
 			q => p
 		);
 		
--- SFP
+-- SFPs (data out on PLL clk, data in on CDR clk)
 
-	sfp_dout <= p when rising_edge(fmc_clk);
-	rec_d_r <= rec_d when rising_edge(rec_clk);
+	q <= p;
 	
-	prbs_chk_sfp: entity work.prbs7_chk
+	chk_sfp: entity work.prbs7_chk_noctr
 		port map(
-			clk => rec_clk,
-			rst => rst_rec_clk,
-			init => chk_init,
-			d => rec_d_r,
-			err_ctr => err_ctr,
-			cyc_ctr => open,
-			zflag => zflag
+			clk => clk_cdr,
+			rst => rst_cdr,
+			init => chk_init_cdr,
+			d => d_cdr,
+			err => err_sfp,
+			zflag => zflag_cdr
 		);
 		
--- RJ45
-
-	rj45_dout <= p when falling_edge(fmc_clk);
-	rj45_din_r <= rj45_din when falling_edge(fmc_clk);
-	rj45_din_rr <= rj45_din_r when rising_edge(fmc_clk);
-
-	prbs_chk_rj45: entity work.prbs7_chk
+	ctrs_sfp: entity work.ipbus_ctrs_v
+		generic map(
+			N_CTRS => 1,
+			CTR_WDS => 2
+		)
 		port map(
-			clk => fmc_clk,
-			rst => rst_fmc_clk,
-			init => chk_init_fmc,
-			d => rj45_din_rr,
-			err_ctr => err_ctr_rj45,
-			cyc_ctr => cyc_ctr,
-			zflag => zflag_rj45
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SFP_CTRS),
+			ipb_out => ipbr(N_SLV_SFP_CTRS),
+			clk => clk_cdr,
+			rst => chk_init_cdr,
+			inc => err_sfp
 		);
+		
+-- HDMI (data out and data in on PLL clk)
+
+	q_hdmi <= p;
+	
+	chk_hdmi: entity work.prbs7_chk_noctr
+		port map(
+			clk => clk,
+			rst => rst_pll,
+			init => chk_init_pll,
+			d => d_hdmi,
+			err => err_hdmi,
+			zflag => zflag_hdmi
+		);
+		
+-- uSFP (data out and data in on PLL clk)
+
+	q_usfp <= p;
+	
+	chk_hdmi: entity work.prbs7_chk_noctr
+		port map(
+			clk => clk,
+			rst => rst_pll,
+			init => chk_init_pll,
+			d => d_usfp,
+			err => err_usfp,
+			zflag => zflag_usfp
+		);
+		
+-- Counters
+		
+	ctrs_sfp: entity work.ipbus_ctrs_v
+		generic map(
+			N_CTRS => 3,
+			CTR_WDS => 2
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_CTRS),
+			ipb_out => ipbr(N_SLV_CTRS),
+			clk => clk,
+			rst => chk_init_pll,
+			inc(0) => '1',
+			inc(1) => err_hdmi,
+			inc(2) => err_usfp
+		);	
 		
 end rtl;
