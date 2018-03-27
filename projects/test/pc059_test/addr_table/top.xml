@@ -3,7 +3,7 @@
         <node id="ctrl" address="0x0">
         	<node id="prbs_init" mask="0x1"/>
         </node>
-        <node id="stat" address="0x08">
+        <node id="stat" address="0x1">
         	<node id="zflag_sfp" mask="0x1"/>
         	<node id="zflag_hdmi" mask="0x2"/>
         	<node id="zflag_usfp" mask="0x2"/>
