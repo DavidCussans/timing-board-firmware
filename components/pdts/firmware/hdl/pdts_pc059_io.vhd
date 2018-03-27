@@ -134,6 +134,8 @@ begin
 	inmux <= ctrl(0)(10 downto 8);
 	ctrl_gpio <= ctrl(0)(14 downto 12);
 	ledb <= not ctrl(0)(18 downto 16);
+	
+	usfp_txdis <= '0';
 
 -- Clocks
 			
