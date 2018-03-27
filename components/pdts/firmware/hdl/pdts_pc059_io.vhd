@@ -10,7 +10,7 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pdts_fmc_io.all;
+use work.ipbus_decode_pdts_pc059_io.all;
 
 library unisim;
 use unisim.VComponents.all;
@@ -102,7 +102,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_pdts_fmc_io(ipb_in.ipb_addr),
+      sel => ipbus_sel_pdts_pc059_io(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
