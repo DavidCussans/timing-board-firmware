@@ -11,6 +11,6 @@
         </node>
     </node>
     <node id="sfp_ctrs" address="0x2" mode="block" size="0x2" fwinfo="endpoint;width=1"/>
-    <node id="ctrs" address="0x8" mode="block" size="0x6" fwinfo="endpoint;width=3"/>
+    <node id="ctrs" address="0x8" mode="block" size="0x8" fwinfo="endpoint;width=3"/>
     <node id="io" address="0x40" module="file://pdts_pc059_io.xml"/>
 </node>
