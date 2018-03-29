@@ -4,9 +4,10 @@
         	<node id="prbs_init" mask="0x1"/>
         </node>
         <node id="stat" address="0x1">
-        	<node id="zflag_sfp" mask="0x1"/>
-        	<node id="zflag_hdmi" mask="0x2"/>
-        	<node id="zflag_usfp" mask="0x4"/>
+        	<node id="zflag_cdr" mask="0x1"/>
+        	<node id="zflag_sfp" mask="0x2"/>
+        	<node id="zflag_hdmi" mask="0x4"/>
+        	<node id="zflag_usfp" mask="0x8"/>
         </node>
     </node>
     <node id="sfp_ctrs" address="0x2" mode="block" size="0x2" fwinfo="endpoint;width=1"/>

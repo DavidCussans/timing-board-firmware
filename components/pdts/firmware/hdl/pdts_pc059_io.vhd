@@ -83,12 +83,13 @@ architecture rtl of pdts_pc059_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_gpio: std_logic_vector(2 downto 0);
-	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_hdmi_i, d_usfp_i, q_i, q_hdmi_i, q_usfp_i: std_logic;
+	signal ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
+	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal sda_o, usfp_sda_o: std_logic;
 	
   attribute IOB: string;
-  attribute IOB of d_cdr, d_hdmi, d_usfp, q_i, q_hdmi_i, q_usfp_i: signal is "TRUE";
+  attribute IOB of q_i, q_hdmi_i, q_usfp_i: signal is "TRUE";
 
 begin
 
@@ -134,6 +135,10 @@ begin
 	inmux <= ctrl(0)(10 downto 8);
 	ctrl_gpio <= ctrl(0)(14 downto 12);
 	ledb <= not ctrl(0)(18 downto 16);
+	ctrl_cdr_edge <= ctrl(0)(20);
+	ctrl_sfp_edge <= ctrl(0)(21);
+	ctrl_hdmi_edge <= ctrl(0)(22);
+	ctrl_usfp_edge <= ctrl(0)(23);
 	
 	usfp_txdis <= '0';
 
@@ -171,11 +176,32 @@ begin
 
 -- Data inputs
 
+	ibufds_cdr: IBUFDS
+		port map(
+			i => d_cdr_p,
+			ib => d_cdr_n,
+			o => d_cdr_i
+		);
+		
+	iddr_cdr: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => d_cdr_r,
+			q2 => d_cdr_f,
+			c => clk_cdr_i,
+			ce => '1',
+			d => d_cdr_i,
+			r => '0',
+			s => '0'
+		);
+		
+	d_cdr <= d_cdr_r when ctrl_cdr_edge = '0' else d_cdr_f;
+	
 	d_g: for i in 7 downto 0 generate
 	
-		signal di: std_logic;
-		attribute IOB: string;
-		attribute IOB of di: signal is "TRUE";
+		signal di, dr, df: std_logic;
 		
 	begin
 	
@@ -185,20 +211,25 @@ begin
 				ib => d_n(i),
 				o => di
 			);
+			
+		iddr_d: IDDR
+			generic map(
+				DDR_CLK_EDGE => "SAME_EDGE"
+			)
+			port map(
+				q1 => dr,
+				q2 => df,
+				c => clk_i,
+				ce => '1',
+				d => di,
+				r => '0',
+				s => '0'
+			);
  	
-		d(i) <= di when rising_edge(clk_i); -- SFP input data registered on rising edge of clk (selectable edge later)
+		d(i) <= dr when ctrl_sfp_edge = '0' else df;
 		
 	end generate;
-	
-	ibufds_cdr: IBUFDS
-		port map(
-			i => d_cdr_p,
-			ib => d_cdr_n,
-			o => d_cdr_i
-		);
 		
-	d_cdr <= d_cdr_i when rising_edge(clk_cdr_i); -- CDR input data registered on rising edge of clk_cdr
-	
 	ibufds_hdmi: IBUFDS
 		port map(
 			i => d_hdmi_p,
@@ -206,7 +237,21 @@ begin
 			o => d_hdmi_i
 		);
 		
-	d_hdmi <= d_hdmi_i when rising_edge(clk_i); -- HDMI input data registered on rising edge of clk
+	iddr_hdmi: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => d_hdmi_r,
+			q2 => d_hdmi_f,
+			c => clk_i,
+			ce => '1',
+			d => d_hdmi_i,
+			r => '0',
+			s => '0'
+		);
+		
+	d_hdmi <= d_hdmi_r when ctrl_cdr_edge = '0' else d_hdmi_f;
 	
 	ibufds_usfp: IBUFDS
 		port map(
@@ -215,7 +260,21 @@ begin
 			o => d_usfp_i
 		);
 		
-	d_usfp <= d_usfp_i when rising_edge(clk_i); -- uSFP input data registered on rising edge of clk
+	iddr_usfp: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => d_usfp_r,
+			q2 => d_usfp_f,
+			c => clk_i,
+			ce => '1',
+			d => d_usfp_i,
+			r => '0',
+			s => '0'
+		);
+		
+	d_usfp <= d_usfp_r when ctrl_cdr_edge = '0' else d_usfp_f;
 	
 -- Data outputs
 

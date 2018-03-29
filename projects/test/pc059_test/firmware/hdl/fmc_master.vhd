@@ -68,12 +68,13 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal clk, q, d_cdr, clk_cdr, d_hdmi, q_hdmi, d_usfp, q_usfp: std_logic;
+	signal inmux_i: std_logic_vector(2 downto 0);
+	signal clk, q, d_cdr, clk_cdr, d_hdmi, q_hdmi, d_usfp, q_usfp, d_sel: std_logic;
 	signal d: std_logic_vector(7 downto 0);
-	signal rst, ctrl_chk_init: std_logic;
-	signal zflag_cdr, zflag_hdmi, zflag_usfp, chk_init_pll, chk_init_cdr, rst_pll, rst_cdr: std_logic;
+	signal rst, ctrl_chk_init, cdr_rst, cdr_ctr_rst: std_logic;
+	signal zflag_cdr, zflag_sfp, zflag_hdmi, zflag_usfp, chk_init_pll, chk_init_cdr, rst_pll, rst_cdr: std_logic;
 	signal p: std_logic;
-	signal err_sfp, err_hdmi, err_usfp: std_logic;
+	signal err_cdr, err_sfp, err_hdmi, err_usfp: std_logic;
 	
 begin
 
@@ -124,7 +125,7 @@ begin
 			clk_cdr => clk_cdr,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
-			inmux => inmux,
+			inmux => inmux_i,
 			rstb_i2cmux => rstb_i2cmux,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
@@ -152,6 +153,8 @@ begin
 			gpio_p => gpio_p,
 			gpio_n => gpio_n
 		);
+		
+	inmux <= inmux_i;
     
 -- CSR
 
@@ -170,9 +173,9 @@ begin
 		);
 		
 	ctrl_chk_init <= ctrl(0)(0);
-	stat(0) <= X"0000000" & '0' & zflag_usfp & zflag_hdmi & zflag_cdr;
+	stat(0) <= X"0000000" & zflag_usfp & zflag_hdmi & zflag_sfp & zflag_cdr;
 	
-	fmc_clk_s: entity work.pdts_synchro
+	clk_s: entity work.pdts_synchro
 		generic map(
 			N => 2
 		)
@@ -184,15 +187,17 @@ begin
 			q(0) => rst_pll,
 			q(1) => chk_init_pll
 		);
+
+	cdr_rst <= rst or cdr_lol; -- CDC, async signal from outside, synchronised downstream
 		
-	rec_clk_s: entity work.pdts_synchro
+	clk_cdr_s: entity work.pdts_synchro
 		generic map(
 			N => 2
 		)
 		port map(
 			clk => ipb_clk,
 			clks => clk_cdr,
-			d(0) => rst,
+			d(0) => cdr_rst,
 			d(1) => ctrl_chk_init,
 			q(0) => rst_cdr,
 			q(1) => chk_init_cdr
@@ -209,9 +214,7 @@ begin
 			q => p
 		);
 		
--- SFPs (data out on PLL clk, data in on CDR clk)
-
-	q <= p;
+-- Downstream CDR (data in on CDR clk)
 	
 	chk_sfp: entity work.prbs7_chk_noctr
 		port map(
@@ -219,9 +222,11 @@ begin
 			rst => rst_cdr,
 			init => chk_init_cdr,
 			d => d_cdr,
-			err => err_sfp,
+			err => err_cdr,
 			zflag => zflag_cdr
 		);
+
+	cdr_ctr_rst <= chk_init_cdr or rst_cdr;
 		
 	ctrs_sfp: entity work.ipbus_ctrs_v
 		generic map(
@@ -234,8 +239,24 @@ begin
 			ipb_in => ipbw(N_SLV_SFP_CTRS),
 			ipb_out => ipbr(N_SLV_SFP_CTRS),
 			clk => clk_cdr,
-			rst => chk_init_cdr,
-			inc(0) => err_sfp
+			rst => cdr_ctr_rst,
+			inc(0) => err_cdr
+		);
+		
+-- Downstream SFP direct (data out and data in on PLL clk)
+
+	q <= p;
+
+	d_sel <= d(to_integer(unsigned(inmux_i)));
+
+	chk_hdmi: entity work.prbs7_chk_noctr
+		port map(
+			clk => clk,
+			rst => rst_pll,
+			init => chk_init_pll,
+			d => d_sel,
+			err => err_sfp,
+			zflag => zflag_sfp
 		);
 		
 -- HDMI (data out and data in on PLL clk)
@@ -270,7 +291,7 @@ begin
 		
 	ctrs: entity work.ipbus_ctrs_v
 		generic map(
-			N_CTRS => 3,
+			N_CTRS => 4,
 			CTR_WDS => 2
 		)
 		port map(
@@ -281,8 +302,9 @@ begin
 			clk => clk,
 			rst => chk_init_pll,
 			inc(0) => '1',
-			inc(1) => err_hdmi,
-			inc(2) => err_usfp
+			inc(1) => err_sfp,
+			inc(2) => err_hdmi,
+			inc(3) => err_usfp
 		);	
 		
 end rtl;
