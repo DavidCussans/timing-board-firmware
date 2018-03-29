@@ -4,7 +4,7 @@
 					<node id="soft_rst" mask="0x1"/>
 					<node id="nuke" mask="0x2"/>
 					<node id="rst" mask="0x4"/>
-					<node id="rst_pll" mask="0x8"/>
+					<node id="pll_rst" mask="0x8"/>
 					<node id="rst_i2cmux" mask="0x10"/>
 					<node id="rst_i2c" mask="0x20"/>
 					<node id="mux" mask="0x700"/>
