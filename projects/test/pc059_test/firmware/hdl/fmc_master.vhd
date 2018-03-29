@@ -4,6 +4,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
@@ -216,7 +217,7 @@ begin
 		
 -- Downstream CDR (data in on CDR clk)
 	
-	chk_sfp: entity work.prbs7_chk_noctr
+	chk_cdr: entity work.prbs7_chk_noctr
 		port map(
 			clk => clk_cdr,
 			rst => rst_cdr,
@@ -228,7 +229,7 @@ begin
 
 	cdr_ctr_rst <= chk_init_cdr or rst_cdr;
 		
-	ctrs_sfp: entity work.ipbus_ctrs_v
+	ctrs_cdr: entity work.ipbus_ctrs_v
 		generic map(
 			N_CTRS => 1,
 			CTR_WDS => 2
@@ -249,7 +250,7 @@ begin
 
 	d_sel <= d(to_integer(unsigned(inmux_i)));
 
-	chk_hdmi: entity work.prbs7_chk_noctr
+	chk_sfp: entity work.prbs7_chk_noctr
 		port map(
 			clk => clk,
 			rst => rst_pll,
