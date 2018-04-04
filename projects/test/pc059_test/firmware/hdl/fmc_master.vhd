@@ -264,7 +264,7 @@ begin
 		
 -- Downstream SFP direct (data out and data in on PLL clk)
 
-	q <= p;
+	q <= p when rising_edge(clk);
 
 	sgen: for i in 7 downto 0 generate
 	
@@ -297,7 +297,7 @@ begin
 		
 -- HDMI (data out and data in on PLL clk)
 
-	q_hdmi <= p;
+	q_hdmi <= p when rising_edge(clk);
 	
 	chk_hdmi: entity work.prbs7_chk_noctr
 		port map(
@@ -311,7 +311,7 @@ begin
 		
 -- uSFP (data out and data in on PLL clk)
 
-	q_usfp <= p;
+	q_usfp <= p when rising_edge(clk);
 	
 	chk_usfp: entity work.prbs7_chk_noctr
 		port map(
