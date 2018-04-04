@@ -83,8 +83,10 @@ architecture rtl of pdts_pc059_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_gpio: std_logic_vector(2 downto 0);
-	signal ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
+	signal ctrl_cdr_rx_edge, ctrl_sfp_rx_edge, ctrl_hdmi_rx_edge, ctrl_usfp_rx_edge: std_logic;
+	signal ctrl_sfp_tx_edge, ctrl_hdmi_tx_edge, ctrl_usfp_tx_edge: std_logic;
 	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
+	signal q_i_r, q_i_f, q_i_s, q_hdmi_r, q_hdmi_f, q_hdmi_s, q_usfp_r, q_usfp_f, q_usfp_s: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal sda_o, usfp_sda_o: std_logic;
 	
@@ -135,10 +137,13 @@ begin
 	inmux <= ctrl(0)(10 downto 8);
 	ctrl_gpio <= ctrl(0)(14 downto 12);
 	ledb <= not ctrl(0)(18 downto 16);
-	ctrl_cdr_edge <= ctrl(0)(20);
-	ctrl_sfp_edge <= ctrl(0)(21);
-	ctrl_hdmi_edge <= ctrl(0)(22);
-	ctrl_usfp_edge <= ctrl(0)(23);
+	ctrl_cdr_rx_edge <= ctrl(0)(20);
+	ctrl_sfp_rx_edge <= ctrl(0)(21);
+	ctrl_hdmi_rx_edge <= ctrl(0)(22);
+	ctrl_usfp_rx_edge <= ctrl(0)(23);
+	ctrl_sfp_tx_edge <= ctrl(0)(24);
+	ctrl_hdmi_tx_edge <= ctrl(0)(25);
+	ctrl_usfp_tx_edge <= ctrl(0)(26);
 	
 	usfp_txdis <= '0';
 
@@ -197,7 +202,7 @@ begin
 			s => '0'
 		);
 		
-	d_cdr <= d_cdr_r when ctrl_cdr_edge = '0' else d_cdr_f;
+	d_cdr <= d_cdr_r when ctrl_cdr_rx_edge = '0' else d_cdr_f;
 	
 	d_g: for i in 7 downto 0 generate
 	
@@ -226,7 +231,7 @@ begin
 				s => '0'
 			);
  	
-		d(i) <= dr when ctrl_sfp_edge = '0' else df;
+		d(i) <= dr when ctrl_sfp_rx_edge = '0' else df;
 		
 	end generate;
 		
@@ -251,7 +256,7 @@ begin
 			s => '0'
 		);
 		
-	d_hdmi <= d_hdmi_r when ctrl_cdr_edge = '0' else d_hdmi_f;
+	d_hdmi <= d_hdmi_r when ctrl_hdmi_rx_edge = '0' else d_hdmi_f;
 	
 	ibufds_usfp: IBUFDS
 		port map(
@@ -274,11 +279,24 @@ begin
 			s => '0'
 		);
 		
-	d_usfp <= d_usfp_r when ctrl_cdr_edge = '0' else d_usfp_f;
+	d_usfp <= d_usfp_r when ctrl_usfp_rx_edge = '0' else d_usfp_f;
 	
 -- Data outputs
 
-	q_i <= q when rising_edge(clk_i); -- SFP output data registered on rising edge of clk
+	q_i_r <= q when rising_edge(clk_i); -- SFP output data registered on rising edge of clk
+	q_i_f <= q_i_r when falling_edge(clk_i); -- half-cycle pipeline
+	
+	q_i_s <= q_i_r when ctrl_sfp_tx_edge = '1' else q_i_f;
+	
+	oddr_q: ODDR
+		port map(
+			d1 => q_i_s,
+			d2 => q_i_s,
+			c => clk_i,
+			ce => '1',
+			sr => '0',
+			q => q_i
+		);
 
 	obuf_q: OBUFDS
 		port map(
@@ -287,7 +305,20 @@ begin
 			ob => q_n
 		);
 
-	q_hdmi_i <= q_hdmi when rising_edge(clk_i); -- HDMI output data registered on rising edge of clk
+	q_hdmi_r <= q_hdmi when rising_edge(clk_i); -- HDMI output data registered on rising edge of clk
+	q_hdmi_f <= q_hdmi_r when falling_edge(clk_i);
+	
+	q_hdmi_s <= q_hdmi_r when ctrl_hdmi_tx_edge = '1' else q_hdmi_f;
+		
+	oddr_hdmi: ODDR
+		port map(
+			d1 => q_hdmi_s,
+			d2 => q_hdmi_s,
+			c => clk_i,
+			ce => '1',
+			sr => '0',
+			q => q_hdmi_i
+		);
 
 	obuf_q_hdmi: OBUFDS
 		port map(
@@ -296,8 +327,21 @@ begin
 			ob => q_hdmi_n
 		);
 
-	q_usfp_i <= q_usfp when rising_edge(clk_i); -- uSFP output data registered on rising edge of clk
-
+	q_usfp_r <= q_usfp when rising_edge(clk_i); -- uSFP output data registered on rising edge of clk
+	q_usfp_f <= q_usfp_r when falling_edge(clk_i);
+	
+	q_usfp_s <= q_usfp_r when ctrl_usfp_tx_edge = '1' else q_usfp_r;
+	
+	oddr_usfp: ODDR
+		port map(
+			d1 => q_usfp_s,
+			d2 => q_usfp_s,
+			c => clk_i,
+			ce => '1',
+			sr => '0',
+			q => q_usfp_i
+		);
+	
 	obuf_q_usfp: OBUFDS
 		port map(
 			i => q_usfp_i,
