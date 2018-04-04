@@ -226,8 +226,8 @@ begin
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_SFP_CTR),
-			ipb_out => ipbr(N_SLV_CTR),
+			ipb_in => ipbw(N_SLV_CYC_CTR),
+			ipb_out => ipbr(N_SLV_CYC_CTR),
 			clk => clk,
 			rst => chk_init_pll,
 			inc(0) => '1'
@@ -289,7 +289,7 @@ begin
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_SFP_CTR),
-			ipb_out => ipbr(N_SLV_CTR),
+			ipb_out => ipbr(N_SLV_SFP_CTR),
 			clk => clk,
 			rst => chk_init_pll,
 			inc => err_sfp
