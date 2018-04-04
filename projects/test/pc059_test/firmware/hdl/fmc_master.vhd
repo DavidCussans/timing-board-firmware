@@ -178,7 +178,7 @@ begin
 		);
 		
 	ctrl_chk_init <= ctrl(0)(0);
-	stat(0) <= X"0000" & zflag_sfp & "0" & '0' & zflag_usfp & zflag_hdmi & zflag_cdr;
+	stat(0) <= X"0000" & zflag_sfp & X"0" & '0' & zflag_usfp & zflag_hdmi & zflag_cdr;
 	
 	clk_s: entity work.pdts_synchro
 		generic map(
