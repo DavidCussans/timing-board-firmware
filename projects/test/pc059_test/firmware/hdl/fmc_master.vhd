@@ -78,6 +78,9 @@ architecture rtl of payload is
 	signal err_cdr, err_hdmi, err_usfp: std_logic;
 	signal err_sfp, zflag_sfp: std_logic_vector(7 downto 0);
 	
+	attribute DONT_TOUCH: string;
+	attribute DONT_TOUCH of q, q_hdmi, q_usfp: signal is "true";
+	
 begin
 
 -- ipbus address decode
