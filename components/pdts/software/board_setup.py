@@ -23,12 +23,15 @@ brd_rev = {
 	0xd880395e36ae: 2,
 	0xd880395e2b2e: 2,
 	0xd880395e2b33: 2,
-	0xd880395e1c81: 2
+	0xd880395e1c81: 2,
+	0xd88039d980cf: 3,
+	0xd88039d98adf: 3
 }
 
 clk_cfg_files = {
 	1: "SI5344/PDTS0000.txt",
-	2: "SI5344/PDTS0003.txt"
+	2: "SI5344/PDTS0003.txt",
+	3: "SI5344/PDTS0004.txt"
 }
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
@@ -55,7 +58,16 @@ for hw in hw_list:
     hw.getNode("io.csr.ctrl.pll_rst").write(0)
     hw.dispatch()
 
-    uid_I2C = I2CCore(hw, 10, 5, "io.uid_i2c", None)
+    if "io.i2c" in hw.getNodes("io.*"):
+	    uid_I2C = I2CCore(hw, 10, 5, "io.i2c", None)
+	    clock_I2C = I2CCore(hw, 10, 5, "io.i2c", None)
+	    eeprom_addr = 0x57
+	    print "This address map is for a pc059"
+    else:
+	    uid_I2C = I2CCore(hw, 10, 5, "io.uid_i2c", None)
+	    clock_I2C = I2CCore(hw, 10, 5, "io.pll_i2c", None)
+	    eeprom_addr = 0x53
+	    print "This address map is for a pc053"
 
     uid_I2C.write(0x0, [8 * 0x0], True) # Wake up AX3 EEPROM if present
     time.sleep(0.1)
@@ -67,14 +79,13 @@ for hw in hw_list:
         print "Not an AX3, assuming a Xilinx KX705; setting I2C bus switch"
         uid_I2c.write(0x74, [0x10]) # Set up KC705 bus switch   
 
-    uid_I2C.write(0x53, [0xfa], False)
-    res = uid_I2C.read(0x53, 6)
+    uid_I2C.write(eeprom_addr, [0xfa], False)
+    res = uid_I2C.read(eeprom_addr, 6)
     id = 0
     for i in res:
     	id = (id << 8) | int(i)
     print "Unique ID PROM / board rev:", hex(id), brd_rev[id]
 
-    clock_I2C = I2CCore(hw, 10, 5, "io.pll_i2c", None)
     zeClock=si5344(clock_I2C)
     res= zeClock.getDeviceVersion()
     zeClock.setPage(0, True)
@@ -92,9 +103,6 @@ for hw in hw_list:
         hw.dispatch()
         print "Freq:", i, int(fv), int(fq) * 119.20928 / 1000000;
         
-    hw.getNode("io.csr.ctrl.sfp_tx_dis").write(0)
-    hw.dispatch()
-
     hw.getNode("io.csr.ctrl.rst").write(1)
     hw.dispatch()
     hw.getNode("io.csr.ctrl.rst").write(0)
