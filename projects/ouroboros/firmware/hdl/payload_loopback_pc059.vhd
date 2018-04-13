@@ -61,7 +61,9 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
+	signal fmc_clk, rec_clk, rec_d, q, rst_io, rsti, clk, stb, rst, locked: std_logic;
+	
+	constant N_EP: positive := 4;
 	
 begin
 
@@ -82,7 +84,7 @@ begin
 
 -- IO
 
-	io: entity work.pdts_fmc_io
+	io: entity work.pdts_fmc_io_loopback
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -103,10 +105,10 @@ begin
 			fmc_clk => fmc_clk,
 			rec_clk_p => rec_clk_p,
 			rec_clk_n => rec_clk_n,
-			rec_clk => open,
+			rec_clk => rec_clk,
 			rec_d_p => rec_d_p,
 			rec_d_n => rec_d_n,
-			rec_d => open,
+			rec_d => rec_d,
 			clk_out_p => clk_out_p,
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
@@ -168,5 +170,28 @@ begin
 			rst => rst,
 			q => q
 		);
+	
+-- Endpoint wrapper
+
+	egen: for i in N_EP - 1 downto 0 generate
+
+		wrapper: entity work.endpoint_wrapper_local
+			port map(
+				ipb_clk => ipb_clk,
+				ipb_rst => ipb_rst,
+				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
+				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+				rec_clk => rec_clk,
+				rec_d => rec_d,
+				clk => clk
+			);
+			
+	end generate;
+	
+	negen: for i in 3 downto N_EP generate
+	
+		ipbr(i + N_SLV_ENDPOINT0) <= IPB_RBUS_NULL;
+		
+	end generate;
 
 end rtl;
