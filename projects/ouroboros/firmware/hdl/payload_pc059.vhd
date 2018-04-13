@@ -190,7 +190,7 @@ begin
 
 	egen: for i in N_EP - 1 downto 0 generate
 
-		wrapper: entity work.endpoint_wrapper
+		wrapper: entity work.endpoint_wrapper_local
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
