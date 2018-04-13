@@ -1,0 +1,8 @@
+<node id="TOP">
+    <node id="io" address="0x0" module="file://pdts_pc059_io.xml"/>
+    <node id="master" address="0x200" module="file://master.xml"/>
+    <node id="endpoint0" address="0x400" module="file://endpoint_wrapper.xml"/>
+    <node id="endpoint1" address="0x440" module="file://endpoint_wrapper.xml"/>
+    <node id="endpoint2" address="0x480" module="file://endpoint_wrapper.xml"/>
+    <node id="endpoint3" address="0x4c0" module="file://endpoint_wrapper.xml"/>
+</node>

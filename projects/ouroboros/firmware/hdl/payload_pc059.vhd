@@ -184,4 +184,31 @@ begin
 			q => q
 		);
 
+-- Endpoint wrapper
+
+	egen: for i in N_EP - 1 downto 0 generate
+
+		wrapper: entity work.endpoint_wrapper
+			port map(
+				ipb_clk => ipb_clk,
+				ipb_rst => ipb_rst,
+				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
+				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+				rec_clk => clk_pll,
+				rec_d => q,
+				txd => open,
+				sfp_los => '0',
+				cdr_los => '0',
+				cdr_lol => '0',
+				sfp_tx_dis => open
+			);
+			
+	end generate;
+	
+	negen: for i in 3 downto N_EP generate
+	
+		ipbr(i + N_SLV_ENDPOINT0) <= IPB_RBUS_NULL;
+		
+	end generate;
+
 end rtl;
