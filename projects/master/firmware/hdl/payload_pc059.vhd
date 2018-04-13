@@ -69,8 +69,6 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
 	
-	constant N_EP: positive := 4;
-	
 begin
 
 -- ipbus address decode
