@@ -102,7 +102,7 @@ begin
 	phy_rstn <= not phy_rst_e;
 		
 	mac_addr <= X"020ddba116c0"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c81c"; -- 192.168.200.32
+	ip_addr <= X"c0a8c820"; -- 192.168.200.32
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
