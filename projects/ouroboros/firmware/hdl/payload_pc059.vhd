@@ -198,11 +198,7 @@ begin
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
 				rec_clk => clk_pll,
 				rec_d => q,
-				txd => open,
-				sfp_los => '0',
-				cdr_los => '0',
-				cdr_lol => '0',
-				sfp_tx_dis => open
+				clk => clk
 			);
 			
 	end generate;
