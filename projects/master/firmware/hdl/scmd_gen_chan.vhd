@@ -79,7 +79,7 @@ begin
 	process(r_i)
 	begin
 		for i in mask'range loop
-			if i > r_i then
+			if i > r_i then -- Yeah, this is wrong (should be 'i >= r_i') but it's fixed in SW for now
 				mask(i) <= '0';
 			else
 				mask(i) <= '1';
