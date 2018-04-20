@@ -1,4 +1,4 @@
-src payload_pc059.vhd
+src payload_pc059_monitor.vhd
 src ipbus_decode_top_pc059.vhd
 addrtab -t top_pc059.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
