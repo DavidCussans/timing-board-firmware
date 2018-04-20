@@ -16,6 +16,9 @@ library unisim;
 use unisim.VComponents.all;
 
 entity pdts_059_io is
+	generic(
+		LOOPBACK: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -74,8 +77,9 @@ architecture rtl of pdts_059_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r, rec_d_i: std_logic;
-	signal gpin, rj45_din_u, rec_d_u: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r: std_logic;
+	signal gpin, rj45_din_u, rec_d_u, rec_d_i, rec_d_il, rj45_din_i, rj45_din_il: std_logic;
+	signal mmcm_bad, mmcm_ok, mmcm_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
@@ -115,7 +119,7 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"000000" & "000" & locked & cdr_lol & cdr_los & sfp_flt & sfp_los;
+	stat(0) <= X"000000" & "00" & mmcm_lm & mmcm_ok & cdr_lol & cdr_los & sfp_flt & sfp_los;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
@@ -126,20 +130,6 @@ begin
 	userled <= not (cdr_lol or cdr_los or sfp_los);
 	
 -- Unused signals
-	
---	obufds_0: OBUFDS
---		port map(
---			i => '0',
---			o => gpout_0_p,
---			ob => gpout_0_n
---		);
-	
---	obufds_1: OBUFDS
---		port map(
---			i => '0',
---			o => gpout_1_p,
---			ob => gpout_1_n
---		);
 
 	ibufds_gpin_0: IBUFDS
 		port map(
@@ -178,7 +168,23 @@ begin
 			o => rec_clk_i
 		);
 		
-	rec_clk <= rec_clk_i;
+	rec_clk <= rec_clk_i when not LOOPBACK else fmc_clk_i;
+	
+-- Clock lock monitor
+
+	mmcm_bad <= not locked;
+
+	chk: entity work.pdts_chklock
+		generic map(
+			N => 1
+		)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			los(0) => mmcm_bad
+			ok(0) => mmcm_ok,
+			ok_sticky(0) => mmcm_lm,
+		);
 
 -- Outputs
 		
@@ -260,19 +266,23 @@ begin
 		port map(
 			i => rec_d_p,
 			ib => rec_d_n,
-			o => rec_d
+			o => rec_d_u
 		);
 		
-	rec_d <= rec_d_u when rising_edge(rec_clk_i); -- Register CDR data on CDR recovered clock
-		
+	rec_d_i <= rec_d_u when rising_edge(rec_clk_i); -- Register CDR data on CDR recovered clock
+	rec_d_il <= sfp_dut when rising_edge(fmc_clk_i);
+	rec_d <= r_d_i when not LOOPBACK else rec_d_il;
+	
 	ibufds_rj45: IBUFDS
 		port map(
 			i => rj45_din_p,
 			ib => rj45_din_n,
-			o => rj45_din
+			o => rj45_din_u
 		);
 		
-	rj45_din <= rj45_din_u when falling_edge(fmc_clk_i); -- Register RJ45 data on tx clock
+	rj45_din_i <= rj45_din_u when falling_edge(fmc_clk_i); -- Register RJ45 data on tx clock
+	rj45_din_il <= rj45_dout when falling_edge(fmc_clk_i);
+	rj45_din <= rj45_din_i when not LOOPBACK else rj45_din_il;
 
 -- Frequency measurement
 

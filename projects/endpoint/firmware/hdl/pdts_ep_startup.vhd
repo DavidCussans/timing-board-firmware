@@ -44,7 +44,7 @@ architecture rtl of pdts_ep_startup is
 	signal f_ok, t, td: std_logic;
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
-	signal sfp_los_ok, cdr_ok, f_en: std_logic;
+	signal cdr_bad, sfp_los_ok, cdr_ok, f_en: std_logic;
 	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, rdy_i: std_logic;
 	signal rec_rst_i, rxphy_rst_i, rst_i, rst_u: std_logic;
 
@@ -187,29 +187,20 @@ begin
 
 -- External signal debounce	
 
-	process(sclk)
-	begin
-		if rising_edge(sclk) then
-			if srst = '1' then
-				sfp_los_ctr <= (others => '0');
-				cdr_ctr <= (others => '0');
-			else
-				if sfp_los = '1' then
-					sfp_los_ctr <= (others => '0');
-				elsif sfp_los_ok = '0' then
-					sfp_los_ctr <= sfp_los_ctr + 1;
-				end if;
-				if cdr_los = '1' or cdr_lol = '1' then
-					cdr_ctr <= (others => '0');
-				elsif cdr_ok = '0' then
-					cdr_ctr <= cdr_ctr + 1;
-				end if;
-			end if;
-		end if;
-	end process;
+	cdr_bad <= cdr_los or cdr_lol;
 
-	sfp_los_ok <= and_reduce(std_logic_vector(sfp_los_ctr));
-	cdr_ok <= and_reduce(std_logic_vector(cdr_ctr));
+	chk: entity work.pdts_chklock
+		generic map(
+			N => 2
+		)
+		port map(
+			clk => sclk,
+			rst => srst,
+			los(0) => sfp_los,
+			los(1) => cdr_bad,
+			ok(0) => sfp_los_ok,
+			ok(1) => cdr_ok
+		);
 
 -- CDC into sclk domain
 

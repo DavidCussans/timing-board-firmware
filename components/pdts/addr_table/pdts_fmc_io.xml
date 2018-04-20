@@ -6,13 +6,15 @@
 					<node id="rst" mask="0x4"/>
 					<node id="sfp_tx_dis" mask="0x8"/>
 					<node id="pll_rst" mask="0x10"/>
+					<node id="rst_lock_mon" mask="0x20"/>
 				</node>
 				<node id="stat" address="0x1">
 					<node id="sfp_los" mask="0x1"/>
 					<node id="sfp_flt" mask="0x2"/>        	
 					<node id="cdr_los" mask="0x4"/>
 					<node id="cdr_lol" mask="0x8"/>
-					<node id="locked" mask="0x10"/>
+					<node id="mmcm_ok" mask="0x10"/>
+					<node id="mmcm_sticky" mask="0x20"/>
 				</node>
 		</node>
 		<node id="uid_i2c" address="0x08" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="FMC_UID_PROM=0x53;AX3_Switch=0x21;KC705_Switch=0x74"/>

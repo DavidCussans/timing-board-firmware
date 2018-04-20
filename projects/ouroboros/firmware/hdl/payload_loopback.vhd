@@ -84,7 +84,10 @@ begin
 
 -- IO
 
-	io: entity work.pdts_fmc_io_loopback
+	io: entity work.pdts_fmc_io
+		generic map(
+			LOOPBACK => true
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,

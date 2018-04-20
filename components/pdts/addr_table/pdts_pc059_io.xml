@@ -7,6 +7,7 @@
 					<node id="pll_rst" mask="0x8"/>
 					<node id="rst_i2cmux" mask="0x10"/>
 					<node id="rst_i2c" mask="0x20"/>
+					<node id="rst_lock_mon" mask="0x40"/>
 					<node id="mux" mask="0x700"/>
 					<node id="gpio" mask="0x7000"/>
 					<node id="leds" mask="0x70000"/>
@@ -24,7 +25,10 @@
 					<node id="cdr_lol" mask="0x20"/>
 					<node id="pll_lol" mask="0x40"/>
 					<node id="sfp_los" mask="0xff00"/>
-					<node id="locked" mask="0x10000"/>
+					<node id="mmcm_ok" mask="0x10000"/>
+					<node id="pll_ok" mask="0x20000"/>
+					<node id="mmcm_sticky" mask="0x40000"/>
+					<node id="pll_sticky" mas="0x80000"/>
 				</node>
 		</node>
 		<node id="i2c" address="0x08" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="FMC_UID_PROM=0x53;AX3_Switch=0x21;KC705_Switch=0x74"/>

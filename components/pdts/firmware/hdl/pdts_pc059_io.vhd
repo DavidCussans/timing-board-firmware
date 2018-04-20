@@ -83,8 +83,9 @@ architecture rtl of pdts_pc059_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_gpio: std_logic_vector(2 downto 0);
-	signal ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
+	signal ctrl_rst_lock_mon, ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
 	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
+	signal mmcm_bad, mmcm_ok, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal sda_o, usfp_sda_o: std_logic;
 	
@@ -124,7 +125,7 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"000" & "000" & locked & sfp_los & '0' & not clk_lolb & cdr_lol & cdr_los & ucdr_lol & ucdr_los & usfp_fault & usfp_los;
+	stat(0) <= X"000" & pll_lm & mmcm_lm & pll_ok & mmcm_ok & sfp_los & '0' & not clk_lolb & cdr_lol & cdr_los & ucdr_lol & ucdr_los & usfp_fault & usfp_los;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
@@ -132,6 +133,7 @@ begin
 	rstb_clk <= not ctrl(0)(3);
 	rstb_i2cmux <= not ctrl(0)(4);
 	rstb_i2c <= not ctrl(0)(5);
+	ctrl_rst_lock_mon <= ctrl(0)(6);
 	inmux <= ctrl(0)(10 downto 8);
 	ctrl_gpio <= ctrl(0)(14 downto 12);
 	ledb <= not ctrl(0)(18 downto 16);
@@ -173,6 +175,25 @@ begin
 		);
 		
 	clk_cdr <= clk_cdr_i;
+	
+-- Clock lock monitor
+
+	mmcm_bad <= not locked;
+
+	chk: entity work.pdts_chklock
+		generic map(
+			N => 2
+		)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			los(0) => mmcm_bad
+			los(1) => clk_lolb,
+			ok(0) => mmcm_ok,
+			ok(1) => pll_ok,
+			ok_sticky(0) => mmcm_lm,
+			ok_sticky(1) => pll_lm
+		);
 
 -- Data inputs
 

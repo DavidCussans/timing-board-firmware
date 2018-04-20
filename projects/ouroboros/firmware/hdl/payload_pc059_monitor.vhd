@@ -68,8 +68,9 @@ architecture rtl of payload is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
+	signal d_cdr, clk_cdr: std_logic;
 	
-	constant N_EP: positive := 4;
+	constant N_EP: positive := 1;
 	
 begin
 
@@ -114,10 +115,10 @@ begin
 			sfp_los => sfp_los,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => open,
+			d_cdr => d_cdr,
 			clk_cdr_p => clk_cdr_p,
 			clk_cdr_n => clk_cdr_n,
-			clk_cdr => open,
+			clk_cdr => clk_cdr,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
 			inmux => open,
@@ -190,15 +191,19 @@ begin
 
 	egen: for i in N_EP - 1 downto 0 generate
 
-		wrapper: entity work.endpoint_wrapper_local
+		wrapper: entity work.endpoint_wrapper
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
 				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
-				rec_clk => clk_pll,
-				rec_d => q,
-				clk => clk
+				rec_clk => clk_cdr,
+				rec_d => d_cdr,
+				txd => open,
+				sfp_los => sfp_los(0),
+				cdr_los => cdr_los,
+				cdr_lol => cdr_lol,
+				sfp_tx_dis => open
 			);
 			
 	end generate;
