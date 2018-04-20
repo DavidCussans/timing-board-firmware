@@ -1,4 +1,4 @@
-src endpoint_wrapper_local.vhd
+src endpoint_wrapper.vhd
 src ipbus_decode_endpoint_wrapper.vhd
 addrtab -t endpoint_wrapper.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
