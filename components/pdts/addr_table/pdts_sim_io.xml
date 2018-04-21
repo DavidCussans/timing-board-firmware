@@ -9,4 +9,5 @@
 					<node id="locked" mask="0x10"/>
 				</node>
 		</node>
+		<node id="config" address="0x2" description="board/firmware config" fwinfo="endpoint;width=0"/>		
 </node>

@@ -17,6 +17,7 @@ use unisim.VComponents.all;
 
 entity pdts_059_io is
 	generic(
+		FWINFO: std_logic_vector(23 downto 0) := X"000000";
 		LOOPBACK: boolean := false
 	);
 	port(
@@ -128,6 +129,19 @@ begin
 	pll_rstn <= not ctrl(0)(4);
 	
 	userled <= not (cdr_lol or cdr_los or sfp_los);
+	
+-- Config info
+
+	config: entity work.ipbus_roreg_v
+		generic map(
+			N_REG => 1,
+			DATA(31 downto 8) => FWINFO,
+			DATA(7 downto 0) => X"00"
+		)
+		port map(
+			ipb_in => ipbw(N_SLV_CONFIG),
+			ipb_out => ipbr(N_SLV_CONFIG)
+		);
 	
 -- Unused signals
 
