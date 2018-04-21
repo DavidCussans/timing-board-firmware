@@ -28,7 +28,7 @@
 					<node id="mmcm_ok" mask="0x10000"/>
 					<node id="pll_ok" mask="0x20000"/>
 					<node id="mmcm_sticky" mask="0x40000"/>
-					<node id="pll_sticky" mas="0x80000"/>
+					<node id="pll_sticky" mask="0x80000"/>
 				</node>
 		</node>
 		<node id="config" address="0x2" description="board/firmware config" fwinfo="endpoint;width=0"/>
