@@ -187,7 +187,7 @@ begin
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			los(0) => mmcm_bad
+			los(0) => mmcm_bad,
 			los(1) => clk_lolb,
 			ok(0) => mmcm_ok,
 			ok(1) => pll_ok,
