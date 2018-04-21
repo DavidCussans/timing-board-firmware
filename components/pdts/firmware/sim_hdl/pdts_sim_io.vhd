@@ -16,6 +16,9 @@ library unisim;
 use unisim.VComponents.all;
 
 entity pdts_sim_io is
+	generic(
+		FWINFO: std_logic_vector(23 downto 0) := X"000000"
+	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -73,5 +76,18 @@ begin
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
 	rst <= ctrl(0)(2);
+	
+-- Config info
+
+	config: entity work.ipbus_roreg_v
+		generic map(
+			N_REG => 1,
+			DATA(31 downto 8) => FWINFO,
+			DATA(7 downto 0) => X"01"
+		)
+		port map(
+			ipb_in => ipbw(N_SLV_CONFIG),
+			ipb_out => ipbr(N_SLV_CONFIG)
+		);
 				
 end rtl;
