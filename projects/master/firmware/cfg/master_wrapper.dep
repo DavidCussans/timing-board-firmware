@@ -1,0 +1,2 @@
+include master.dep
+src master_defs.vhd

@@ -124,7 +124,7 @@ begin
 		end if;
 	end process;
 
--- Address match
+-- Address match (looks like needs fixing)
 
 	s_match <= d(4 + to_integer(unsigned(tgrp)));
 

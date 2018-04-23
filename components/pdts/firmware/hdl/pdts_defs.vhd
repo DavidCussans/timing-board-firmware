@@ -57,11 +57,6 @@ package pdts_defs is
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
 	constant SCMD_LEN: SCMD_LEN_T := (to_integer(unsigned(SCMD_SYNC)) => 1 + TSTAMP_WDS, others => 1);
 	
--- System-level constants
-
-	constant SPS_CYCLE_LEN: real := 30.0; -- 30s cycle time
-	constant SPS_SPILL_LEN: real := 4.8; -- 4.8s spill
-	
 -- Types
 
 	type cmd_w is

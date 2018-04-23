@@ -1,0 +1,4 @@
+src trig_rx.vhd
+#src ipbus_decode_trig_rx.vhd
+#addrtab -t trig_rx.xml
+#src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd

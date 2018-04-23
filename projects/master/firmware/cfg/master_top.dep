@@ -1,2 +1,4 @@
-include master.dep
-src master_defs.vhd
+src master_top.vhd master.vhd trig_rx.vhd
+src ipbus_decode_master_top.vhd
+addrtab -t master_top.xml
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
