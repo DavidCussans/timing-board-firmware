@@ -195,9 +195,9 @@ begin
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			los(0) => mmcm_bad
+			los(0) => mmcm_bad,
 			ok(0) => mmcm_ok,
-			ok_sticky(0) => mmcm_lm,
+			ok_sticky(0) => mmcm_lm
 		);
 
 -- Outputs
