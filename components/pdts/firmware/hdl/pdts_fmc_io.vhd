@@ -10,7 +10,7 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pc059_io.all;
+use work.ipbus_decode_fmc_io.all;
 
 library unisim;
 use unisim.VComponents.all;
