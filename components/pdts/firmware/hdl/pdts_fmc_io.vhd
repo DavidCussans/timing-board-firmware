@@ -1,4 +1,4 @@
--- pdts_059_io
+-- pdts_fmc_io
 --
 -- Various functions for talking to the pc059 board chipset
 --
@@ -15,7 +15,7 @@ use work.ipbus_decode_pc059_io.all;
 library unisim;
 use unisim.VComponents.all;
 
-entity pdts_059_io is
+entity pdts_fmc_io is
 	generic(
 		FWINFO: std_logic_vector(23 downto 0) := X"000000";
 		LOOPBACK: boolean := false
@@ -70,9 +70,9 @@ entity pdts_059_io is
 		gpout_1_n: out std_logic		
 	);
 
-end pdts_059_io;
+end pdts_fmc_io;
 
-architecture rtl of pdts_059_io is
+architecture rtl of pdts_fmc_io is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
