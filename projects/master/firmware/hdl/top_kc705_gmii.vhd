@@ -104,6 +104,9 @@ begin
 -- The ipbus fabric is instantiated within.
 
 	slaves: entity work.payload
+		generic map(
+			CARRIER_TYPE => X"01"
+		)
 		port map(
 			ipb_clk => clk_ipb,
 			ipb_rst => rst_ipb,
