@@ -38,7 +38,7 @@ begin
 
 	payload: entity work.payload_sim
 		generic map(
-			CARRIER_TYPE => X"01"
+			CARRIER_TYPE => X"00"
 		)
 		port map(
 			ipb_clk => clk_ipb,
