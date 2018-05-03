@@ -31,9 +31,8 @@ set_property PACKAGE_PIN E6 [get_ports eth_clk_n]
 set_property LOC GTPE2_CHANNEL_X0Y0 [get_cells -hier -filter {name=~infra/eth/*/gtpe2_i}]
 
 set_property IOSTANDARD LVCMOS33 [get_ports {sfp_*}]
-set_property PACKAGE_PIN B17 [get_ports {sfp_los}]
-#set_property PULLUP TRUE [get_ports {sfp_los}]
-set_property PACKAGE_PIN A14 [get_ports {sfp_tx_disable}]
+set_property PACKAGE_PIN B21 [get_ports {sfp_los}]
+set_property PACKAGE_PIN A19 [get_ports {sfp_tx_disable}]
 false_path sfp_* eth_refclk
 
 set_property IOSTANDARD LVCMOS33 [get_ports {leds[*]}]
