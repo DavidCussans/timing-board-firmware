@@ -23,7 +23,7 @@ create_clock -period 8.000 -name eth_refclk [get_ports eth_clk_p]
 # Ethernet monitor clock hack (62.5MHz)
 create_clock -period 16.000 -name clk_dc [get_pins infra/eth/dc_buf/O]
 
-set_clock_groups -asynchronous -group -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks eth_refclk] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/RXOUTCLK}]] -group [get_clocks -include_generated_clocks [get_clocks -filter {name =~ infra/eth/phy/*/TXOUTCLK}]]
 
 set_property PACKAGE_PIN F6 [get_ports eth_clk_p]
 set_property PACKAGE_PIN E6 [get_ports eth_clk_n]
