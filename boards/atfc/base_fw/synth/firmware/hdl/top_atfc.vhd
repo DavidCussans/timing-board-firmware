@@ -8,7 +8,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.all;
-use work.top_decl.all;
 
 entity top is port(
 		eth_clk_p: in std_logic; -- 125MHz MGT clock
@@ -52,8 +51,8 @@ begin
 			clk125_o => open,
 			rst125_o => open,
 			clk200 => open,
-			pllclk => pllclk,
-			pllrefclk => pllrefclk,
+			pllclk => open,
+			pllrefclk => open,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			leds => infra_leds,
