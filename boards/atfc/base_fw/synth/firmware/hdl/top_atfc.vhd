@@ -63,11 +63,11 @@ begin
 			ipb_out => ipb_out
 		);
 		
-	leds <= not infra_leds & not userled & not infra_leds & not userled & infra_leds;
+	leds <= userled & "11" & "11" & userled & infra_leds; -- Turning on green LED will lead to blindness
 	sfp_tx_disable <= '0';
 	
-	mac_addr <= X"020ddba1158" & not dip_sw; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8eb8" & not dip_sw; -- 192.168.200.16+n
+	mac_addr <= X"020ddba1158" & dip_sw; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8eb8" & dip_sw; -- 192.168.200.16+n
 	
 	slaves: entity work.ipbus_example
 		port map(
