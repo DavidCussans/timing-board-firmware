@@ -31,6 +31,8 @@ architecture rtl of top is
 	signal ipb_out: ipb_wbus;
 	signal ipb_in: ipb_rbus;
 	signal infra_leds: std_logic_vector(1 downto 0);
+	signal mac_addr: std_logic_vector(47 downto 0);
+	signal ip_addr: std_logic_vector(31 downto 0);
 	
 begin
 
@@ -56,18 +58,18 @@ begin
 			soft_rst => soft_rst,
 			leds => infra_leds,
 			debug => open,
-			mac_addr(47 downto 4) => MAC_ADDR(47 downto 4),
-			mac_addr(3 downto 0) => dip_sw,
-			ip_addr(31 downto 4) => IP_ADDR(31 downto 4),
-			ip_addr(3 downto 0) => dip_sw,
+			mac_addr => mac_addr,
+			ip_addr => ip_addr,
 			ipb_in => ipb_in,
 			ipb_out => ipb_out
 		);
 		
-	leds <= infra_leds & userled & infra_leds & userled & infra_leds;
-	
+	leds <= not infra_leds & not userled & not infra_leds & not userled & infra_leds;
 	sfp_tx_disable <= '0';
-
+	
+	mac_addr <= X"020ddba1158" & not dip_sw; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8eb8" & not dip_sw; -- 192.168.200.16+n
+	
 	slaves: entity work.ipbus_example
 		port map(
 			ipb_clk => clk_ipb,
