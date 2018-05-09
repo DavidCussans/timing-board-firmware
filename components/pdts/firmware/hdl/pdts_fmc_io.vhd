@@ -10,7 +10,7 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pc059_io.all;
+use work.ipbus_decode_fmc_io.all;
 
 library unisim;
 use unisim.VComponents.all;
@@ -200,9 +200,9 @@ begin
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
-			los(0) => mmcm_bad
+			los(0) => mmcm_bad,
 			ok(0) => mmcm_ok,
-			ok_sticky(0) => mmcm_lm,
+			ok_sticky(0) => mmcm_lm
 		);
 
 -- Outputs
