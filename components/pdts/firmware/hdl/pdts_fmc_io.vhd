@@ -289,8 +289,8 @@ begin
 		);
 		
 	rec_d_i <= rec_d_u when rising_edge(rec_clk_i); -- Register CDR data on CDR recovered clock
-	rec_d_il <= sfp_dut when rising_edge(fmc_clk_i);
-	rec_d <= r_d_i when not LOOPBACK else rec_d_il;
+	rec_d_il <= sfp_dout when rising_edge(fmc_clk_i);
+	rec_d <= rec_d_i when not LOOPBACK else rec_d_il;
 	
 	ibufds_rj45: IBUFDS
 		port map(
