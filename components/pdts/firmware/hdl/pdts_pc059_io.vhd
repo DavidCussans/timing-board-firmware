@@ -1,6 +1,6 @@
 -- pdts_pc059_io
 --
--- Various functions for talking to the FMC board chipset
+-- Various functions for talking to the pc059 board chipset
 --
 -- Dave Newbold, February 2016
 

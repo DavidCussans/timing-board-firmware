@@ -1,6 +1,6 @@
--- pdts_059_io
+-- pdts_fmc_io
 --
--- Various functions for talking to the pc059 board chipset
+-- Various functions for talking to the FMC board chipset
 --
 -- Dave Newbold, March 2018
 
@@ -10,12 +10,12 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pc059_io.all;
+use work.ipbus_decode_fmc_io.all;
 
 library unisim;
 use unisim.VComponents.all;
 
-entity pdts_059_io is
+entity pdts_fmc_io is
 	generic(
 		CARRIER_TYPE: std_logic_vector(7 downto 0);
 		DESIGN_TYPE: std_logic_vector(7 downto 0);
@@ -71,9 +71,9 @@ entity pdts_059_io is
 		gpout_1_n: out std_logic		
 	);
 
-end pdts_059_io;
+end pdts_fmc_io;
 
-architecture rtl of pdts_059_io is
+architecture rtl of pdts_fmc_io is
 
 	constant BOARD_TYPE: std_logic_vector(7 downto 0) := X"00";
 
