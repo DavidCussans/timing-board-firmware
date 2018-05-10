@@ -1,4 +1,7 @@
 src trig_rx.vhd
-#src ipbus_decode_trig_rx.vhd
-#addrtab -t trig_rx.xml
-#src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+src ipbus_decode_trig_rx.vhd
+addrtab -t trig_rx.xml
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
+include -c projects/endpoint pdts_endpoint_upstream.dep
+src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
