@@ -1,6 +1,6 @@
 -- pdts_pc059_io
 --
--- Various functions for talking to the FMC board chipset
+-- Various functions for talking to the pc059 board chipset
 --
 -- Dave Newbold, February 2016
 
@@ -17,7 +17,8 @@ use unisim.VComponents.all;
 
 entity pdts_pc059_io is
 	generic(
-		FWINFO: std_logic_vector(23 downto 0) := X"000000"
+		CARRIER_TYPE: std_logic_vector(7 downto 0);
+		DESIGN_TYPE: std_logic_vector(7 downto 0)
 	);
 	port(
 		ipb_clk: in std_logic;
@@ -80,6 +81,8 @@ entity pdts_pc059_io is
 end pdts_pc059_io;
 
 architecture rtl of pdts_pc059_io is
+
+	constant BOARD_TYPE: std_logic_vector(7 downto 0) := X"02";
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
@@ -152,8 +155,10 @@ begin
 	config: entity work.ipbus_roreg_v
 		generic map(
 			N_REG => 1,
-			DATA(31 downto 8) => FWINFO,
-			DATA(7 downto 0) => X"02"
+			DATA(31 downto 24) => X"00",
+			DATA(23 downto 16) => BOARD_TYPE,
+			DATA(15 downto 8) => CARRIER_TYPE,
+			DATA(7 downto 0) => DESIGN_TYPE
 		)
 		port map(
 			ipb_in => ipbw(N_SLV_CONFIG),

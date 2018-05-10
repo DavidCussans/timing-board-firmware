@@ -1,6 +1,6 @@
 -- pdts_fmc_io
 --
--- Various functions for talking to the pc059 board chipset
+-- Various functions for talking to the FMC board chipset
 --
 -- Dave Newbold, March 2018
 
@@ -10,14 +10,16 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_fmc_io.all;
+use work.ipbus_decode_pdts_fmc_io.all;
+
 
 library unisim;
 use unisim.VComponents.all;
 
 entity pdts_fmc_io is
 	generic(
-		FWINFO: std_logic_vector(23 downto 0) := X"000000";
+		CARRIER_TYPE: std_logic_vector(7 downto 0);
+		DESIGN_TYPE: std_logic_vector(7 downto 0);
 		LOOPBACK: boolean := false
 	);
 	port(
@@ -73,6 +75,8 @@ entity pdts_fmc_io is
 end pdts_fmc_io;
 
 architecture rtl of pdts_fmc_io is
+
+	constant BOARD_TYPE: std_logic_vector(7 downto 0) := X"00";
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
@@ -135,8 +139,10 @@ begin
 	config: entity work.ipbus_roreg_v
 		generic map(
 			N_REG => 1,
-			DATA(31 downto 8) => FWINFO,
-			DATA(7 downto 0) => X"00"
+			DATA(31 downto 24) => X"00",
+			DATA(23 downto 16) => BOARD_TYPE,
+			DATA(15 downto 8) => CARRIER_TYPE,
+			DATA(7 downto 0) => DESIGN_TYPE
 		)
 		port map(
 			ipb_in => ipbw(N_SLV_CONFIG),
@@ -284,8 +290,8 @@ begin
 		);
 		
 	rec_d_i <= rec_d_u when rising_edge(rec_clk_i); -- Register CDR data on CDR recovered clock
-	rec_d_il <= sfp_dut when rising_edge(fmc_clk_i);
-	rec_d <= r_d_i when not LOOPBACK else rec_d_il;
+	rec_d_il <= sfp_dout when rising_edge(fmc_clk_i);
+	rec_d <= rec_d_i when not LOOPBACK else rec_d_il;
 	
 	ibufds_rj45: IBUFDS
 		port map(

@@ -17,7 +17,11 @@
 					<node id="mmcm_sticky" mask="0x20"/>
 				</node>
 		</node>
-		<node id="config" address="0x2" description="board/firmware config" fwinfo="endpoint;width=0"/>
+		<node id="config" address="0x2" description="board/firmware config" fwinfo="endpoint;width=0">
+		    <node id="board_type" mask="0xff0000"/>
+		    <node id="carrier_type" mask="0xff00"/>
+		    <node id="design_type" mask="0xff"/>
+		</node>
 		<node id="uid_i2c" address="0x08" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="FMC_UID_PROM=0x53;AX3_Switch=0x21;KC705_Switch=0x74"/>
 		<node id="sfp_i2c" address="0x10" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="eeprom=0x50"/>
 		<node id="pll_i2c" address="0x18" module="file://opencores_i2c.xml" class="SI5344Node" parameters="i2caddr=0x68"/>

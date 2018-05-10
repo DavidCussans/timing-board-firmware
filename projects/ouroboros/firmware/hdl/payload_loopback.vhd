@@ -12,6 +12,9 @@ use work.ipbus.all;
 use work.ipbus_decode_top.all;
 
 entity payload is
+	generic(
+		CARRIER_TYPE: std_logic_vector(7 downto 0)
+	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -59,6 +62,8 @@ end payload;
 
 architecture rtl of payload is
 
+	constant DESIGN_TYPE: std_logic_vector := X"02";
+
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal fmc_clk, rec_clk, rec_d, q, rst_io, rsti, clk, stb, rst, locked: std_logic;
@@ -86,6 +91,8 @@ begin
 
 	io: entity work.pdts_fmc_io
 		generic map(
+			CARRIER_TYPE => CARRIER_TYPE,
+			DESIGN_TYPE => DESIGN_TYPE,			
 			LOOPBACK => true
 		)
 		port map(
