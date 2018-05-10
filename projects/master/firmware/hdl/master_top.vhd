@@ -79,7 +79,7 @@ begin
 			clk => clk,
 			d => d,
 			scmd_out => scmd_in,
-			scmd_in => scmd_out,
+			scmd_in => scmd_out
 		);
  
 end rtl;
