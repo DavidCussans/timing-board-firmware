@@ -94,4 +94,8 @@ begin
 			acmd => open
 		);
 		
+-- outputs
+
+	scmd_out <= CMD_W_NULL;
+		
 end rtl;
