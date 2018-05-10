@@ -166,7 +166,7 @@ begin
 
 -- master block
 
-	master: entity work.master
+	master: entity work.master_top
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
