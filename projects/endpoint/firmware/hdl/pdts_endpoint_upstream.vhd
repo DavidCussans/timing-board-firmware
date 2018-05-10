@@ -34,17 +34,9 @@ architecture rtl of pdts_endpoint_upstream is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
-	signal phase_locked, phase_rst: std_logic;	
 	signal stb, k, s_valid, s_valid_d, s_stb, s_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
-	signal rdy_i: std_logic;
-	signal scmdw_v: cmd_w_array(1 downto 0);
-	signal scmdr_v: cmd_r_array(1 downto 0);
-	signal scmdw, acmdw: cmd_w;
-	signal scmdr, acmdr: cmd_r;
-	signal tp, tp_d: std_logic;
-	signal tx_q: std_logic_vector(7 downto 0);
-	signal tx_err, tx_stb, tx_k: std_logic;
+	signal a_valid, a_last: std_logic;
 
 begin
 
@@ -71,11 +63,9 @@ begin
 			rxphy_locked => rxphy_locked,
 			rst => rst_i,
 			rx_err => rx_err,
-			rdy => rdy_i
+			rdy => '1'
 		);
-		
-	rst <= rst_i;
-				
+
 -- Rx PHY
 
 	rxphy: entity work.pdts_rx_phy
@@ -117,8 +107,8 @@ begin
 			s_stb => s_stb,
 			s_valid => s_valid,
 			s_first => s_first,
-			a_valid => open,
-			a_last => open,
+			a_valid => a_valid,
+			a_last => a_last,
 			err => rx_err
 		);
 
@@ -129,5 +119,7 @@ begin
 	acmd.d <= dr;
 	acmd.req <= a_valid;
 	acmd.last <= a_last;
+	
+	rdy <= rxphy_locked when rx_err = "000" else '0';
 		
 end rtl;
