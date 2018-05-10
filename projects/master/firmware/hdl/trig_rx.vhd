@@ -37,6 +37,7 @@ architecture rtl of trig_rx is
 	signal ctrl_ep_en: std_logic;
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_rst, ep_rdy: std_logic;
+	signal t: std_logic_vector(SCMD_MAX downto 0);
 	
 begin
 
@@ -92,6 +93,35 @@ begin
 			rdy => ep_rdy,
 			scmd => open,
 			acmd => open
+		);
+
+-- Trigger counters
+
+	process(ep_scmd, ep_v) -- Unroll sync command
+	begin
+		for i in t'range loop
+			if scmd.d = std_logic_vector(to_unsigned(i, ep_scmd'length)) and scmd.req = '1' and ep_rdy = '1' then
+				t(i) <= '1';
+			else
+				t(i) <= '0';
+			end if;
+		end loop;
+	end process;
+
+	ctr_rst <= ipb_rst or ctrl_ctr_rst;
+
+	ctrs: entity work.ipbus_ctrs_v
+		generic map(
+			N_CTRS => t'length
+		)
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_CTRS),
+			ipb_out => ipbr(N_SLV_CTRS),
+			clk => clk,
+			rst => ep_rst,
+			inc => t
 		);
 		
 -- outputs
