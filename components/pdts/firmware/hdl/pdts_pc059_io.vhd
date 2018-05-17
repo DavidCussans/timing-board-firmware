@@ -91,7 +91,7 @@ architecture rtl of pdts_pc059_io is
 	signal ctrl_gpio: std_logic_vector(2 downto 0);
 	signal ctrl_rst_lock_mon, ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
 	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
-	signal mmcm_bad, mmcm_ok, pll_ok, mmcm_lm, pll_lm: std_logic;
+	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal sda_o, usfp_sda_o: std_logic;
 	
@@ -200,6 +200,7 @@ begin
 -- Clock lock monitor
 
 	mmcm_bad <= not locked;
+	pll_bad <= not clk_lolb;
 
 	chk: entity work.pdts_chklock
 		generic map(
@@ -209,7 +210,7 @@ begin
 			clk => ipb_clk,
 			rst => ipb_rst,
 			los(0) => mmcm_bad,
-			los(1) => clk_lolb,
+			los(1) => pll_bad,
 			ok(0) => mmcm_ok,
 			ok(1) => pll_ok,
 			ok_sticky(0) => mmcm_lm,

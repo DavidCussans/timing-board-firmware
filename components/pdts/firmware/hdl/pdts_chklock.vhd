@@ -27,7 +27,7 @@ architecture rtl of pdts_chklock is
 
 	type ctrs_t is array(N - 1 downto 0) of unsigned(7 downto 0); -- 256 cycle debounce
 	signal ctrs: ctrs_t;
-	signal ok_i, ok_s: std_logic_vector(N - 1 downto 0);
+	signal ok_i: std_logic_vector(N - 1 downto 0);
 	
 begin
 
@@ -61,16 +61,10 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
-				ok_s <= (others => '0');
-				ok_sticky <= (others => '0');
+				ok_sticky <= (others => '1');
 			else
 				for i in N - 1 downto 0 loop
-					if ok_i(i) = '1' then
-						ok_s(i) <= '1';
-						if ok_s(i) = '0' then
-							ok_sticky(i) <= '1';
-						end if;
-					else
+					if ok_i(i) = '0' then
 						ok_sticky(i) <= '0';
 					end if;
 				end loop;
