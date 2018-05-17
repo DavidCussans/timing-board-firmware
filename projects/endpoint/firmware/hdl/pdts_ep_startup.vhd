@@ -71,7 +71,7 @@ begin
 -- Wait for CDR lock
 				when W_CDR =>
 					if cdr_ok = '1' then
-						state <= W_ALIGN;
+						state <= W_FREQ;
 					end if;
 -- Wait for frequency match
 				when W_FREQ =>
@@ -269,8 +269,8 @@ begin
 		"0000" when W_RST, -- Starting state after reset
 		"0001" when W_SFP, -- Waiting for SFP LOS to go low
 		"0010" when W_CDR, -- Waiting for CDR lock
-		"0011" when W_ALIGN, -- Waiting for comma alignment, stable 50MHz phase
-		"0100" when W_FREQ, -- Waiting for good frequency check
+		"0011" when W_FREQ, -- Waiting for comma alignment, stable 50MHz phase
+		"0100" when W_ALIGN, -- Waiting for good frequency check
 		"0101" when W_LOCK, -- Waiting for 8b10 decoder good packet
 		"0110" when W_RDY, -- Waiting for time stamp initialisation
 		"1000" when RUN, -- Good to go
