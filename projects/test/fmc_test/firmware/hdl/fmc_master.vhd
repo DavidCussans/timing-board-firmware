@@ -71,16 +71,10 @@ architecture rtl of payload is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(6 downto 0);
 	signal rst, fmc_clk, rec_clk, rec_d, sfp_dout, rj45_din, rj45_dout: std_logic;
-	signal ctrl_chk_init, rst_fmc_clk, rst_rec_clk, chk_init, chk_init_fmc, rec_d_r, rj45_din_r, rj45_din_rr, p: std_logic;
+	signal ctrl_chk_init, rst_fmc_clk, rst_rec_clk, chk_init, chk_init_fmc, p: std_logic;
 	signal cyc_ctr, err_ctr, err_ctr_rj45: std_logic_vector(47 downto 0);
 	signal zflag, zflag_rj45: std_logic;
-	
-	attribute IOB: string;
-	attribute IOB of sfp_dout: signal is "TRUE";
-	attribute IOB of rec_d_r: signal is "TRUE";
-	attribute IOB of rj45_dout: signal is "TRUE";
-  attribute IOB of rj45_din_r: signal is "TRUE";
-			
+				
 begin
 
 -- ipbus address decode
@@ -220,15 +214,14 @@ begin
 		
 -- SFP
 
-	sfp_dout <= p when rising_edge(fmc_clk);
-	rec_d_r <= rec_d when rising_edge(rec_clk);
+	sfp_dout <= p;
 	
 	prbs_chk_sfp: entity work.prbs7_chk
 		port map(
 			clk => rec_clk,
 			rst => rst_rec_clk,
 			init => chk_init,
-			d => rec_d_r,
+			d => rec_d,
 			err_ctr => err_ctr,
 			cyc_ctr => open,
 			zflag => zflag
@@ -236,16 +229,14 @@ begin
 		
 -- RJ45
 
-	rj45_dout <= p when falling_edge(fmc_clk);
-	rj45_din_r <= rj45_din when falling_edge(fmc_clk);
-	rj45_din_rr <= rj45_din_r when rising_edge(fmc_clk);
+	rj45_dout <= p;
 
 	prbs_chk_rj45: entity work.prbs7_chk
 		port map(
 			clk => fmc_clk,
 			rst => rst_fmc_clk,
 			init => chk_init_fmc,
-			d => rj45_din_rr,
+			d => rj45_din,
 			err_ctr => err_ctr_rj45,
 			cyc_ctr => cyc_ctr,
 			zflag => zflag_rj45
