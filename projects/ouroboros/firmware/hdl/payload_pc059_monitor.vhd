@@ -130,7 +130,7 @@ begin
 			clk_cdr => clk_cdr,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
-			inmux => open,
+			inmux => inmux,
 			rstb_i2cmux => rstb_i2cmux,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
