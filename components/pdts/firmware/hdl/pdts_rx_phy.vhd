@@ -47,10 +47,10 @@ architecture rtl of pdts_rx_phy is
 	signal rxdd, c: std_logic;
 	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
-	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu: std_logic;
+	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu, kok: std_logic;
 	signal ctr: unsigned(4 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
-	signal fctr, dctr: unsigned(3 downto 0) := X"0";
+	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, ki, lock, ldone, kerr, cerr, derr: std_logic;
@@ -109,6 +109,7 @@ begin
 				ctr <= (others => '0');
 				m <= '1';
 				sctr <= fctr; -- CDC; randomise starting value of stb counter, don't care about bit synchronisation
+				kctr <= X"0";
 			else
 				if sctr = (10 / SCLK_RATIO) - 1 then
 					sctr <= X"0";
@@ -117,6 +118,9 @@ begin
 				end if;
 				if done = '0' and stb = '1' then
 					ctr <= ctr + 1;
+					if w = CCHAR_PD or w = CCHAR_ND then
+						kctr <= kctr + 1;
+					end if;
 					m <= m and tr;
 				end if;
 			end if;
@@ -126,8 +130,9 @@ begin
 	stb <= not or_reduce(std_logic_vector(sctr));
 	done <= and_reduce(std_logic_vector(ctr));
 	done_d <= done when rising_edge(clk);
-	phase_rst <= done and not m and phase_locked;
-	rstu <= done and not m when UPSTREAM_MODE else '0';
+	kok <= '1' when kctr > 1 else '0';
+	phase_rst <= done and not (m and kok) and phase_locked;
+	rstu <= done and not (m and kok) when UPSTREAM_MODE else '0';
 
 	process(clk)
 	begin
@@ -142,7 +147,7 @@ begin
 		end if;
 	end process;
 
-	aligned_i <= done and m;
+	aligned_i <= done and m and kok;
 	aligned <= aligned_i;
 
 -- Coarse delay
