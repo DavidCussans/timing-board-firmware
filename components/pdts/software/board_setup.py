@@ -25,13 +25,14 @@ brd_rev = {
 	0xd880395e2b33: 2,
 	0xd880395e1c81: 2,
 	0xd88039d980cf: 3,
-	0xd88039d98adf: 3
+	0xd88039d98adf: 3,
+        0xd88039d9248e: 3
 }
 
 clk_cfg_files = {
 	1: "SI5344/PDTS0000.txt",
 	2: "SI5344/PDTS0003.txt",
-	3: "SI5344/PDTS0004.txt"
+	3: "SI5344/PDTS0005.txt"
 }
 
 uhal.setLogLevelTo(uhal.LogLevel.NOTICE)
