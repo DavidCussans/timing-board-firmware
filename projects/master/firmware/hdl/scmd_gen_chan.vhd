@@ -2,10 +2,10 @@
 --
 -- Generates random sync commands
 --
--- div words indicates power of two to divide rate by, with 256 prescale
--- e.g. at 50MHz clock, div = 0 is 12.2kHz, div = 7 is 95.4Hz, div = 15 is 0.373Hz
+-- rate_div sets rate as a fraction of (50MHz / 2^18) = 190.74Hz
+-- e.g. at 50MHz clock, div = 0 is 190.74Hz, div = 511 is 95.55Hz, div = 1023 is 0.19Hz
 --
--- Dave Newbold, March 2017
+-- Dave Newbold, June 2018
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -45,9 +45,8 @@ architecture rtl of scmd_gen_chan is
 	signal stb: std_logic;
 	signal ctrl_en, ctrl_patt, ctrl_force: std_logic;
 	signal ctrl_type: std_logic_vector(7 downto 0);
-	signal ctrl_rate_div: std_logic_vector(3 downto 0);
+	signal ctrl_rate_div: std_logic_vector(9 downto 0);
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
-	signal mask: std_logic_vector(15 downto 0);
 	signal src: std_logic_vector(27 downto 0);
 	signal v: std_logic;
 
@@ -73,22 +72,10 @@ begin
 	ctrl_patt <= ctrl(0)(1);
 	ctrl_force <= ctrl(0)(2);
 	ctrl_type <= ctrl(0)(15 downto 8);
-	ctrl_rate_div <= ctrl(0)(19 downto 16);
-	r_i <= to_integer(unsigned(ctrl_rate_div));
-	
-	process(r_i)
-	begin
-		for i in mask'range loop
-			if i > r_i then -- Yeah, this is wrong (should be 'i >= r_i') but it's fixed in SW for now
-				mask(i) <= '0';
-			else
-				mask(i) <= '1';
-			end if;
-		end loop;
-	end process;
+	ctrl_rate_div <= ctrl(0)(25 downto 16);
 	
 	src <= tstamp(27 downto 0) when ctrl_patt = '0' else rand(27 downto 0);
-	v <= '1' when (or_reduce(mask and src(27 downto 12)) = '0' and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
+	v <= '1' when unsigned(src(27 downto 18)) >= unsigned(ctrl_rate_div) and src(17 downto 12) = X"00" and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
 		
 	scmd_out.d <= ctrl_type;
