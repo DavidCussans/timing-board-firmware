@@ -2,7 +2,7 @@
 --
 -- Generates random sync commands
 --
--- rate_div sets rate as a fraction of (50MHz / 2^18) = 190.74Hz
+-- rate_div sets rate as a fraction (n / 1024) of (50MHz / 2^18) = 190.74Hz
 -- e.g. at 50MHz clock, div = 0 is 190.74Hz, div = 511 is 95.55Hz, div = 1023 is 0.19Hz
 --
 -- Dave Newbold, June 2018
