@@ -75,7 +75,7 @@ begin
 	ctrl_rate_div <= ctrl(0)(25 downto 16);
 	
 	src <= tstamp(27 downto 0) when ctrl_patt = '0' else rand(27 downto 0);
-	v <= '1' when unsigned(src(27 downto 18)) >= unsigned(ctrl_rate_div) and src(17 downto 12) = X"00" and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
+	v <= '1' when (unsigned(src(27 downto 18)) >= unsigned(ctrl_rate_div) and src(17 downto 12) = X"00" and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
 		(ctrl_force = '1' and stb = '1') else '0';
 		
 	scmd_out.d <= ctrl_type;
