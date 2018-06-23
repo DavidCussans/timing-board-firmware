@@ -13,5 +13,6 @@ package master_defs is
 	constant N_PART: integer := 4; -- Number of partitions (max 4 at present)
 	constant N_CHAN: integer := 4; -- Number of scmd generator channels
 	constant TS_DIV: positive := 50000000; -- 1Hz (must be divisible by 25)
+	constant THROTTLE_TICKS: positive := 400000; -- 10ms between triggers
 	
 end master_defs;

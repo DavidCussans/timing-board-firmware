@@ -42,13 +42,15 @@ architecture rtl of partition is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en: std_logic;
+	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en, ctrl_throttle_en: std_logic;
 	signal ctrl_trig_mask: std_logic_vector(7 downto 0);
 	signal run_int, part_up: std_logic;
 	signal v, grab, trig, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
 	signal buf_warn, buf_err, in_spill, in_run, rob_en_s: std_logic;
+	signal thr: std_logic;
+	signal tctr: unsigned(calc_width(THROTTLE_TICKS) - 1 downto 0);
 	
 begin
 
@@ -89,6 +91,7 @@ begin
 	ctrl_trig_en <= ctrl(0)(2);
 	ctrl_buf_en <= ctrl(0)(3);
 	ctrl_trig_ctr_rst	<= ctrl(0)(4);
+	ctrl_throttle_en <= ctrl(0)(5);
 	ctrl_trig_mask <= ctrl(0)(15 downto 8);
 	stat(0) <= X"000000" & "00" & in_run & in_spill & run_int & part_up & buf_warn & buf_err;
 
@@ -113,11 +116,32 @@ begin
 
 	grab <= v when ((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') -- Grab run start or stop only if we issued it
 		or (unsigned(typ) < 8 and typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP) -- Grab all other system commands if partition is running
-		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1') -- Otherwise apply trigger masks
+		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1' and thr = '0') -- Otherwise apply trigger masks
 		else '0';
 		
 	tack <= grab;
 	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ)));
+	
+-- Throttling
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if part_up = '0' or ctrl_throttle_en = '0' then
+				tctr <= (others => '0');
+			elsif tctr /= (others => '0') or (grab = '1' and unsigned(typ) > 7) then
+				if tctr = THROTTLE_TICKS - 1 then
+					tctr <= (others => '0');
+				else
+					tctr <= tctr + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	thr <= or_reduce(tctr);
+
+-- Command counters
 	
 	process(typ) -- Unroll typ
 	begin
