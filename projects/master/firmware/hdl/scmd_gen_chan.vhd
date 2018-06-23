@@ -78,12 +78,12 @@ begin
 	ctrl_force <= ctrl(0)(2);
 	ctrl_type <= ctrl(0)(15 downto 8);
 	ctrl_rate_div_p <= ctrl(0)(23 downto 16);
-	ctrl_rate_div_d <= ctrl(0)(27 downto 23);
+	ctrl_rate_div_d <= ctrl(0)(27 downto 24);
 	
 	process(ctrl_rate_div_d)
 	begin
 		for i in mask'range loop
-			if i >= integer(unsigned(ctrl_rate_div_d)) then
+			if i >= to_integer(unsigned(ctrl_rate_div_d)) then
 				mask(i) <= '0';
 			else
 				mask(i) <= '1';
@@ -92,7 +92,7 @@ begin
 	end process;
 	
 	src <= tstamp(31 downto 0) when ctrl_patt = '0' else rand;
-	s <= '1' when or_reduce(src(23 downto 8) and mask) = '0' and src(7 downto 0) = '1' & std_logic_vector(to_unsigned(ID, 3)) & X"0)" else '0';
+	s <= '1' when or_reduce(src(23 downto 8) and mask) = '0' and src(7 downto 0) = '1' & std_logic_vector(to_unsigned(ID, 3)) & X"0" else '0';
 	
 	process(clk)
 	begin
@@ -100,7 +100,7 @@ begin
 			if rst = '1' then
 				pctr <= X"00";
 			elsif s = '1' then
-				if pctr = ctrl_rate_div_p then
+				if pctr = Unsigned(ctrl_rate_div_p) then
 					pctr <= X"00";
 				else
 					pctr <= pctr + 1;
@@ -109,7 +109,7 @@ begin
 		end if;
 	end process;
 	
-	c = '1' when pctr = X"00" else '0';
+	c <= '1' when pctr = X"00" else '0';
 	
 	v <= (s and c) or (ctrl_force and stb);
 			
