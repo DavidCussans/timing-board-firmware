@@ -2,8 +2,10 @@
 --
 -- Generates random sync commands
 --
--- rate_div sets rate as a fraction (n / 1024) of (50MHz / 2^18) = 190.74Hz
--- e.g. at 50MHz clock, div = 0 is 190.74Hz, div = 511 is 95.55Hz, div = 1023 is 0.19Hz
+-- The division from 50MHz to the desired rate is done in three steps:
+-- a) A pre-division by 256
+-- b) Division by a power of two set by n = 2 ^ rate_div_d (ranging from 2^0 -> 2^15)
+-- c) 1-in-n prescaling set by n = rate_div_p
 --
 -- Dave Newbold, June 2018
 
@@ -45,11 +47,14 @@ architecture rtl of scmd_gen_chan is
 	signal stb: std_logic;
 	signal ctrl_en, ctrl_patt, ctrl_force: std_logic;
 	signal ctrl_type: std_logic_vector(7 downto 0);
-	signal ctrl_rate_div: std_logic_vector(9 downto 0);
+	signal ctrl_rate_div_p: std_logic_vector(7 downto 0);
+	signal ctrl_rate_div_d: std_logic_vector(3 downto 0);
 	signal r_i: integer range 2 ** 4 - 1 downto 0 := 0;
-	signal src: std_logic_vector(27 downto 0);
-	signal v: std_logic;
-
+	signal src: std_logic_vector(31 downto 0);
+	signal s, c, v: std_logic;
+	signal pctr: unsigned(7 downto 0);
+	signal mask: std_logic_vector(15 downto 0);
+	
 begin
 
 	csr: entity work.ipbus_syncreg_v
@@ -64,7 +69,7 @@ begin
 			ipb_out => ipb_out,
 			slv_clk => clk,
 			q => ctrl,
-			qmask(0) => X"003fff07",
+			qmask(0) => X"03ffff07",
 			stb(0) => stb
 		);
 
@@ -72,12 +77,42 @@ begin
 	ctrl_patt <= ctrl(0)(1);
 	ctrl_force <= ctrl(0)(2);
 	ctrl_type <= ctrl(0)(15 downto 8);
-	ctrl_rate_div <= ctrl(0)(25 downto 16);
+	ctrl_rate_div_p <= ctrl(0)(23 downto 16);
+	ctrl_rate_div_d <= ctrl(0)(27 downto 23);
 	
-	src <= tstamp(27 downto 0) when ctrl_patt = '0' else rand(27 downto 0);
-	v <= '1' when (unsigned(src(27 downto 18)) >= unsigned(ctrl_rate_div) and src(17 downto 12) = X"00" and src(11 downto 8) = std_logic_vector(to_unsigned(ID, 4)) and src(7 downto 0) = X"80" and ctrl_en = '1') or
-		(ctrl_force = '1' and stb = '1') else '0';
-		
+	process(ctrl_rate_div_d)
+	begin
+		for i in mask'range loop
+			if i >= integer(unsigned(ctrl_rate_div_d)) then
+				mask(i) <= '0';
+			else
+				mask(i) <= '1';
+			end if;
+		end loop;
+	end process;
+	
+	src <= tstamp(31 downto 0) when ctrl_patt = '0' else rand;
+	s <= '1' when or_reduce(src(23 downto 8) and mask) = '0' and src(7 downto 0) = '1' & std_logic_vector(to_unsigned(ID, 3)) & X"0)" else '0';
+	
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				pctr <= X"00";
+			elsif s = '1' then
+				if pctr = ctrl_rate_div_p then
+					pctr <= X"00";
+				else
+					pctr <= pctr + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	c = '1' when pctr = X"00" else '0';
+	
+	v <= (s and c) or (ctrl_force and stb);
+			
 	scmd_out.d <= ctrl_type;
 	scmd_out.req <= v;
 	scmd_out.last <= '1';

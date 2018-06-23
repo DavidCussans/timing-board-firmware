@@ -9,7 +9,8 @@
 		<node id="patt" mask="0x2"/>
 		<node id="force" mask="0x4"/>
 		<node id="type" mask="0xff00"/>
-		<node id="rate_div" mask="0x3ff0000"/>
+		<node id="rate_div_p" mask="0xff0000"/>
+		<node id="rate_div_d" mask="0xf000000"/>
 	</node>
 	<node id="actrs" address="0x10" mode="block" size="0x10" fwinfo="endpoint;width=4"/>
 	<node id="rctrs" address="0x20" mode="block" size="0x10" fwinfo="endpoint;width=4"/>		
