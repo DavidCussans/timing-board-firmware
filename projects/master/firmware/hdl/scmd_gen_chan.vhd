@@ -69,7 +69,7 @@ begin
 			ipb_out => ipb_out,
 			slv_clk => clk,
 			q => ctrl,
-			qmask(0) => X"03ffff07",
+			qmask(0) => X"0fffff07",
 			stb(0) => stb
 		);
 
