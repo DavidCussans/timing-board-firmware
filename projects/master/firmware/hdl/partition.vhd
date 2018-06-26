@@ -9,6 +9,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
@@ -129,7 +130,7 @@ begin
 		if rising_edge(clk) then
 			if part_up = '0' or ctrl_throttle_en = '0' then
 				tctr <= (others => '0');
-			elsif tctr /= (others => '0') or (grab = '1' and unsigned(typ) > 7) then
+			elsif thr = '1' or (grab = '1' and unsigned(typ) > 7) then
 				if tctr = THROTTLE_TICKS - 1 then
 					tctr <= (others => '0');
 				else
@@ -139,7 +140,7 @@ begin
 		end if;
 	end process;
 	
-	thr <= or_reduce(tctr);
+	thr <= or_reduce(std_logic_vector(tctr));
 
 -- Command counters
 	
