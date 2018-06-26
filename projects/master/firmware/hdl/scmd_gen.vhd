@@ -39,7 +39,7 @@ architecture rtl of scmd_gen is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, ctrl_sel: ipb_reg_v(0 downto 0);
-	signal ctrl_en, ctrl_clr: std_logic;
+	signal ctrl_clr: std_logic;
 	signal sel: std_logic_vector(3 downto 0);
 	signal rand: std_logic_vector(31 downto 0);
 	signal ipbw_c: ipb_wbus_array(N_CHAN - 1 downto 0);
@@ -81,8 +81,7 @@ begin
 			qmask(0) => X"00000003"
 		);
 	
-	ctrl_en <= ctrl(0)(0);
-	ctrl_clr <= ctrl(0)(1);
+	ctrl_clr <= ctrl(0)(0);
 		
 -- Channel select register
 

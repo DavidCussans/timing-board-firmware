@@ -92,12 +92,12 @@ begin
 	end process;
 	
 	src <= tstamp(31 downto 0) when ctrl_patt = '0' else rand;
-	s <= '1' when or_reduce(src(23 downto 8) and mask) = '0' and src(7 downto 0) = '1' & std_logic_vector(to_unsigned(ID, 3)) & X"0" else '0';
+	s <= '1' when ctrl_en = '1' and or_reduce(src(23 downto 8) and mask) = '0' and src(7 downto 0) = '1' & std_logic_vector(to_unsigned(ID, 3)) & X"0" else '0';
 	
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' then
+			if rst = '1' or ctrl_en = '0' then
 				pctr <= X"00";
 			elsif s = '1' then
 				if pctr = Unsigned(ctrl_rate_div_p) then
