@@ -75,24 +75,24 @@ stages:
 quick_check:ouroboros_fmc:
   <<: *template_job_vivado_quick_check
   variables:
-    PROJECT_DIR_PATH: "projects/ourboros"
+    PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
 
 quick_check:ouroloop_fmc:
   <<: *template_job_vivado_quick_check
   variables:
-    PROJECT_DIR_PATH: "projects/ourboros"
+    PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
-full_build:mpultra:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ourboros"
+# full_build:mpultra:
+#   <<: *template_job_vivado_full_build
+#   variables:
+#     PROJECT_DIR_PATH: "projects/ouroboros"
 
-full_build:k800:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ourboros"
+# full_build:k800:
+#   <<: *template_job_vivado_full_build
+#   variables:
+#     PROJECT_DIR_PATH: "projects/ouroboros"
 
 quick_check:sim: 
   <<: *template_job_base
