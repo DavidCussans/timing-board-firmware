@@ -3,15 +3,13 @@ stages:
   - quick_checks
   - builds
 
-
 .job_template: &template_job_base
   image: cern/cc7-base:20180516
   tags:
     - docker
     - xilinx-tools
   before_script:
-    - yum -y install git python-pip python-virtualenv gcc-c++
-    - yum -y install libX11
+    - yum -y install git python-pip python-virtualenv gcc-c++ libX11 libXext libXft
     - cd /tmp
     - curl -L https://github.com/ipbus/ipbb/archive/test/ci.tar.gz | tar xvz
     - source ipbb-test-ci/env.sh
@@ -35,14 +33,17 @@ stages:
     # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
-    - export MODELSIM_ROOT="/opt/mentor/modelsim_10.5/modeltech/"
+    - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
-    
+    - export IPBB_SIMLIB_BASE=/build/xilinx-simlibs/modelsim_10.5
+
     - cd /tmp
     - ipbb init buildArea
     - cd buildArea
     - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    - mount
+    - return -1
 
 
 .job_template: &template_job_vivado_quick_check
@@ -108,4 +109,4 @@ quick_check:ouroboros_sim:
     - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
     - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
     - cd proj/ouroboros_sim
-    - ipbb sim ipcores fli make-project
+    - ipbb sim setup-simlib ipcores fli make-project
