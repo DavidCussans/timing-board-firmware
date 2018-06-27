@@ -19,7 +19,7 @@ stages:
     ##
     ## Run ssh-agent (inside the build environment)
     ##
-    - eval $(ssh-agent -s)
+    # - eval $(ssh-agent -s)
 
     ##
     ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
@@ -48,8 +48,8 @@ stages:
   stage: quick_checks
   script:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
-    - ipbb proj create vivado ${CI_JOB_NAME#${CI_JOB_STAGE}:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
-    - cd proj/${CI_JOB_NAME#${CI_JOB_STAGE}:}
+    - ipbb proj create vivado ${CI_JOB_NAME#quick_check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#quick_check:}
     - ipbb vivado make-project
     - ipbb vivado check-syntax
 
@@ -94,10 +94,10 @@ quick_check:ouroloop_fmc:
 #   variables:
 #     PROJECT_DIR_PATH: "projects/ouroboros"
 
-quick_check:sim: 
+quick_check:ouroboros_sim: 
   <<: *template_job_base
   stage: quick_checks
   script:
-    - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ourboros/sim top_sim.dep
-    - ipbb proj create sim sim timing-board-firmware:projects/ouroboros/sim -t top_sim.dep
+    - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros/sim top_sim.dep
+    - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros/sim -t top_sim.dep
     - cd proj/sim
