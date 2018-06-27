@@ -74,29 +74,29 @@ stages:
     - ipbb vivado bitfile package
 
 
-quick_check:ouroboros_fmc:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35.dep"
+# quick_check:ouroboros_fmc:
+#   <<: *template_job_vivado_quick_check
+#   variables:
+#     PROJECT_DIR_PATH: "projects/ouroboros"
+#     PROJECT_TOP_DEP: "top_a35.dep"
 
-quick_check:ouroloop_fmc:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_loopback.dep"
+# quick_check:ouroloop_fmc:
+#   <<: *template_job_vivado_quick_check
+#   variables:
+#     PROJECT_DIR_PATH: "projects/ouroboros"
+#     PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
-full_build:ouroboros_fmc:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35.dep"
+# full_build:ouroboros_fmc:
+#   <<: *template_job_vivado_full_build
+#   variables:
+#     PROJECT_DIR_PATH: "projects/ouroboros"
+#     PROJECT_TOP_DEP: "top_a35.dep"
 
-full_build:ouroboros_fmc:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_loopback.dep"
+# full_build:ouroboros_fmc:
+#   <<: *template_job_vivado_full_build
+#   variables:
+#     PROJECT_DIR_PATH: "projects/ouroboros"
+#     PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
 quick_check:ouroboros_sim: 
   <<: *template_job_base
@@ -104,4 +104,5 @@ quick_check:ouroboros_sim:
   script:
     - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
     - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
-    - cd proj/sim
+    - cd proj/ouroboros_sim
+    - ipbb sim ipcores fli make-project
