@@ -9,7 +9,7 @@ stages:
     - docker
     - xilinx-tools
   before_script:
-    - yum -y install git python-pip python-virtualenv gcc-c++ libX11 libXext libXft
+    - yum -y install git python-pip python-virtualenv gcc-c++ make libX11 libXext libXft
     - cd /tmp
     - curl -L https://github.com/ipbus/ipbb/archive/test/ci.tar.gz | tar xvz
     - source ipbb-test-ci/env.sh
