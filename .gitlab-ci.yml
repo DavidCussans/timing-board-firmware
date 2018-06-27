@@ -42,7 +42,8 @@ stages:
     - cd buildArea
     - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
-    - mount
+    - env
+    - export -p
 
 
 .job_template: &template_job_vivado_quick_check
