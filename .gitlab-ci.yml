@@ -35,7 +35,9 @@ stages:
     # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
-
+    - export MODELSIM_ROOT="/opt/mentor/modelsim_10.5/modeltech/"
+    - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
+    
     - cd /tmp
     - ipbb init buildArea
     - cd buildArea
@@ -60,6 +62,7 @@ stages:
   only:
     - web
   script:
+
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
