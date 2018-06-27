@@ -67,9 +67,6 @@ stages:
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
-    # - ipbb toolbox check-dep -t vivado emp-fwk:${PROJECT_DIR_PATH} top_full.dep
-    # - ipbb proj create vivado null_algo_full emp-fwk:${PROJECT_DIR_PATH} -t top_full.dep
-    # - cd proj/null_algo_full
     - ipbb proj create vivado ${CI_JOB_NAME#full_build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#full_build:}
     - ipbb vivado make-project
@@ -78,29 +75,29 @@ stages:
     - ipbb vivado bitfile package
 
 
-# quick_check:ouroboros_fmc:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35.dep"
+quick_check:ouroboros_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
 
-# quick_check:ouroloop_fmc:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35_loopback.dep"
+quick_check:ouroloop_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
-# full_build:ouroboros_fmc:
-#   <<: *template_job_vivado_full_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35.dep"
+full_build:ouroboros_fmc:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
 
-# full_build:ouroboros_fmc:
-#   <<: *template_job_vivado_full_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35_loopback.dep"
+full_build:ouroboros_fmc:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
 quick_check:ouroboros_sim: 
   <<: *template_job_base
