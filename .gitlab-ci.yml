@@ -48,8 +48,8 @@ stages:
   stage: quick_checks
   script:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
-    - ipbb proj create vivado ${CI_JOB_NAME} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
-    - cd proj/${CI_JOB_NAME}
+    - ipbb proj create vivado ${CI_JOB_NAME#${CI_JOB_STAGE}:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#${CI_JOB_STAGE}:}
     - ipbb vivado make-project
     - ipbb vivado check-syntax
 
