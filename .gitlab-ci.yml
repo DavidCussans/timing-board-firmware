@@ -35,7 +35,7 @@ stages:
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
     - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
-    - export IPBB_SIMLIB_BASE=/build/xilinx-simlibs/modelsim_10.5
+    - export IPBB_SIMLIB_BASE=/scratch/xilinx-simlibs/modelsim_10.5
 
     - cd /tmp
     - ipbb init buildArea
@@ -43,7 +43,6 @@ stages:
     - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
     - mount
-    - return -1
 
 
 .job_template: &template_job_vivado_quick_check
