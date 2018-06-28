@@ -32,6 +32,7 @@ stages:
     # ##
     # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
+    - pwd
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
     - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
@@ -75,7 +76,7 @@ stages:
   artifacts:
     when: on_success
     paths:
-      - package/*.tgz
+      - /tmp/buildArea/proj/${CI_JOB_NAME#full_build:}/package/*.tgz
 
 
 #--- Quick checks ---
