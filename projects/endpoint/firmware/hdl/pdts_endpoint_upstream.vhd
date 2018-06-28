@@ -35,7 +35,7 @@ architecture rtl of pdts_endpoint_upstream is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
-	signal stb, k, s_valid, s_valid_d, s_stb, s_first: std_logic;
+	signal stb, k, s_stb, s_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal a_valid, a_last: std_logic;
 
@@ -107,7 +107,6 @@ begin
 			k => k,
 			q => dr,
 			s_stb => s_stb,
-			s_valid => s_valid,
 			s_first => s_first,
 			a_valid => a_valid,
 			a_last => a_last,

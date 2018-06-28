@@ -31,7 +31,7 @@ entity pdts_endpoint_local is
 		rdy: out std_logic; -- Timestamp valid flag
 		sync: out std_logic_vector(SCMD_W - 1 downto 0); -- Sync command output (clk domain)
 		sync_stb: out std_logic; -- Sync command strobe (clk domain)
-		sync_valid: out std_logic; -- Sync command valid flag (clk domain)
+		sync_first: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		tsync_in: in cmd_w := CMD_W_NULL; -- Tx sync command input
 		tsync_out: out cmd_r -- Tx sync command handshake
@@ -43,15 +43,13 @@ architecture rtl of pdts_endpoint_local is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
-	signal phase_locked, phase_rst: std_logic;	
-	signal stb, k, s_valid, s_valid_d, s_stb, s_first: std_logic;
+	signal stb, k, s_stb, s_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
 	signal scmdr_v: cmd_r_array(1 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
-	signal tp, tp_d: std_logic;
 	signal tx_q: std_logic_vector(7 downto 0);
 	signal tx_err, tx_stb, tx_k: std_logic;
 
@@ -122,7 +120,6 @@ begin
 			k => k,
 			q => dr,
 			s_stb => s_stb,
-			s_valid => s_valid,
 			s_first => s_first,
 			a_valid => open,
 			a_last => open,
@@ -132,7 +129,7 @@ begin
 -- Temporary sync output
 
 	sync <= dr(SCMD_W - 1 downto 0);
-	sync_valid <= s_first and rdy_i;
+	sync_first <= s_first and rdy_i;
 	sync_stb <= s_stb and rdy_i;
 	
 -- Timestamp / event counter
@@ -153,7 +150,7 @@ begin
 -- Echo command; send it back to the master
 
 	scmdw_v(0).d <= dr;
-	scmdw_v(0).req <= s_valid and s_first and s_stb when dr(3 downto 0) = SCMD_ECHO else '0';
+	scmdw_v(0).req <= s_first and s_stb when dr(3 downto 0) = SCMD_ECHO else '0';
 	scmdw_v(0).last <= '1';
 
 -- Sync command input
