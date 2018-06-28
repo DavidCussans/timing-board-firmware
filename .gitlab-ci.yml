@@ -4,15 +4,15 @@ stages:
   - builds
 
 .job_template: &template_job_base
-  image: cern/cc7-base:20180516
+  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:latest
   tags:
     - docker
     - xilinx-tools
   before_script:
-    - yum -y install git python-pip python-virtualenv gcc-c++ make which libX11 libXext libXft
-    - cd /tmp
-    - curl -L https://github.com/ipbus/ipbb/archive/test/ci.tar.gz | tar xvz
-    - source ipbb-test-ci/env.sh
+    # - yum -y install git python-pip python-virtualenv gcc-c++ make which libX11 libXext libXft
+    # - cd /tmp
+    # - curl -L https://github.com/ipbus/ipbb/archive/test/ci.tar.gz | tar xvz
+    # - source ipbb-test-ci/env.sh
 
     ##
     ## Run ssh-agent (inside the build environment)
