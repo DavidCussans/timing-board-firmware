@@ -119,7 +119,7 @@ full_build:ouroboros_fmc:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
 
-full_build:ouroboros_fmc:
+full_build:ouroloop_fmc:
   <<: *template_job_vivado_full_build
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
