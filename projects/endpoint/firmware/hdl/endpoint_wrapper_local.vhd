@@ -16,6 +16,9 @@ use work.pdts_defs.all;
 use work.wrapper_defs.all;
 
 entity endpoint_wrapper_local is
+	generic(
+		SIM: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -129,7 +132,8 @@ begin
 
 	ep: entity work.pdts_endpoint_local
 		generic map(
-			SCLK_FREQ => 31.25
+			SCLK_FREQ => 31.25,
+			SIM => SIM
 		)
 		port map(
 			sclk => ipb_clk,

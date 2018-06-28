@@ -99,6 +99,9 @@ begin
 -- master block
 
 	master: entity work.master_top
+		generic map(
+			SIM => true
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -120,6 +123,9 @@ begin
 	egen: for i in N_EP - 1 downto 0 generate
 
 		wrapper: entity work.endpoint_wrapper_local
+			generic map(
+				SIM => true
+			)
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,

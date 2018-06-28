@@ -15,6 +15,9 @@ use work.ipbus_decode_trig_rx.all;
 use work.pdts_defs.all;
 
 entity trig_rx is
+	generic(
+		SIM: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic; -- IPbus connection
 		ipb_rst: in std_logic;
@@ -83,7 +86,8 @@ begin
 
 	ep: entity work.pdts_endpoint_upstream
 		generic map(
-			SCLK_FREQ => 31.25
+			SCLK_FREQ => 31.25,
+			SIM => SIM
 		)	
 		port map(
 			sclk => ipb_clk,

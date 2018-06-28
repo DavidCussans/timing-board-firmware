@@ -13,6 +13,9 @@ use work.ipbus_decode_master_top.all;
 use work.pdts_defs.all;
 
 entity master_top is
+	generic(
+		SIM: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic; -- IPbus connection
 		ipb_rst: in std_logic;
@@ -70,6 +73,9 @@ begin
 -- Trigger receiver
 
 	trig: entity work.trig_rx
+		generic map(
+			SIM => SIM
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,

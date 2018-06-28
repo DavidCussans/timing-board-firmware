@@ -96,7 +96,10 @@ begin
 
 -- master block
 
-	tx: entity work.master
+	tx: entity work.master_top
+		generic map(
+			SIM => true
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,

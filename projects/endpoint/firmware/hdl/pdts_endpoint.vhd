@@ -13,7 +13,8 @@ use work.pdts_defs.all;
 entity pdts_endpoint is
 	generic(
 		SCLK_FREQ: real := 50.0; -- Frequency (MHz) of the supplied sclk
-		EN_TX: boolean := false
+		EN_TX: boolean := false;
+		SIM: boolean := false
 	);
 	port(
 		sclk: in std_logic; -- Free-running system clock
@@ -63,7 +64,8 @@ begin
 
 	startup: entity work.pdts_ep_startup
 		generic map(
-			SCLK_FREQ => SCLK_FREQ
+			SCLK_FREQ => SCLK_FREQ,
+			SIM => SIM
 		)
 		port map(
 			sclk => sclk,
