@@ -1,0 +1,142 @@
+
+stages:
+  - quick_checks
+  - builds
+
+.job_template: &template_job_base
+  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:latest
+  tags:
+    - docker
+    - xilinx-tools
+  before_script:
+    # - yum -y install git python-pip python-virtualenv gcc-c++ make which libX11 libXext libXft
+    # - cd /tmp
+    # - curl -L https://github.com/ipbus/ipbb/archive/test/ci.tar.gz | tar xvz
+    # - source ipbb-test-ci/env.sh
+
+    ##
+    ## Run ssh-agent (inside the build environment)
+    ##
+    # - eval $(ssh-agent -s)
+
+    ##
+    ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    ## We're using tr to fix line endings which makes ed25519 keys work
+    ## without extra base64 encoding.
+    ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+    ##
+    # - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+
+    ##
+    ## Create the SSH directory and give it the right permissions
+    # ##
+    # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+    - pwd
+    - source /software/Xilinx/Vivado/2016.4/settings64.sh
+    - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
+    - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
+    - export IPBB_SIMLIB_BASE=/scratch/xilinx-simlibs/modelsim_10.5
+
+    - cd /tmp
+    - ipbb init buildArea
+    - cd buildArea
+    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
+    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    - env
+    - export -p
+
+
+.job_template: &template_job_vivado_quick_check
+  <<: *template_job_base
+  stage: quick_checks
+  script:
+    - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
+    - ipbb proj create vivado ${CI_JOB_NAME#quick_check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#quick_check:}
+    - ipbb vivado make-project
+    - ipbb vivado check-syntax
+
+.job_template: &template_job_vivado_full_build
+  <<: *template_job_base
+  stage: builds
+  only:
+    - web
+  script:
+    - mkdir -p ${HOME}/.Xilinx/Vivado
+    - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
+    - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
+    - ipbb proj create vivado ${CI_JOB_NAME#full_build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#full_build:}
+    - ipbb vivado make-project
+    - ipbb vivado -q synth -j3 
+    - ipbb vivado -q impl 
+    - ipbb vivado bitfile package
+    - mkdir ${CI_PROJECT_DIR}/package
+    - cp package/*.tgz ${CI_PROJECT_DIR}/package
+  artifacts:
+    when: on_success
+    paths:
+      - package/*.tgz
+
+
+#--- Quick checks ---
+quick_check:ouroboros_sim: 
+  <<: *template_job_base
+  stage: quick_checks
+  script:
+    - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
+    - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
+    - cd proj/ouroboros_sim
+    - ipbb sim setup-simlib ipcores fli make-project
+
+quick_check:ouroboros_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
+
+quick_check:ouroloop_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
+
+quick_check:ouroboros_pc059:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059.dep"
+
+quick_check:ouroboros_pc059_monitor:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
+
+#--- Full builds ---
+full_build:ouroboros_fmc:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
+
+full_build:ouroloop_fmc:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
+
+full_build:ouroboros_pc059:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059.dep"
+
+full_build:ouroboros_pc059_monitor:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
+
+
