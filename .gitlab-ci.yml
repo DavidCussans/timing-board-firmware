@@ -63,7 +63,6 @@ stages:
   only:
     - web
   script:
-
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
@@ -73,6 +72,10 @@ stages:
     - ipbb vivado -q synth -j3 
     - ipbb vivado -q impl 
     - ipbb vivado bitfile package
+  artifacts:
+    - when: on_success
+    - paths:
+      - package/*.tgz
 
 
 #--- Quick checks ---
