@@ -98,12 +98,12 @@ begin
 
 -- master block
 
-	master: entity work.master
+	master: entity work.master_top
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_MASTER),
-			ipb_out => ipbr(N_SLV_MASTER),
+			ipb_in => ipbw(N_SLV_MASTER_TOP),
+			ipb_out => ipbr(N_SLV_MASTER_TOP),
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
