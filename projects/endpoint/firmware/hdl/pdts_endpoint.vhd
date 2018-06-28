@@ -161,7 +161,7 @@ begin
 -- Echo command; send it back to the master
 
 	scmdw_v(0).d <= dr;
-	scmdw_v(0).req <= s_valid and s_stb when dr(3 downto 0) = SCMD_ECHO else '0';
+	scmdw_v(0).req <= s_valid and s_first and s_stb when dr(3 downto 0) = SCMD_ECHO else '0';
 	scmdw_v(0).last <= '1';
 
 -- Sync command input
