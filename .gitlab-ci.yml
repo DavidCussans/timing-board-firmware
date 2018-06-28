@@ -50,6 +50,8 @@ stages:
 .job_template: &template_job_vivado_quick_check
   <<: *template_job_base
   stage: quick_checks
+  except:
+    - web
   script:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
     - ipbb proj create vivado ${CI_JOB_NAME#quick_check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
