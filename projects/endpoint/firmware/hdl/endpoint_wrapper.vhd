@@ -153,7 +153,7 @@ begin
 			rst => ep_rsto,
 			rdy => ep_rdy,
 			sync => ep_scmd,
-			sync_valid => ep_v,
+			sync_first => ep_v,
 			tstamp => tstamp,
 			tsync_in => tsync_in,
 			tsync_out => tsync_out

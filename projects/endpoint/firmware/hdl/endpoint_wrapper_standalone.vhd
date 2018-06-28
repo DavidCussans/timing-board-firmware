@@ -83,7 +83,7 @@ begin
 			rst => ep_rsto,
 			rdy => ep_rdy,
 			sync => ep_scmd,
-			sync_v => ep_v,
+			sync_first => ep_v,
 			tstamp => tstamp,
 			evtctr => evtctr
 		);
