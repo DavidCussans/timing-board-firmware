@@ -48,12 +48,15 @@ architecture rtl of pdts_rx_phy is
 	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
 	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu, kok: std_logic;
-	signal ctr: unsigned(4 downto 0) := (others => '0');
+	signal ctr: unsigned(7 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
 	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, ki, lock, ldone, kerr, cerr, derr: std_logic;
+	
+	attribute KEEP: string;
+	attribute KEEP of kctr, kok, rstu: signal is "true";
 	
 begin
 
