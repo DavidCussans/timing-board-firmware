@@ -14,7 +14,6 @@ use work.ipbus_reg_types.all;
 use work.ipbus_decode_scmd_gen.all;
 
 use work.pdts_defs.all;
-use work.master_defs.all;
 
 entity scmd_gen is
 	generic(
@@ -78,7 +77,7 @@ begin
 			ipb_out => ipbr(N_SLV_CTRL),
 			slv_clk => clk,
 			q => ctrl,
-			qmask(0) => X"00000003"
+			qmask(0) => X"00000001"
 		);
 	
 	ctrl_clr <= ctrl(0)(0);
