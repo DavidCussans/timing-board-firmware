@@ -80,6 +80,9 @@ begin
 -- Endpoint wrapper
 
 	wrapper: entity work.endpoint_wrapper
+		generic map(
+			SIM => true
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,

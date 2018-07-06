@@ -5,6 +5,6 @@ src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
 include -c components/pdts pdts_pc059_io.dep
 src -c components/pdts pdts_rx_div_mmcm.vhd
 src -c components/pdts pdts_synchro.vhd
-include -c projects/master master_top.dep
+include -c projects/master master_wrapper.dep
 include -c projects/endpoint endpoint_wrapper_local.dep
 src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd

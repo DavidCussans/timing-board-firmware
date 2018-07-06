@@ -1,0 +1,3 @@
+include master_top.dep
+src master_defs.vhd
+addrtab -t master_top.xml

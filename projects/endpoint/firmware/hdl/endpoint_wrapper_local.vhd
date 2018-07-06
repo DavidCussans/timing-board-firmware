@@ -16,6 +16,9 @@ use work.pdts_defs.all;
 use work.wrapper_defs.all;
 
 entity endpoint_wrapper_local is
+	generic(
+		SIM: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -104,27 +107,24 @@ begin
 	ctrl_addr <= ctrl(0)(15 downto 8);
 	stat(0) <= X"00000" & "00" & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
 
--- Sync command tx control
+-- Sync command tx
 
-	cmd: entity work.ipbus_syncreg_v
+	gen: entity work.scmd_gen
 		generic map(
-			N_CTRL => 1,
-			N_STAT => 1
+			N_CHAN => 1
 		)
 		port map(
-			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_CMD),
-			ipb_out => ipbr(N_SLV_CMD),
-			slv_clk => ep_clk,
-			d => stat_cmd,
-			q => ctrl_cmd,
-			stb => stb_cmd
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SCMD_GEN),
+			ipb_out => ipbr(N_SLV_SCMD_GEN),
+			clk => ep_clk,
+			rst => ep_rsto,
+			tstamp => tstamp,
+			scmd_out(0) => tsync_in,
+			scmd_in(0) => tsync_out
 		);
-		
-	tsync_in <= (ctrl_cmd(0)(7 downto 0), stb_cmd(0), '1');
-	stat_cmd(0) <= X"0000000" & "000" & tsync_out.ack when rising_edge(ep_clk) and stb_cmd(0) = '1';
-	
+
 -- The endpoint
 
 	ep_rst <= ipb_rst or not ctrl_ep_en;
@@ -132,7 +132,8 @@ begin
 
 	ep: entity work.pdts_endpoint_local
 		generic map(
-			SCLK_FREQ => 31.25
+			SCLK_FREQ => 31.25,
+			SIM => SIM
 		)
 		port map(
 			sclk => ipb_clk,
@@ -147,7 +148,7 @@ begin
 			rst => ep_rsto,
 			rdy => ep_rdy,
 			sync => ep_scmd,
-			sync_valid => ep_v,
+			sync_first => ep_v,
 			tstamp => tstamp,
 			tsync_in => tsync_in,
 			tsync_out => tsync_out

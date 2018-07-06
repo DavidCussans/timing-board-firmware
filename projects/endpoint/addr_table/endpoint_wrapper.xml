@@ -26,11 +26,6 @@
 			<node id="count" address="0x1" mask="0xffff"/>
 		</node>		
 		<node id="freq" address="0xa" module="file://freq_ctr.xml"/>
-		<node id="cmd" address="0xc" fwinfo="endpoint;width=1">
-		    <node id="cmd" address="0x0"/>
-		    <node id="stat" address="0x1">
-		        <node id="ack" mask="0x1"/>
-		    </node>
-		</node>
 		<node id="ctrs" address="0x10" mode="block" size="0x10" fwinfo="endpoint;width=4"/>
+		<node id="scmd_gen" address="0x40" module="file://scmd_gen.xml"/>
 </node>

@@ -20,8 +20,8 @@ package pdts_defs is
 -- L1 constants (encoding layer)
 	
 	constant CCHAR: std_logic_vector(7 downto 0) := X"bc"; -- Async pkt marker and comma: K28.5
-	constant CCHAR_PD: std_logic_vector(9 downto 0) := "1010000011"; -- K28.5 encoded RD = +1
-	constant CCHAR_ND: std_logic_vector(9 downto 0) := "0101111100"; -- K28.5 encoded RD = -1
+	constant CCHAR_PD: std_logic_vector(9 downto 0) := "1010000011"; -- K28.5 encoded RD = +1, 0x283
+	constant CCHAR_ND: std_logic_vector(9 downto 0) := "0101111100"; -- K28.5 encoded RD = -1, 0x17c
 	constant SCHAR: std_logic_vector(7 downto 0) := X"3c"; -- Sync pkt marker: K28.1
 
 -- L2	constants (protocol layer)
@@ -56,11 +56,6 @@ package pdts_defs is
 	constant SCMD_MAX: integer := 11; -- Number of scmds in use (must be contiguous)
 	type SCMD_LEN_T is array(0 to 2 ** SCMD_W - 1) of natural; -- Data words for each sync cmd
 	constant SCMD_LEN: SCMD_LEN_T := (to_integer(unsigned(SCMD_SYNC)) => 1 + TSTAMP_WDS, others => 1);
-	
--- System-level constants
-
-	constant SPS_CYCLE_LEN: real := 30.0; -- 30s cycle time
-	constant SPS_SPILL_LEN: real := 4.8; -- 4.8s spill
 	
 -- Types
 

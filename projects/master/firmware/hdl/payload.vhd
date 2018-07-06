@@ -66,7 +66,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
+	signal fmc_clk, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
 	
 begin
 
@@ -120,6 +120,7 @@ begin
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
+			rj45_din => d,
 			rj45_dout => q,
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
@@ -166,16 +167,17 @@ begin
 
 -- master block
 
-	master: entity work.master
+	master: entity work.master_top
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_MASTER),
-			ipb_out => ipbr(N_SLV_MASTER),
+			ipb_in => ipbw(N_SLV_MASTER_TOP),
+			ipb_out => ipbr(N_SLV_MASTER_TOP),
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			q => q
+			q => q,
+			d => d
 		);
 
 end rtl;

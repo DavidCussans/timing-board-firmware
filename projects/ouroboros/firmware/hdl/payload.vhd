@@ -61,13 +61,13 @@ end payload;
 architecture rtl of payload is
 
 	constant DESIGN_TYPE: std_logic_vector := X"02";
+	constant N_EP: positive := 4;
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, q, rst_io, rsti, clk, stb, rst, locked: std_logic;
-	
-	constant N_EP: positive := 4;
-	
+	signal fmc_clk, rec_clk, rec_d, q, d, rst_io, rsti, clk, stb, rst, locked: std_logic;
+	signal txd: std_logic_vector(N_EP - 1 downto 0);
+		
 begin
 
 -- ipbus address decode
@@ -120,6 +120,7 @@ begin
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
+			rj45_din => d,
 			rj45_dout => q,
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
@@ -166,16 +167,17 @@ begin
 
 -- master block
 
-	master: entity work.master
+	master: entity work.master_top
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_MASTER),
-			ipb_out => ipbr(N_SLV_MASTER),
+			ipb_in => ipbw(N_SLV_MASTER_TOP),
+			ipb_out => ipbr(N_SLV_MASTER_TOP),
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			q => q
+			q => q,
+			d => d
 		);
 	
 -- Endpoint wrapper
@@ -190,7 +192,7 @@ begin
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
 				rec_clk => rec_clk,
 				rec_d => rec_d,
-				txd => open,
+				txd => txd(i),
 				sfp_los => sfp_los,
 				cdr_los => cdr_los,
 				cdr_lol => cdr_lol,

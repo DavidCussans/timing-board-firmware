@@ -1,2 +1,0 @@
-include master.dep
-src --cd ../sim_hdl master_defs.vhd

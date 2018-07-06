@@ -59,7 +59,7 @@ begin
 				case state is
 				when W_RST =>
 					if SIM then
-						state <= W_ALIGN;
+						state <= W_ALIGN; -- Skip freq check for simulation
 					else
 						state <= W_SFP;
 					end if;
@@ -77,12 +77,12 @@ begin
 				when W_FREQ =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
-					elsif f_ok = '1' then -- Don't want simulation to wait for freq lock
+					elsif f_ok = '1' then
 						state <= W_ALIGN;
 					end if;
 -- Wait for rxphy alignment
 				when W_ALIGN =>
-					if sfp_los_ok = '0' or cdr_ok = '0' then
+					if (sfp_los_ok = '0' or cdr_ok = '0') and not SIM then
 						state <= W_SFP;
 					elsif rxphy_aligned_i = '1' then
 						state <= W_LOCK;

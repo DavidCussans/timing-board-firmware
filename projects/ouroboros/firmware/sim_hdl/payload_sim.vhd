@@ -32,13 +32,13 @@ end payload_sim;
 architecture rtl of payload_sim is
 
 	constant DESIGN_TYPE: std_logic_vector := X"02";
+	constant N_EP: positive := 1;
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal fmc_clk, rst_io, rsti, clk, rst, locked, d, q: std_logic;
-	
-	constant N_EP: positive := 1;
-	
+	signal txd: std_logic_vector(N_EP - 1 downto 0);
+		
 begin
 
 -- ipbus address decode
@@ -98,16 +98,20 @@ begin
 
 -- master block
 
-	master: entity work.master
+	master: entity work.master_top
+		generic map(
+			SIM => true
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_MASTER),
-			ipb_out => ipbr(N_SLV_MASTER),
+			ipb_in => ipbw(N_SLV_MASTER_TOP),
+			ipb_out => ipbr(N_SLV_MASTER_TOP),
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			q => q
+			q => q,
+			d => txd(0)
 		);
 		
 -- The loopback
@@ -119,6 +123,9 @@ begin
 	egen: for i in N_EP - 1 downto 0 generate
 
 		wrapper: entity work.endpoint_wrapper_local
+			generic map(
+				SIM => true
+			)
 			port map(
 				ipb_clk => ipb_clk,
 				ipb_rst => ipb_rst,
@@ -126,7 +133,8 @@ begin
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
 				rec_clk => fmc_clk,
 				rec_d => d,
-				clk => clk
+				clk => clk,
+				txd => txd(i)
 			);
 			
 	end generate;
