@@ -211,7 +211,7 @@ begin
 	oddr_clkout: ODDR -- Feedback clock, not through MMCM
 		port map(
 			q => clkout,
-			c => fmc_clk_i,
+			c => rec_clk_i,
 			ce => '1',
 			d1 => '0',
 			d2 => '1',

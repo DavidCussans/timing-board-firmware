@@ -1,6 +1,9 @@
--- pdts_endpoint
+-- pdts_ep_decoder
 --
--- The timing endpoint design
+-- Simple decoder to provide run and spill status signals from endpoint commands, plus the
+-- event counter
+--
+-- Can be used as-is, or as an example of how to decode commands
 --
 -- Dave Newbold, February 2017
 
