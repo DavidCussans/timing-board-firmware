@@ -38,14 +38,14 @@ begin
 	begin
 	   if rising_edge(clk) then
     		if rst = '1' or sync = '1' then
-	       		dctr <= (others => '0');
+	       	dctr <= (others => '0');
 		    else
 			    dctr <= dctr + 1;
 		    end if;
 	   end if;
 	end process;
 	
-	sync <= '1' when dctr = TS_DIV else '0';
+	sync <= '1' when dctr = TS_DIV - 1 else '0';
 	
 -- Sending packet
 
