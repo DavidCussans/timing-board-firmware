@@ -7,6 +7,7 @@
 					<node id="sfp_tx_dis" mask="0x8"/>
 					<node id="pll_rst" mask="0x10"/>
 					<node id="rst_lock_mon" mask="0x20"/>
+					<node id="master_src" mask="0x40"/>
 				</node>
 				<node id="stat" address="0x1">
 					<node id="sfp_los" mask="0x1"/>

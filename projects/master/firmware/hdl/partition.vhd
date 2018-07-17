@@ -43,7 +43,7 @@ architecture rtl of partition is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en, ctrl_throttle_en: std_logic;
+	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en, ctrl_rate_ctrl_en, ctrl_spill_gate_en: std_logic;
 	signal ctrl_trig_mask: std_logic_vector(7 downto 0);
 	signal run_int, part_up: std_logic;
 	signal v, grab, trig, trst: std_logic;
@@ -92,7 +92,8 @@ begin
 	ctrl_trig_en <= ctrl(0)(2);
 	ctrl_buf_en <= ctrl(0)(3);
 	ctrl_trig_ctr_rst	<= ctrl(0)(4);
-	ctrl_throttle_en <= ctrl(0)(5);
+	ctrl_rate_ctrl_en <= ctrl(0)(5);
+	ctrl_spill_gate_en <= ctrl(0)(6);
 	ctrl_trig_mask <= ctrl(0)(15 downto 8);
 	stat(0) <= X"000000" & "00" & in_run & in_spill & run_int & part_up & buf_warn & buf_err;
 
@@ -117,18 +118,18 @@ begin
 
 	grab <= v when ((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') -- Grab run start or stop only if we issued it
 		or (unsigned(typ) < 8 and typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP) -- Grab all other system commands if partition is running
-		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1' and thr = '0') -- Otherwise apply trigger masks
+		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and not (ctrl_spill_gate_en = '1' and spill = '0') and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1' and thr = '0') -- Otherwise apply trigger masks
 		else '0';
 		
 	tack <= grab;
 	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ)));
 	
--- Throttling
+-- Rate control
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if part_up = '0' or ctrl_throttle_en = '0' then
+			if part_up = '0' or ctrl_rate_ctrl_en = '0' then
 				tctr <= (others => '0');
 			elsif thr = '1' or (grab = '1' and unsigned(typ) > 7) then
 				if tctr = THROTTLE_TICKS - 1 then
@@ -160,7 +161,7 @@ begin
 
 -- Event counter etc
 
-	decode:entity work.pdts_ep_decoder
+	decode: entity work.pdts_ep_decoder
 		port map(
 			clk => clk,
 			rst => rst,

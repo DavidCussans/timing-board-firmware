@@ -6,7 +6,8 @@
 				<node id="trig_en" mask="0x4"/>
 				<node id="buf_en" mask="0x8"/>
 				<node id="trig_ctr_rst" mask="0x10"/>
-				<node id="throttle_en" mask="0x20"/>
+				<node id="rate_ctrl_en" mask="0x20"/>
+				<node id="spill_gate_en" mask="0x40"/>
 				<node id="trig_mask" mask="0xff00"/>
 			</node>
 			<node id="stat" address="0x1">

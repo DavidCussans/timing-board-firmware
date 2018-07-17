@@ -38,7 +38,7 @@ architecture rtl of trig_rx is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_ep_en: std_logic;
+	signal ctrl_ep_en, ctrl_ext_trig_en: std_logic;
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_rst, ep_rdy: std_logic;
 	signal scmd: cmd_w;
@@ -78,6 +78,7 @@ begin
 		);
 		
 	ctrl_ep_en <= ctrl(0)(0);
+	ctrl_ext_trig_en <= ctrl(0)(1);
 	stat(0) <= X"000000" & "000" & ep_rdy & ep_stat; -- CDC on ep_rdy, don't care (pseudo static level)
 
 -- The rx endpoint
@@ -130,6 +131,6 @@ begin
 		
 -- outputs
 
-	scmd_out <= CMD_W_NULL;
-		
+	scmd_out <= scmd when ctrl_ext_trig_en = '1' else CMD_W_NULL;
+	
 end rtl;

@@ -32,7 +32,7 @@ architecture rtl of global is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl, stat: ipb_reg_v(0 downto 0);
+	signal stat: ipb_reg_v(0 downto 0);
 	
 	constant MASTER_CONF: std_logic_vector(31 downto 0) := X"000000" & std_logic_vector(to_unsigned(N_CHAN, 4)) & std_logic_vector(to_unsigned(N_PART, 4));
 	
@@ -81,7 +81,7 @@ begin
 
 	csr: entity work.ipbus_ctrlreg_v
 		generic map(
-			N_CTRL => 1,
+			N_CTRL => 0,
 			N_STAT => 1
 		)
 		port map(
@@ -89,8 +89,7 @@ begin
 			reset => ipb_rst,
 			ipbus_in => ipbw(N_SLV_CSR),
 			ipbus_out => ipbr(N_SLV_CSR),
-			d => stat,
-			q => ctrl
+			d => stat
 		);
 
 	stat(0) <= X"0000000" & "000" & tx_err;

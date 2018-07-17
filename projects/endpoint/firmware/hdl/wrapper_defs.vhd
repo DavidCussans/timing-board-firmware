@@ -9,6 +9,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 package wrapper_defs is
 
-	constant WRAPPER_VERSION: std_logic_vector(31 downto 0) := X"0004000a"; -- Version number
+	constant WRAPPER_VERSION: std_logic_vector(31 downto 0) := X"00040100"; -- Version number
 	
 end wrapper_defs;

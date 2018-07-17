@@ -2,6 +2,7 @@
 		<node id="csr" address="0x0" fwinfo="endpoint;width=1">
 			<node id="ctrl" address="0x0">
 				<node id="ep_en" mask="0x1"/>
+				<node id="ext_trig_en" mask="0x2"/>
 			</node>
 			<node id="stat" address="0x1">
 			    <node id="ep_stat" mask="0xf"/>
