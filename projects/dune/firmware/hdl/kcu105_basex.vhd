@@ -55,6 +55,7 @@ end top;
 architecture rtl of top is
 
 	signal clk_ipb, rst_ipb, nuke, soft_rst, userled: std_logic;
+	signal clk_aux, rst_aux: std_logic;
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal ipb_out: ipb_wbus;
@@ -65,6 +66,9 @@ begin
 -- Infrastructure
 
 	infra: entity work.kcu105_basex_infra
+		generic map(
+			CLK_AUX_FREQ => 200.0
+		)
 		port map(
 			sysclk_p => sysclk_p,
 			sysclk_n => sysclk_n,
@@ -77,6 +81,8 @@ begin
 			sfp_los => '0',
 			clk_ipb_o => clk_ipb,
 			rst_ipb_o => rst_ipb,
+			clk_aux_o => clk_aux,
+			rst_aux_o => rst_aux,
 			nuke => nuke,
 			soft_rst => soft_rst,
 			leds => leds(1 downto 0),
@@ -94,7 +100,7 @@ begin
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
 
-	slaves: entity work.ipbus_example
+	slaves: entity work.payload
 		port map(
 			ipb_clk => clk_ipb,
 			ipb_rst => rst_ipb,
@@ -102,7 +108,9 @@ begin
 			ipb_out => ipb_in,
 			nuke => nuke,
 			soft_rst => soft_rst,
-			userled => userled
+			userled => userled,
+			clk => clk_aux,
+			rst => rst_aux
 		);
 
 end rtl;
