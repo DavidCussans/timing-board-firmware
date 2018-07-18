@@ -17,7 +17,7 @@ package ipbus_decode_global is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_global(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Mon Mar  5 17:27:42 2018 
+-- START automatically  generated VHDL the Wed Jul 18 15:47:55 2018 
   constant N_SLV_VERSION: integer := 0;
   constant N_SLV_CONFIG: integer := 1;
   constant N_SLV_CSR: integer := 2;
@@ -33,13 +33,13 @@ package body ipbus_decode_global is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Mon Mar  5 17:27:42 2018 
+-- START automatically  generated VHDL the Wed Jul 18 15:47:55 2018 
     if    std_match(addr, "------------------------------00") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_VERSION, IPBUS_SEL_WIDTH)); -- version / base 0x00000000 / mask 0x00000003
     elsif std_match(addr, "------------------------------01") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CONFIG, IPBUS_SEL_WIDTH)); -- config / base 0x00000001 / mask 0x00000003
-    elsif std_match(addr, "------------------------------1-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000002 / mask 0x00000002
+    elsif std_match(addr, "------------------------------10") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000002 / mask 0x00000003
 -- END automatically generated VHDL
 
     else
