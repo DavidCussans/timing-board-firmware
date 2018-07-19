@@ -9,6 +9,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
 use work.dtpc_stream_defs.all;
+use work.ipbus_reg_types.all;
 
 entity dtpc_arb is
 	generic(
@@ -39,11 +40,11 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
-				ctr <= 0;
+				ctr <= (others => '0');
 				p <= '0';
 			elsif p = '0' then
 				if d(sel).h_valid = '1' then
-					p <= '1'
+					p <= '1';
 				else
 					ctr <= ctr + 1;
 				end if;
@@ -56,7 +57,7 @@ begin
 		end if;
 	end process;
 
-	gen: for i in range N_PORTS - 1 downto 0 generate
+	gen: for i in N_PORTS - 1 downto 0 generate
 		q(i).ack <= da.ack when sel = i else '0';
 	end generate;
 	

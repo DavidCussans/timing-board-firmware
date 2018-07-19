@@ -7,6 +7,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_dtpc_src.all;
@@ -39,7 +40,7 @@ architecture rtl of dtpc_wbuf is
 
 	constant ADDR_WIDTH: integer := calc_width(N_MUX) + BLOCK_RADIX;
 	signal tctr: unsigned(DTPC_STREAM_D_W * 2 - 1 downto 0);
-	signal cctr: unsigned(calc_width(N_MUX));
+	signal cctr: unsigned(calc_width(N_MUX) -1 downto 0);
 	signal sctr: unsigned(BLOCK_RADIX - 1 downto 0);
 	signal addr: unsigned(ADDR_WIDTH - 1 downto 0);
 	signal addr_sl: std_logic_vector(ADDR_WIDTH - 1 downto 0);
@@ -96,7 +97,7 @@ begin
 						sctr <= sctr + 1;
 					else
 						sctr <= (others => '0');
-						c <= '1'
+						c <= '1';
 					end if;
 				else
 					sctr <= sctr + 1;
@@ -104,7 +105,7 @@ begin
 						addr <= addr + N_MUX;
 					else
 						cctr <= cctr + 1;
-						addr <= (cctr'range => cctr + 1, others => '0');							
+						addr <= (ADDR_WIDTH - 1 downto cctr'left + 1 => '0') & (cctr + 1);							
 					end if;
 				end if;
 			end if;
@@ -117,7 +118,7 @@ begin
 	done_p <= (done_p or (send and cend)) and not (run or go) when rising_edge(clk);
 	
 	with sctr select hdata <=
-		std_logic_vector(resize(cctr, DTPC_STREAM_D_W) + CBASE) when 0,
+		std_logic_vector(resize(cctr, DTPC_STREAM_D_W) + C_BASE) when 0,
 		std_logic_vector(tctr(DTPC_STREAM_D_W - 1 downto 0)) when 1,
 		std_logic_vector(tctr(DTPC_STREAM_D_W * 2 - 1 downto DTPC_STREAM_D_W)) when others;
 		

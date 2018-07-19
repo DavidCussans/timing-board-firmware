@@ -27,7 +27,7 @@ architecture rtl of dtpc_sum is
 	signal ictr, octr: unsigned(1 downto 0);
 	signal s: unsigned(2 * DTPC_STREAM_D_W - 1 downto 0);
 	signal chan, tsl, tsh: std_logic_vector(DTPC_STREAM_D_W - 1 downto 0);
-	signal last, pend: std_logic;
+	signal last, last_d, pend: std_logic;
 
 begin
 
@@ -42,7 +42,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' or last = '1' then
-				ictr <= 0;
+				ictr <= (others => '0');
 			elsif d.h_valid = '1' then
 				ictr <= ictr + 1;
 				if ictr = 0 then
@@ -50,7 +50,7 @@ begin
 				elsif ictr = 1 then
 					tsl <= d.d;
 				else
-					tsh <= d.d
+					tsh <= d.d;
 				end if;
 			end if;
 		end if;
@@ -78,7 +78,7 @@ begin
 				pend <= '0';
 			elsif last_d = '1' then
 				pend <= '1';
-				octr <= 0;
+				octr <= (others => '0');
 			else
 				if da.ack = '1' then
 					if octr /= 3 then
@@ -93,13 +93,13 @@ begin
 	
 -- Output data
 				
-	with octr select q.d <=
-		chan when 0,
-		tsl when 1,
-		tsh when 2,
+	with octr select qa.d <=
+		chan when "00",
+		tsl when "01",
+		tsh when "10",
 		std_logic_vector(s) when others;
 		
-	q.h_valid <= pend;
-	q.c_valid <= '1' when pend = '1' and octr = 3 else '0';
+	qa.h_valid <= pend;
+	qa.c_valid <= '1' when pend = '1' and octr = 3 else '0';
 
 end rtl;
