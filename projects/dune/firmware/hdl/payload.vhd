@@ -29,8 +29,8 @@ end payload;
 
 architecture rtl of payload is
 
-	constant N_PORTS: integer := 1;
-	constant N_MUX: integer := 1;
+	constant N_PORTS: integer := 15;
+	constant N_MUX: integer := 64;
 	constant BLOCK_RADIX: integer := 8;
 	constant N_SAMP: integer := 1;
 	
