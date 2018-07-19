@@ -118,8 +118,8 @@ begin
 	done_p <= (done_p or (send and cend)) and not (run or go) when rising_edge(clk);
 	
 	with sctr select hdata <=
-		std_logic_vector(resize(cctr, DTPC_STREAM_D_W) + C_BASE) when 0,
-		std_logic_vector(tctr(DTPC_STREAM_D_W - 1 downto 0)) when 1,
+		std_logic_vector(resize(cctr, DTPC_STREAM_D_W) + C_BASE) when to_unsigned(0, sctr'length),
+		std_logic_vector(tctr(DTPC_STREAM_D_W - 1 downto 0)) when to_unsigned(1, sctr'length),
 		std_logic_vector(tctr(DTPC_STREAM_D_W * 2 - 1 downto DTPC_STREAM_D_W)) when others;
 		
 	hdata_r <= hdata when rising_edge(clk);
