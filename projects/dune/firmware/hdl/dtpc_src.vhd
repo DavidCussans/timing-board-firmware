@@ -121,6 +121,7 @@ begin
 	
 		mem: entity work.dtpc_wbuf
 			generic map(
+				C_BASE => i * N_MUX,
 				N_MUX => N_MUX,
 				BLOCK_RADIX => BLOCK_RADIX
 			)
