@@ -51,6 +51,8 @@ begin
 
 -- RAM block
 
+    addr_sl <= std_logic_vector(addr);
+
 	ram: entity work.ipbus_ported_dpram
 		generic map(
 			ADDR_WIDTH => ADDR_WIDTH,
@@ -63,7 +65,7 @@ begin
 			ipb_out => ipb_out,
 			rclk => clk,
 			q => q_ram,
-			addr => addr
+			addr => addr_sl
 		);
 
 -- Timestamp

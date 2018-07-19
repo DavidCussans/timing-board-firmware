@@ -43,8 +43,9 @@ architecture rtl of dtpc_sink is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_en: std_logic;
 	signal full, empty, rden, rderr, wren, wrerr, err, rden_d, rden_c: std_logic;
-	signal rdcount: std_logic_vector(12 downto 0);
-	signal d_fifo, q_fifo: std_logic_vector(31 downto 0);
+	signal rdcount: std_logic_vector(9 downto 0);
+	signal d_fifo: std_logic_vector(31 downto 0);
+	signal q_fifo: std_logic_vector(15 downto 0);
 	
 begin
 
@@ -94,11 +95,13 @@ begin
 		port map(
 			din => d_fifo,
 			dinp => "0000",
-			dout => q_fifo,
+			dout(31 downto 16) => open,
+			dout(15 downto 0) => q_fifo,
 			empty => empty,
 			full => full,
 			rdclk => ipb_clk,
-			rdcount => rdcount,
+			rdcount(12 downto 10) => open,
+			rdcount(9 downto 0) => rdcount,
 			rden => rden,
 			rderr => rderr,
 			regce => '1',
@@ -119,17 +122,17 @@ begin
 		);
 		
 	wren <= d.h_valid or d.c_valid;
-	d_fifo <= (31 downto DTPC_STREAM_D_W + 1 => '0') & d.h_valid & d.c_valid & d.d;
+	d_fifo <= (31 downto DTPC_STREAM_D_W + 2 => '0') & d.h_valid & d.c_valid & d.d;
 	q.ack <= not full;
 
 	err <= (err or wrerr) and not rst when rising_edge(clk);
 	
-	rden <= ipb_in.ipb_strobe and not ipb_in.ipb_write and not ipb_in.ipb_addr(0);
+	rden <= ipbw(N_SLV_BUF).ipb_strobe and not ipbw(N_SLV_BUF).ipb_write and not ipbw(N_SLV_BUF).ipb_addr(0);
 	rden_d <= rden when rising_edge(clk);
-	rden_c <= ipb_in.ipb_strobe and not ipb_in.ipb_write and ipb_in.ipb_addr(0);
+	rden_c <= ipbw(N_SLV_BUF).ipb_strobe and not ipbw(N_SLV_BUF).ipb_write and ipbw(N_SLV_BUF).ipb_addr(0);
 	
-	ipb_out.ipb_rdata <= (31 downto rdcount'left + 1 => '0') & rdcount when rden_c = '1' else q_fifo;
-	ipb_out.ipb_ack <= (rden_d and not rderr and not ipb_in.ipb_addr(0)) or rden_c;
-	ipb_out.ipb_err <= (rden_d and rderr) or (ipb_in.ipb_strobe and ipb_in.ipb_write);
+	ipbr(N_SLV_BUF).ipb_rdata <= (31 downto rdcount'left + 1 => '0') & rdcount when rden_c = '1' else X"0000" & q_fifo;
+	ipbr(N_SLV_BUF).ipb_ack <= (rden_d and not rderr and not ipbw(N_SLV_BUF).ipb_addr(0)) or rden_c;
+	ipbr(N_SLV_BUF).ipb_err <= (rden_d and rderr) or (ipbw(N_SLV_BUF).ipb_strobe and ipbw(N_SLV_BUF).ipb_write);
 
 end rtl;
