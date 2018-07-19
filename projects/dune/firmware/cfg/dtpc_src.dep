@@ -3,5 +3,5 @@ src ipbus_decode_dtpc_src.vhd
 addrtab -t dtpc_src.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
 src -c ipbus-firmware:components/ipbus_slaves ipbus_roreg_v.vhd
-include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep
+include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep ipbus_ported_dpram.vhd
 src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd
