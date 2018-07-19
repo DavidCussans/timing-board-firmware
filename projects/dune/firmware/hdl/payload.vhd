@@ -34,8 +34,6 @@ architecture rtl of payload is
 	
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(0 downto 0);
 	signal istream_w, astream_w: dtpc_stream_w_array(N_PORTS - 1 downto 0);
 	signal istream_r, astream_r: dtpc_stream_r_array(N_PORTS - 1 downto 0);
 	signal ostream_w: dtpc_stream_w_array(0 downto 0);
