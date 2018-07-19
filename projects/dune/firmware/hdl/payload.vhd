@@ -27,12 +27,20 @@ entity payload is
 end payload;
 
 architecture rtl of payload is
+
+	constant N_PORTS: integer := 1;
+	constant N_MUX: integer := 1;
+	constant BLOCK_RADIX: integer := 8;
 	
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-
+	signal istream_w, astream_w: dtpc_stream_w_array(N_PORTS - 1 downto 0);
+	signal istream_r, astream_r: dtpc_stream_r_array(N_PORTS - 1 downto 0);
+	signal ostream_w: dtpc_stream_w_array(0 downto 0);
+	signal ostream_r: dtpc_stream_r_array(0 downto 0);
+	
 begin
 
 -- ipbus address decode
@@ -50,23 +58,68 @@ begin
       ipb_from_slaves => ipbr
     );
 
--- CSR
+-- Data source
 
-	csr: entity work.ipbus_syncreg_v
+	src: entity work.dtpc_src
 		generic map(
-			N_CTRL => 1,
-			N_STAT => 1
+			N_PORTS => N_PORTS,
+			N_MUX => N_MUX,
+			BLOCK_RADIX => BLOCK_RADIX
 		)
 		port map(
-			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_CSR),
-			ipb_out => ipbr(N_SLV_CSR),
-			slv_clk => clk,
-			d => stat,
-			q => ctrl
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SRC),
+			ipb_out => ipbr(N_SLV_SRC),
+			clk => clk,
+			rst => rst,
+			q => istream_w,
+			d => istream_r
 		);
 		
-	stat(0) <= (others => '0');
+-- Summation
+
+	sgen: for i in N_PORTS - 1 downto 0 generate
+
+		sum: entity work.dtpc_sum
+			port map(
+				clk => clk,
+				rst => rst,
+				d => istream_w(i),
+				q => istream_r(i),
+				qa => astream_w(i),
+				da => astream_r(i)
+			);
+		
+	end generate;
+
+-- Arbitrator
+
+	arb: entity work.dtpc_arb
+		generic map(
+			N_PORTS => N_PORTS
+		)
+		port map(
+			clk => clk,
+			rst => rst,
+			d => astream_w
+			q => astream_r,
+			qa => ostream_w,
+			da => ostream_r
+		);
+		
+-- Sink
+
+	sink: entity work.dtpc_sink
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SINK),
+			ipb_out => ipbr(N_SLV_SINK),
+			clk => clk,
+			rst => rst,
+			d => ostream_w,
+			q => ostream_r
+		);
 	
 end rtl;

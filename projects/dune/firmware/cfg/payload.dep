@@ -2,5 +2,6 @@ src payload.vhd
 src ipbus_decode_top.vhd
 addrtab -t top.xml
 src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
-include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep
+include dtpc_src.dep dtpc_sink.dep
+src dtpc_sum.vhd dtpc_arb.vhd dtpc_stream_defs.vhd
 src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd

@@ -1,0 +1,21 @@
+<node id="dtpc_src" description="data source control" fwinfo="endpoint">
+    <node id="config" address="0x0" fwinfo="endpoint;width=0">
+        <node id="n_ports" mask="0xff"/>
+        <node id="n_mux" mask="0xff00"/>
+    </node>
+    <node id="csr" address="0x2" fwinfo="endpoint;width=1">
+        <node id="ctrl" address="0x0">
+	        <node id="en" mask="0x1"/>
+	        <node id="ts_rst" mask="0x2"/>
+	        <node id="sel" mask="0xff00"/>
+	        <node id="cnt" mask="0xffff0000"/>
+	    </node>
+	    <node id="stat" address="0x1">
+    		<node id="waiting" mask="0x1"/>
+    	</node>
+	</node>
+	<node id="buf" address="0x4" fwinfo="endpoint;width=1">
+       <node id="addr" address="0x0"/>
+       <node id="data" mode="port" size="0x1000" address="0x1"/>
+    </node>
+</node>
