@@ -7,6 +7,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_dtpc_src.all;
@@ -39,10 +40,10 @@ architecture rtl of dtpc_src is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_en, ctrl_ts_rst: std_logic;
+	signal stb: std_logic;
+	signal ctrl_en, ctrl_ts_rst, ctrl_go: std_logic;
 	signal ctrl_sel: std_logic_vector(7 downto 0);
-	signal ctrl_cnt: std_logic_vector(15 downto 0);
-	signal go: std_logic;
+	signal go, waiting: std_logic;
 	signal done: std_logic_vector(N_PORTS - 1 downto 0);
 	signal ipbw_m: ipb_wbus_array(N_PORTS - 1 downto 0);
 	signal ipbr_m: ipb_rbus_array(N_PORTS - 1 downto 0);
@@ -90,14 +91,15 @@ begin
 			ipb_out => ipbr(N_SLV_CSR),
 			slv_clk => clk,
 			d => stat,
-			q => ctrl
+			q => ctrl,
+			stb(0) => stb
 		);
 		
 	ctrl_en <= ctrl(0)(0);
 	ctrl_ts_rst <= ctrl(0)(1);
+	ctrl_go <= ctrl(0)(2);
 	ctrl_sel <= ctrl(0)(15 downto 8);
-	ctrl_cnt <= ctrl(0)(31 downto 16);
-	stat(0) <= (others => '0');
+	stat(0) <= X"0000000" & "000" & waiting;
 	
 -- Memories
 		
@@ -128,6 +130,7 @@ begin
 				ipb_out => ipbr_m(i),
 				clk => clk,
 				rst => rst,
+				ts_rst => ctrl_ts_rst,
 				q => q(i),
 				d => d(i),
 				go => go,
@@ -136,6 +139,7 @@ begin
 			
 	end generate;
 	
-	go <= '0';
+	go <= ctrl_go and stb;
+	waiting <= and_reduce(done);
 	
 end rtl;

@@ -7,6 +7,7 @@
         <node id="ctrl" address="0x0">
 	        <node id="en" mask="0x1"/>
 	        <node id="ts_rst" mask="0x2"/>
+	        <node id="go" mask="0x3"/>
 	        <node id="sel" mask="0xff00"/>
 	        <node id="cnt" mask="0xffff0000"/>
 	    </node>
@@ -16,6 +17,6 @@
 	</node>
 	<node id="buf" address="0x4" fwinfo="endpoint;width=1">
        <node id="addr" address="0x0"/>
-       <node id="data" mode="port" size="0x1000" address="0x1"/>
+       <node id="data" mode="port" size="0x4000" address="0x1"/>
     </node>
 </node>
