@@ -6,6 +6,7 @@
 	    <node id="stat" address="0x1">
 	        <node id="empty" mask="0x1"/>
 	        <node id="full" mask="0x2"/>
+	        <node id="err" mask="0x4"/>
 	    </node>
 	</node>
     <node id="buf" address="0x2" fwinfo="endpoint;width=1">
