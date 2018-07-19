@@ -10,6 +10,7 @@ use ieee.numeric_std.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_top.all;
+use work.dtpc_stream_defs.all;
 
 entity payload is
 	port(
@@ -36,8 +37,8 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal istream_w, astream_w: dtpc_stream_w_array(N_PORTS - 1 downto 0);
 	signal istream_r, astream_r: dtpc_stream_r_array(N_PORTS - 1 downto 0);
-	signal ostream_w: dtpc_stream_w_array(0 downto 0);
-	signal ostream_r: dtpc_stream_r_array(0 downto 0);
+	signal ostream_w: dtpc_stream_w;
+	signal ostream_r: dtpc_stream_r;
 	
 begin
 
@@ -100,7 +101,7 @@ begin
 		port map(
 			clk => clk,
 			rst => rst,
-			d => astream_w
+			d => astream_w,
 			q => astream_r,
 			qa => ostream_w,
 			da => ostream_r

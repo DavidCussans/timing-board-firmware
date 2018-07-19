@@ -13,9 +13,9 @@ package dtpc_stream_defs is
 
 	type dtpc_stream_w is
 		record
-			d: std_logic_vector(SD_D_W - 1 downto 0);
+			d: std_logic_vector(DTPC_STREAM_D_W - 1 downto 0);
 			h_valid: std_logic;
-			c_valid: std_logic
+			c_valid: std_logic;
 		end record;
 		
 	type dtpc_stream_w_array is array(natural range <>) of dtpc_stream_w;
@@ -27,6 +27,6 @@ package dtpc_stream_defs is
 		end record;
 		
 	type dtpc_stream_r_array is array(natural range <>) of dtpc_stream_r;
-	constant DTPC_STREAM_R_NULL: dtpc_stream_r := ('0');
+	constant DTPC_STREAM_R_NULL: dtpc_stream_r := (ack => '0');
 
 end dtpc_stream_defs;

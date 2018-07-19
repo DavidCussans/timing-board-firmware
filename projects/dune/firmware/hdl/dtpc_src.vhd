@@ -11,6 +11,7 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_dtpc_src.all;
+use work.ipbus_reg_types.all;
 use work.dtpc_stream_defs.all;
 
 entity dtpc_src is
