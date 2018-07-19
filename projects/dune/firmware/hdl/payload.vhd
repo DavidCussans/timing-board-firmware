@@ -32,6 +32,7 @@ architecture rtl of payload is
 	constant N_PORTS: integer := 1;
 	constant N_MUX: integer := 1;
 	constant BLOCK_RADIX: integer := 8;
+	constant N_SAMP: integer := 1;
 	
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
@@ -63,7 +64,8 @@ begin
 		generic map(
 			N_PORTS => N_PORTS,
 			N_MUX => N_MUX,
-			BLOCK_RADIX => BLOCK_RADIX
+			BLOCK_RADIX => BLOCK_RADIX,
+			N_SAMP => N_SAMP
 		)
 		port map(
 			ipb_clk => ipb_clk,

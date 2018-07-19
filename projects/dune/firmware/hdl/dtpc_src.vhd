@@ -18,7 +18,8 @@ entity dtpc_src is
 	generic(
 		N_PORTS: positive := 1;
 		N_MUX: positive := 1;
-		BLOCK_RADIX: positive := 8
+		BLOCK_RADIX: positive := 8;
+		N_SAMP: positive := 1
 	);
 	port(
 		ipb_clk: in std_logic;
@@ -123,7 +124,8 @@ begin
 			generic map(
 				C_BASE => i * N_MUX,
 				N_MUX => N_MUX,
-				BLOCK_RADIX => BLOCK_RADIX
+				BLOCK_RADIX => BLOCK_RADIX,
+				N_SAMP => N_SAMP
 			)
 			port map(
 				ipb_clk => ipb_clk,

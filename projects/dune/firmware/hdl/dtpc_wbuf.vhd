@@ -18,7 +18,8 @@ entity dtpc_wbuf is
 	generic(
 		C_BASE: integer := 0;
 		N_MUX: positive := 1;
-		BLOCK_RADIX: positive := 8
+		BLOCK_RADIX: positive := 8;
+		N_SAMP: integer := 1
 	);
 	port(
 		ipb_clk: in std_logic;
@@ -38,9 +39,10 @@ end dtpc_wbuf;
 
 architecture rtl of dtpc_wbuf is
 
-	constant ADDR_WIDTH: integer := calc_width(N_MUX) + BLOCK_RADIX;
+	constant ADDR_WIDTH: integer := calc_width(N_SAMP) + calc_width(N_MUX) + BLOCK_RADIX;
 	signal tctr: unsigned(DTPC_STREAM_D_W * 2 - 1 downto 0);
-	signal cctr: unsigned(calc_width(N_MUX) -1 downto 0);
+	signal mctr: unsigned(calc_width(N_SAMP) - 1 downto 0);
+	signal cctr: unsigned(calc_width(N_MUX) - 1 downto 0);
 	signal sctr: unsigned(BLOCK_RADIX - 1 downto 0);
 	signal addr: unsigned(ADDR_WIDTH - 1 downto 0);
 	signal addr_sl: std_logic_vector(ADDR_WIDTH - 1 downto 0);
@@ -51,7 +53,7 @@ begin
 
 -- RAM block
 
-    addr_sl <= std_logic_vector(addr);
+	addr_sl <= std_logic_vector(addr);
 
 	ram: entity work.ipbus_ported_dpram
 		generic map(
@@ -75,7 +77,7 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' or ts_rst = '1' then
 				tctr <= (others => '0');
-			elsif done_i = '1' and d.ack = '1' and run = '1' then
+			elsif send = '1' and cend = '1' and d.ack = '1' and run = '1' then
 				tctr <= tctr + 2 ** BLOCK_RADIX;
 			end if;
 		end if;
@@ -89,6 +91,7 @@ begin
 	begin
 		if falling_edge(clk) then
 			if run = '0' then
+				mctr <= (others => '0');
 				cctr <= (others => '0');
 				sctr <= (others => '0');
 				addr <= (others => '0');
@@ -106,8 +109,13 @@ begin
 					if send = '0' then
 						addr <= addr + N_MUX;
 					else
-						cctr <= cctr + 1;
-						addr <= (ADDR_WIDTH - 1 downto cctr'left + 1 => '0') & (cctr + 1);							
+						if cend = '0' then
+							cctr <= cctr + 1;
+							addr <= (ADDR_WIDTH - 1 downto cctr'left + 1 => '0') & (cctr + 1);
+						else
+							cctr <= (others => '0');
+							mctr <= mctr + 1;
+						end if;
 					end if;
 				end if;
 			end if;
@@ -116,8 +124,9 @@ begin
 	
 	send <= and_reduce(std_logic_vector(sctr));
 	cend <= '1' when cctr = N_MUX - 1 else '0';
-	done_i <= send and cend;
-	done_p <= (done_p or (send and cend)) and not (run or go) when rising_edge(clk);
+	mend <= '1' when mctr = N_SAMP - 1 else '0';
+	done_i <= send and cend and mend;
+	done_p <= (done_p or done_i) and not (run or go) when rising_edge(clk);
 	
 	with sctr select hdata <=
 		std_logic_vector(resize(cctr, DTPC_STREAM_D_W) + C_BASE) when to_unsigned(0, sctr'length),
