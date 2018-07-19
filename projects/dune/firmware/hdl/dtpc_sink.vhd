@@ -10,6 +10,7 @@ use ieee.numeric_std.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_dtpc_sink.all;
+use work.ipbus_reg_types.all;
 use work.dtpc_stream_defs.all;
 
 entity dtpc_sink is
@@ -37,6 +38,8 @@ architecture rtl of dtpc_sink is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
+	signal ctrl_en: std_logic;
+	signal full, empty: std_logic;
 	
 begin
 
@@ -77,5 +80,7 @@ begin
 -- Buffer
 	
 	ipbr(N_SLV_BUF) <= IPB_RBUS_NULL;
+	full <= '0';
+	empty <= '0';
 
 end rtl;
