@@ -98,5 +98,8 @@ begin
 		tsl when 1,
 		tsh when 2,
 		std_logic_vector(s) when others;
+		
+	q.h_valid <= pend;
+	q.c_valid <= '1' when pend = '1' and octr = 3 else '0';
 
 end rtl;
