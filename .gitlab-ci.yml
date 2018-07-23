@@ -61,6 +61,7 @@ stages:
   stage: builds
   only:
     - web
+    - tags
   script:
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
