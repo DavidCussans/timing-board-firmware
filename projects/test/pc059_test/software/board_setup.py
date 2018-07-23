@@ -1,1 +1,0 @@
-../../../../components/pdts/software/board_setup.py
