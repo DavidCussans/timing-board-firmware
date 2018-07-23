@@ -1,7 +1,7 @@
 ### What is this repository for? ###
 
 * This repository holds the firmware components and test software for the ProtoDUNE-SP timing system
-* Current version is v4a4 (clone from tags/v4a4)
+* Current version is v4a9 (clone from tags/v4a9)
 
 ### How do I get set up? ###
 
@@ -13,12 +13,12 @@ These instructions assume that you have your Xilinx Vivado licensing already set
 
 	mkdir work
 	cd work
-	curl -L https://github.com/ipbus/ipbb/archive/v0.3.0.tar.gz | tar xvz
-	source ipbb-0.3.0/env.sh
+	curl -L https://github.com/ipbus/ipbb/archive/v0.3.2.tar.gz | tar xvz
+	source ipbb-0.3.2/env.sh
 	ipbb init build
 	cd build
 	ipbb add git https://github.com/ipbus/ipbus-firmware.git
-	ipbb add git https://:@gitlab.cern.ch:8443/protoDUNE-SP-DAQ/timing-board-firmware.git -b v4a6
+	ipbb add git https://:@gitlab.cern.ch:8443/protoDUNE-SP-DAQ/timing-board-firmware.git -b <tag or branch>
 	ipbb proj create vivado fmc_test timing-board-firmware:projects/test/fmc_test -t top_master_a35.dep
 	cd proj/fmc_test
 	ipbb vivado project
