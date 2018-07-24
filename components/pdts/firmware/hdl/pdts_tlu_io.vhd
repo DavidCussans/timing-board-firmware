@@ -34,48 +34,18 @@ entity pdts_pc059_io is
 		clk: out std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
-		d_p: in std_logic_vector(7 downto 0); -- data from fanout SFPs
-		d_n: in std_logic_vector(7 downto 0);
-		d: out std_logic_vector(7 downto 0);
-		q_p: out std_logic; -- output to fanout
-		q_n: out std_logic;
-		q: in std_logic;
-		sfp_los: in std_logic_vector(7 downto 0); -- fanout SFP LOS
-		d_cdr_p: in std_logic; -- data input from CDR
-		d_cdr_n: in std_logic;
-		d_cdr: out std_logic;
-		clk_cdr_p: in std_logic; -- clock from CDR
-		clk_cdr_n: in std_logic;
-		clk_cdr: out std_logic;
-		cdr_los: in std_logic; -- CDR LOS
-		cdr_lol: in std_logic; -- CDR LOL
-		inmux: out std_logic_vector(2 downto 0); -- mux control
-		rstb_i2cmux: out std_logic; -- reset for mux
-		d_hdmi_p: in std_logic; -- data from upstream HDMI
-		d_hdmi_n: in std_logic;
-		d_hdmi: out std_logic;
-		q_hdmi_p: out std_logic; -- output to upstream HDMI
-		q_hdmi_n: out std_logic;
 		q_hdmi: in std_logic;
-		d_usfp_p: in std_logic; -- input from upstream SFP
-		d_usfp_n: in std_logic;		
-		d_usfp: out std_logic;
-		q_usfp_p: out std_logic; -- output to upstream SFP
-		q_usfp_n: out std_logic;
-		q_usfp: in std_logic;
-		usfp_fault: in std_logic; -- upstream SFP fault
-		usfp_los: in std_logic; -- upstream SFP LOS
-		usfp_txdis: out std_logic; -- upstream SFP tx_dis
-		usfp_sda: inout std_logic; -- upstream SFP I2C
-		usfp_scl: out std_logic;
-		ucdr_los: in std_logic; -- upstream CDR LOS
-		ucdr_lol: in std_logic; -- upstream CDR LOL
-		ledb: out std_logic_vector(2 downto 0); -- FMC LEDs
+		q_hdmi_0_p: out std_logic; -- output to HDMI 0
+		q_hdmi_0_n: out std_logic;
+		q_hdmi_1_p: out std_logic; -- output to HDMI 1
+		q_hdmi_1_n: out std_logic;
+		q_hdmi_2_p: out std_logic; -- output to HDMI 2
+		q_hdmi_2_n: out std_logic;
+		q_hdmi_3_p: out std_logic; -- output to HDMI 3
+		q_hdmi_3_n: out std_logic;
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
-		rstb_i2c: out std_logic; -- reset for I2C expanders
-		gpio_p: out std_logic_vector(2 downto 0); -- GPIO
-		gpio_n: out std_logic_vector(2 downto 0)
+		rstb_i2c: out std_logic -- reset for I2C expanders
 	);
 
 end pdts_pc059_io;
@@ -88,15 +58,14 @@ architecture rtl of pdts_pc059_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_gpio: std_logic_vector(2 downto 0);
-	signal ctrl_rst_lock_mon, ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
-	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
+	signal ctrl_rst_lock_mon: std_logic;
+	signal clk_i, clk_u, q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
-	signal clkdiv: std_logic_vector(1 downto 0);
-	signal sda_o, usfp_sda_o: std_logic;
+	signal clkdiv: std_logic_vector(0 downto 0);
+	signal sda_o: std_logic;
 	
   attribute IOB: string;
-  attribute IOB of q_i, q_hdmi_i, q_usfp_i: signal is "TRUE";
+  attribute IOB of q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: signal is "TRUE";
 
 begin
 
@@ -131,7 +100,7 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"000" & pll_lm & mmcm_lm & pll_ok & mmcm_ok & sfp_los & '0' & not clk_lolb & cdr_lol & cdr_los & ucdr_lol & ucdr_los & usfp_fault & usfp_los;
+	stat(0) <= X"000000" & pll_lm & mmcm_lm & pll_ok & mmcm_ok & "000" & not clk_lolb;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
@@ -140,15 +109,6 @@ begin
 	rstb_i2cmux <= not ctrl(0)(4);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
-	inmux <= ctrl(0)(10 downto 8);
-	ctrl_gpio <= ctrl(0)(14 downto 12);
-	ledb <= not ctrl(0)(18 downto 16);
-	ctrl_cdr_edge <= ctrl(0)(20);
-	ctrl_sfp_edge <= ctrl(0)(21);
-	ctrl_hdmi_edge <= ctrl(0)(22);
-	ctrl_usfp_edge <= ctrl(0)(23);
-	
-	usfp_txdis <= '0';
 	
 -- Config info
 
@@ -182,21 +142,6 @@ begin
 		
 	clk <= clk_i;
 	
-	ibufds_clk_cdr: IBUFDS
-		port map(
-			i => clk_cdr_p,
-			ib => clk_cdr_n,
-			o => clk_cdr_u
-		);
-		
-	bufh_clk_cdr: BUFG
-		port map(
-			i => clk_cdr_u,
-			o => clk_cdr_i
-		);
-		
-	clk_cdr <= clk_cdr_i;
-	
 -- Clock lock monitor
 
 	mmcm_bad <= not locked;
@@ -216,166 +161,59 @@ begin
 			ok_sticky(0) => mmcm_lm,
 			ok_sticky(1) => pll_lm
 		);
-
--- Data inputs
-
-	ibufds_cdr: IBUFDS
-		port map(
-			i => d_cdr_p,
-			ib => d_cdr_n,
-			o => d_cdr_i
-		);
-		
-	iddr_cdr: IDDR
-		generic map(
-			DDR_CLK_EDGE => "SAME_EDGE"
-		)
-		port map(
-			q1 => d_cdr_r,
-			q2 => d_cdr_f,
-			c => clk_cdr_i,
-			ce => '1',
-			d => d_cdr_i,
-			r => '0',
-			s => '0'
-		);
-		
-	d_cdr <= d_cdr_r when ctrl_cdr_edge = '0' else d_cdr_f;
-	
-	d_g: for i in 7 downto 0 generate
-	
-		signal di, dr, df: std_logic;
-		
-	begin
-	
-		ibufds_d: IBUFDS
-			port map(
-				i => d_p(i),
-				ib => d_n(i),
-				o => di
-			);
-			
-		iddr_d: IDDR
-			generic map(
-				DDR_CLK_EDGE => "SAME_EDGE"
-			)
-			port map(
-				q1 => dr,
-				q2 => df,
-				c => clk_i,
-				ce => '1',
-				d => di,
-				r => '0',
-				s => '0'
-			);
- 	
-		d(i) <= dr when ctrl_sfp_edge = '0' else df;
-		
-	end generate;
-		
-	ibufds_hdmi: IBUFDS
-		port map(
-			i => d_hdmi_p,
-			ib => d_hdmi_n,
-			o => d_hdmi_i
-		);
-		
-	iddr_hdmi: IDDR
-		generic map(
-			DDR_CLK_EDGE => "SAME_EDGE"
-		)
-		port map(
-			q1 => d_hdmi_r,
-			q2 => d_hdmi_f,
-			c => clk_i,
-			ce => '1',
-			d => d_hdmi_i,
-			r => '0',
-			s => '0'
-		);
-		
-	d_hdmi <= d_hdmi_r when ctrl_hdmi_edge = '0' else d_hdmi_f;
-	
-	ibufds_usfp: IBUFDS
-		port map(
-			i => d_usfp_p,
-			ib => d_usfp_n,
-			o => d_usfp_i
-		);
-		
-	iddr_usfp: IDDR
-		generic map(
-			DDR_CLK_EDGE => "SAME_EDGE"
-		)
-		port map(
-			q1 => d_usfp_r,
-			q2 => d_usfp_f,
-			c => clk_i,
-			ce => '1',
-			d => d_usfp_i,
-			r => '0',
-			s => '0'
-		);
-		
-	d_usfp <= d_usfp_r when ctrl_usfp_edge = '0' else d_usfp_f;
 	
 -- Data outputs
 
-	q_i <= q when falling_edge(clk_i);
+	q_hdmi_0_i <= q_hdmi when falling_edge(clk_i);
 
-	obuf_q: OBUFDS
+	obuf_q_hdmi_0: OBUFDS
 		port map(
-			i => q_i,
-			o => q_p,
-			ob => q_n
+			i => q_hdmi_0_i,
+			o => q_hdmi_0_p,
+			ob => q_hdmi_0_n
 		);
 
-	q_hdmi_i <= q_hdmi when falling_edge(clk_i);
+	q_hdmi_1_i <= q_hdmi when falling_edge(clk_i);
 
-	obuf_q_hdmi: OBUFDS
+	obuf_q_hdmi_1: OBUFDS
 		port map(
-			i => q_hdmi_i,
-			o => q_hdmi_p,
-			ob => q_hdmi_n
+			i => q_hdmi_1_i,
+			o => q_hdmi_1_p,
+			ob => q_hdmi_1_n
 		);
-
-	q_usfp_i <= q_usfp when falling_edge(clk_i);
-	
-	obuf_q_usfp: OBUFDS
-		port map(
-			i => q_usfp_i,
-			o => q_usfp_p,
-			ob => q_usfp_n
-		);
-
--- GPIO outputs
 		
-	gpio_g: for i in 2 downto 0 generate
+	q_hdmi_2_i <= q_hdmi when falling_edge(clk_i);
+
+	obuf_q_hdmi_2: OBUFDS
+		port map(
+			i => q_hdmi_2_i,
+			o => q_hdmi_2_p,
+			ob => q_hdmi_2_n
+		);
 		
-		obuf_g: OBUFDS
-			port map(
-				i => ctrl_gpio(i),
-				o => gpio_p(i),
-				ob => gpio_n(i)
-			);
-			
-	end generate;
+	q_hdmi_3_i <= q_hdmi when falling_edge(clk_i);
+
+	obuf_q_hdmi_3: OBUFDS
+		port map(
+			i => q_hdmi_3_i,
+			o => q_hdmi_3_p,
+			ob => q_hdmi_3_n
+		);
 
 -- Frequency measurement
 
 	div: entity work.freq_ctr_div
 		generic map(
-			N_CLK => 2
+			N_CLK => 1
 		)
 		port map(
 			clk(0) => clk_i,
-			clk(1) => clk_cdr_i,
 			clkdiv => clkdiv
 		);
 
 	ctr: entity work.freq_ctr
 		generic map(
-			N_CLK => 2
+			N_CLK => 1
 		)
 		port map(
 			clk => ipb_clk,
@@ -399,18 +237,5 @@ begin
 		);
 	
 	sda <= '0' when sda_o = '0' else 'Z';
-	
-	i2c_sfp: entity work.ipbus_i2c_master
-		port map(
-			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_USFP_I2C),
-			ipb_out => ipbr(N_SLV_USFP_I2C),
-			scl => usfp_scl,
-			sda_o => usfp_sda_o,
-			sda_i => usfp_sda
-		);
-	
-	usfp_sda <= '0' when usfp_sda_o = '0' else 'Z';
 				
 end rtl;
