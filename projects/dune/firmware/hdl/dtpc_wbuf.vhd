@@ -46,7 +46,7 @@ architecture rtl of dtpc_wbuf is
 	signal sctr: unsigned(BLOCK_RADIX - 1 downto 0);
 	signal addr: unsigned(ADDR_WIDTH - 1 downto 0);
 	signal addr_sl: std_logic_vector(ADDR_WIDTH - 1 downto 0);
-	signal send, cend, run, c, c_r, done_i, done_p: std_logic;
+	signal send, cend, mend, run, c, c_r, done_i, done_p: std_logic;
 	signal q_ram, hdata, hdata_r: std_logic_vector(DTPC_STREAM_D_W - 1 downto 0);
 	
 begin
