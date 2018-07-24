@@ -82,7 +82,7 @@ end pdts_pc059_io;
 
 architecture rtl of pdts_pc059_io is
 
-	constant BOARD_TYPE: std_logic_vector(7 downto 0) := X"02";
+	constant BOARD_TYPE: std_logic_vector(7 downto 0) := X"04";
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
