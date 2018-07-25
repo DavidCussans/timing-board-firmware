@@ -1,0 +1,2 @@
+include -c boards/enclustra_ax3_pm3/base_fw/sim pc051a_sim.dep
+include payload_sim.dep
