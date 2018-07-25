@@ -114,6 +114,12 @@ quick_check:ouroboros_pc059_monitor:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
 
+quick_check:master_tlu:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/master"
+    PROJECT_TOP_DEP: "top_a35_tlu.dep"
+
 #--- Full builds ---
 full_build:ouroboros_fmc:
   <<: *template_job_vivado_full_build
@@ -139,4 +145,9 @@ full_build:ouroboros_pc059_monitor:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
 
+full_build:master_tlu:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_tlu.dep"
 

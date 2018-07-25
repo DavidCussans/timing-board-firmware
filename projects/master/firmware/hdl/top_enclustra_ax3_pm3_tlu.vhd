@@ -31,7 +31,7 @@ entity top is port(
 		q_hdmi_3: out std_logic; -- output to downstream HDMI 3
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
-		rstb_i2c: out std_logic; -- reset for I2C expanders
+		rstb_i2c: out std_logic -- reset for I2C expanders
 	);
 
 end top;
