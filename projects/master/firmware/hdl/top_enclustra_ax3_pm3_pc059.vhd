@@ -10,6 +10,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 use work.ipbus.ALL;
+use work.net_addr.all;
 
 entity top is port(
 		sysclk: in std_logic;
@@ -101,8 +102,8 @@ begin
 	leds <= not ('0' & userled & inf_leds);
 	phy_rstn <= not phy_rst_e;
 		
-	mac_addr <= X"020ddba11641"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c841"; -- 192.168.200.65
+	mac_addr <= MAC_ADDR; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= IP_ADDR; -- 192.168.200.65
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
