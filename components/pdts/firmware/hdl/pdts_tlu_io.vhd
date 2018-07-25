@@ -10,12 +10,12 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
-use work.ipbus_decode_pdts_pc059_io.all;
+use work.ipbus_decode_pdts_tlu_io.all;
 
 library unisim;
 use unisim.VComponents.all;
 
-entity pdts_pc059_io is
+entity pdts_tlu_io is
 	generic(
 		CARRIER_TYPE: std_logic_vector(7 downto 0);
 		DESIGN_TYPE: std_logic_vector(7 downto 0)
@@ -35,22 +35,18 @@ entity pdts_pc059_io is
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
 		q_hdmi: in std_logic;
-		q_hdmi_0_p: out std_logic; -- output to HDMI 0
-		q_hdmi_0_n: out std_logic;
-		q_hdmi_1_p: out std_logic; -- output to HDMI 1
-		q_hdmi_1_n: out std_logic;
-		q_hdmi_2_p: out std_logic; -- output to HDMI 2
-		q_hdmi_2_n: out std_logic;
-		q_hdmi_3_p: out std_logic; -- output to HDMI 3
-		q_hdmi_3_n: out std_logic;
+		q_hdmi_0: out std_logic; -- output to HDMI 0
+		q_hdmi_1: out std_logic; -- output to HDMI 1
+		q_hdmi_2: out std_logic; -- output to HDMI 2
+		q_hdmi_3: out std_logic; -- output to HDMI 3
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
 		rstb_i2c: out std_logic -- reset for I2C expanders
 	);
 
-end pdts_pc059_io;
+end pdts_tlu_io;
 
-architecture rtl of pdts_pc059_io is
+architecture rtl of pdts_tlu_io is
 
 	constant BOARD_TYPE: std_logic_vector(7 downto 0) := X"04";
 
@@ -59,13 +55,16 @@ architecture rtl of pdts_pc059_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon: std_logic;
-	signal clk_i, clk_u, q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
+	signal clk_i, clk_u: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
+	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal sda_o: std_logic;
 	
   attribute IOB: string;
-  attribute IOB of q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: signal is "TRUE";
+  attribute IOB of q_hdmi_0, q_hdmi_1, q_hdmi_2, q_hdmi_3: signal is "TRUE";
+  attribute KEEP: string;
+  attribute KEEP of q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: signal is "TRUE";
 
 begin
 
@@ -79,7 +78,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_pdts_pc059_io(ipb_in.ipb_addr),
+      sel => ipbus_sel_pdts_tlu_io(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
@@ -106,7 +105,6 @@ begin
 	nuke <= ctrl(0)(1);
 	rst <= ctrl(0)(2);
 	rstb_clk <= not ctrl(0)(3);
-	rstb_i2cmux <= not ctrl(0)(4);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
 	
@@ -164,41 +162,14 @@ begin
 	
 -- Data outputs
 
-	q_hdmi_0_i <= q_hdmi when falling_edge(clk_i);
-
-	obuf_q_hdmi_0: OBUFDS
-		port map(
-			i => q_hdmi_0_i,
-			o => q_hdmi_0_p,
-			ob => q_hdmi_0_n
-		);
-
-	q_hdmi_1_i <= q_hdmi when falling_edge(clk_i);
-
-	obuf_q_hdmi_1: OBUFDS
-		port map(
-			i => q_hdmi_1_i,
-			o => q_hdmi_1_p,
-			ob => q_hdmi_1_n
-		);
-		
-	q_hdmi_2_i <= q_hdmi when falling_edge(clk_i);
-
-	obuf_q_hdmi_2: OBUFDS
-		port map(
-			i => q_hdmi_2_i,
-			o => q_hdmi_2_p,
-			ob => q_hdmi_2_n
-		);
-		
-	q_hdmi_3_i <= q_hdmi when falling_edge(clk_i);
-
-	obuf_q_hdmi_3: OBUFDS
-		port map(
-			i => q_hdmi_3_i,
-			o => q_hdmi_3_p,
-			ob => q_hdmi_3_n
-		);
+    q_hdmi_0_i <= q_hdmi when falling_edge(clk_i);
+	q_hdmi_0 <= q_hdmi_0_i when falling_edge(clk_i);
+    q_hdmi_1_i <= q_hdmi when falling_edge(clk_i);
+	q_hdmi_1 <= q_hdmi_1_i when falling_edge(clk_i);
+    q_hdmi_2_i <= q_hdmi when falling_edge(clk_i);		
+	q_hdmi_2 <= q_hdmi_2_i when falling_edge(clk_i);
+    q_hdmi_3_i <= q_hdmi when falling_edge(clk_i);		
+	q_hdmi_3 <= q_hdmi_3_i when falling_edge(clk_i);
 
 -- Frequency measurement
 

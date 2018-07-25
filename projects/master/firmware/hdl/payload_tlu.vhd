@@ -28,14 +28,10 @@ entity payload is
 		clk_n: in std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
-		q_hdmi_0_p: out std_logic; -- output to HDMI 0
-		q_hdmi_0_n: out std_logic;
-		q_hdmi_1_p: out std_logic; -- output to HDMI 1
-		q_hdmi_1_n: out std_logic;
-		q_hdmi_2_p: out std_logic; -- output to HDMI 2
-		q_hdmi_2_n: out std_logic;
-		q_hdmi_3_p: out std_logic; -- output to HDMI 3
-		q_hdmi_3_n: out std_logic;
+		q_hdmi_0: out std_logic; -- output to HDMI 0
+		q_hdmi_1: out std_logic; -- output to HDMI 1
+		q_hdmi_2: out std_logic; -- output to HDMI 2
+		q_hdmi_3: out std_logic; -- output to HDMI 3
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
 		rstb_i2c: out std_logic -- reset for I2C expanders
@@ -90,14 +86,10 @@ begin
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
 			q_hdmi => q,
-			q_hdmi_0_p => q_hdmi_0_p,
-			q_hdmi_0_n => q_hdmi_0_n,
-			q_hdmi_1_p => q_hdmi_1_p,
-			q_hdmi_1_n => q_hdmi_1_n,
-			q_hdmi_2_p => q_hdmi_2_p,
-			q_hdmi_2_n => q_hdmi_2_n,
-			q_hdmi_3_p => q_hdmi_3_p,
-			q_hdmi_3_n => q_hdmi_3_n,
+			q_hdmi_0 => q_hdmi_0,
+			q_hdmi_1 => q_hdmi_1,
+			q_hdmi_2 => q_hdmi_2,
+			q_hdmi_3 => q_hdmi_3,
 			scl => scl,
 			sda => sda,
 			rstb_i2c => rstb_i2c
@@ -137,6 +129,7 @@ begin
 			mclk => clk_pll,
 			clk => clk,
 			rst => rst,
+		    d => '0',
 			q => q
 		);
 

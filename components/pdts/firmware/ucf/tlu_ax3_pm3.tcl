@@ -10,14 +10,17 @@ set_property DIFF_TERM TRUE [get_port {clk_p clk_n}]
 set_property PACKAGE_PIN T5 [get_ports {clk_p}]
 set_property PACKAGE_PIN T4 [get_ports {clk_n}]
 
-set_property IOSTANDARD LVCMOS3 [get_port {q_hdmi_* rstb_clk clk_lolb scl sda rstb_i2c}]
+set_property IOSTANDARD LVCMOS33 [get_port {q_hdmi_* rstb_clk clk_lolb scl sda rstb_i2c}]
 set_property PACKAGE_PIN R7 [get_ports {q_hdmi_0}]
 set_property PACKAGE_PIN U4 [get_ports {q_hdmi_1}]
 set_property PACKAGE_PIN R8 [get_ports {q_hdmi_2}]
 set_property PACKAGE_PIN K5 [get_ports {q_hdmi_3}]
 set_property PACKAGE_PIN C1 [get_ports {rstb_clk}]
 set_property PACKAGE_PIN G6 [get_ports {clk_lolb}]
+set_property PACKAGE_PIN C2 [get_ports {rstb_i2c}]
+false_path {q_hdmi_* rstb_clk clk_lolb rstb_i2c} sysclk
+
+set_property IOSTANDARD LVCMOS25 [get_port {q_hdmi_* rstb_clk clk_lolb scl sda rstb_i2c}]
 set_property PACKAGE_PIN N17 [get_ports {scl}]
 set_property PACKAGE_PIN P18 [get_ports {sda}]
-set_property PACKAGE_PIN C2 [get_ports {rstb_i2c}]
-false_path {q_hdmi_* rstb_clk clk_lolb scl sda rstb_i2c} sysclk
+false_path {scl sda} sysclk
