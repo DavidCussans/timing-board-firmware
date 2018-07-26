@@ -21,7 +21,7 @@ set_property PACKAGE_PIN G6 [get_ports {clk_lolb}]
 set_property PACKAGE_PIN C2 [get_ports {rstb_i2c}]
 false_path {q_hdmi_* d_hdmi_* rstb_clk clk_lolb rstb_i2c} sysclk
 
-set_property IOSTANDARD LVCMOS25 [get_port {q_hdmi_* rstb_clk clk_lolb scl sda rstb_i2c}]
+set_property IOSTANDARD LVCMOS25 [get_port {scl sda}]
 set_property PACKAGE_PIN N17 [get_ports {scl}]
 set_property PACKAGE_PIN P18 [get_ports {sda}]
 false_path {scl sda} sysclk
