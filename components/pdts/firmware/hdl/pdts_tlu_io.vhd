@@ -1,6 +1,6 @@
--- pdts_pc059_io
+-- pdts_tlu_io
 --
--- Various functions for talking to the pc059 board chipset
+-- Various functions for talking to the TLU board chipset
 --
 -- Dave Newbold, February 2016
 
@@ -39,6 +39,8 @@ entity pdts_tlu_io is
 		q_hdmi_1: out std_logic; -- output to HDMI 1
 		q_hdmi_2: out std_logic; -- output to HDMI 2
 		q_hdmi_3: out std_logic; -- output to HDMI 3
+		d_hdmi_3: in std_logic;
+		d_hdmi: out std_logic;
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
 		rstb_i2c: out std_logic -- reset for I2C expanders
@@ -58,6 +60,7 @@ architecture rtl of pdts_tlu_io is
 	signal clk_i, clk_u: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
+	signal d_hdmi_3_r, d_hdmi_3_f: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal sda_o: std_logic;
 	
@@ -159,16 +162,35 @@ begin
 			ok_sticky(0) => mmcm_lm,
 			ok_sticky(1) => pll_lm
 		);
-	
+		
+-- Data inputs
+
+	iddr_hdmi: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => d_hdmi_3_r,
+			q2 => d_hdmi_3_f,
+			c => clk_i,
+			ce => '1',
+			d => d_hdmi_3,
+			r => '0',
+			s => '0'
+		);
+		
+	d_hdmi <= d_hdmi_3_r when ctrl_hdmi_edge = '0' else d_hdmi_3_f;
+		
+		
 -- Data outputs
 
-    q_hdmi_0_i <= q_hdmi when falling_edge(clk_i);
+	q_hdmi_0_i <= q_hdmi when falling_edge(clk_i); -- Replication needed to meet timing
 	q_hdmi_0 <= q_hdmi_0_i when falling_edge(clk_i);
-    q_hdmi_1_i <= q_hdmi when falling_edge(clk_i);
+	q_hdmi_1_i <= q_hdmi when falling_edge(clk_i);
 	q_hdmi_1 <= q_hdmi_1_i when falling_edge(clk_i);
-    q_hdmi_2_i <= q_hdmi when falling_edge(clk_i);		
+	q_hdmi_2_i <= q_hdmi when falling_edge(clk_i);
 	q_hdmi_2 <= q_hdmi_2_i when falling_edge(clk_i);
-    q_hdmi_3_i <= q_hdmi when falling_edge(clk_i);		
+	q_hdmi_3_i <= q_hdmi when falling_edge(clk_i);
 	q_hdmi_3 <= q_hdmi_3_i when falling_edge(clk_i);
 
 -- Frequency measurement
