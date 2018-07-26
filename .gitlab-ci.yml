@@ -90,64 +90,85 @@ quick_check:ouroboros_sim:
     - cd proj/ouroboros_sim
     - ipbb sim setup-simlib ipcores fli make-project
 
+
+#--- Ouroboros ---------------------
+# Dep and syntax check
 quick_check:ouroboros_fmc:
   <<: *template_job_vivado_quick_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
 
-quick_check:ouroloop_fmc:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_loopback.dep"
-
-quick_check:ouroboros_pc059:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_pc059.dep"
-
-quick_check:ouroboros_pc059_monitor:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
-
-quick_check:master_tlu:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/master"
-    PROJECT_TOP_DEP: "top_a35_tlu.dep"
-
-#--- Full builds ---
+# Build
 full_build:ouroboros_fmc:
   <<: *template_job_vivado_full_build
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
 
+
+#--- Ouroloop FMC ------------------
+# Dep and syntax check
+quick_check:ouroloop_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
+
+# Build 
+full_build:master_tlu:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/master"
+    PROJECT_TOP_DEP: "top_a35_tlu.dep"
+
+
+#--- Ouroboros PC059 -----------------
+# Dep and syntax check
+quick_check:ouroboros_pc059:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059.dep"
+
+# Build
 full_build:ouroloop_fmc:
   <<: *template_job_vivado_full_build
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
+
+#--- Ouroboros PC059-monitor ----------
+# Dep and syntax check
+quick_check:ouroboros_pc059_monitor:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
+
+# Build
 full_build:ouroboros_pc059:
   <<: *template_job_vivado_full_build
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
 
+
+#--- TLU Master -------------------------
+# Dep and syntax check
+quick_check:master_tlu:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/master"
+    PROJECT_TOP_DEP: "top_a35_tlu.dep"
+
+# Build
 full_build:ouroboros_pc059_monitor:
   <<: *template_job_vivado_full_build
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
 
-full_build:master_tlu:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_tlu.dep"
+
 
