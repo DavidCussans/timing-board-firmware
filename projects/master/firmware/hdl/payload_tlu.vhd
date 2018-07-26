@@ -32,6 +32,7 @@ entity payload is
 		q_hdmi_1: out std_logic; -- output to HDMI 1
 		q_hdmi_2: out std_logic; -- output to HDMI 2
 		q_hdmi_3: out std_logic; -- output to HDMI 3
+		d_hdmi_3: in std_logic; -- input from HDMI 3
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
 		rstb_i2c: out std_logic -- reset for I2C expanders
@@ -45,7 +46,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
 	
 begin
 
@@ -90,6 +91,8 @@ begin
 			q_hdmi_1 => q_hdmi_1,
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
+			d_hdmi_3 => d_hdmi_3,
+			d_hdmi => d,
 			scl => scl,
 			sda => sda,
 			rstb_i2c => rstb_i2c
@@ -129,7 +132,7 @@ begin
 			mclk => clk_pll,
 			clk => clk,
 			rst => rst,
-		    d => '0',
+		  d => d,
 			q => q
 		);
 
