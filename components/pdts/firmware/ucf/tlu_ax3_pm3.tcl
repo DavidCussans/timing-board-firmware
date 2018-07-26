@@ -6,7 +6,6 @@ create_clock -period 4.000 -name clk [get_ports clk_p]
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk] -group [get_clocks -include_generated_clocks -of_obj [get_pins -of_obj [get_cells infra/clocks/mmcm] -filter {NAME =~ *CLKOUT*}]]
 
 set_property IOSTANDARD LVDS_25 [get_port {clk_p clk_n}]
-set_property DIFF_TERM TRUE [get_port {clk_p clk_n}]
 set_property PACKAGE_PIN T5 [get_ports {clk_p}]
 set_property PACKAGE_PIN T4 [get_ports {clk_n}]
 
