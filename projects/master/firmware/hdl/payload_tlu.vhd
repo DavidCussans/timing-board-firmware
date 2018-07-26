@@ -100,7 +100,7 @@ begin
 
 -- Clock divider
 
-	clkgen: entity work.pdts_rx_div_mmcm
+	clkgen: entity work.pdts_rx_mul_mmcm
 		port map(
 			sclk => clk_pll,
 			clk => clk,
