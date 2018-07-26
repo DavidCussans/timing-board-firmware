@@ -10,7 +10,7 @@ set_property DIFF_TERM TRUE [get_port {clk_p clk_n}]
 set_property PACKAGE_PIN T5 [get_ports {clk_p}]
 set_property PACKAGE_PIN T4 [get_ports {clk_n}]
 
-set_property IOSTANDARD LVCMOS33 [get_port {q_hdmi_* d_hdmi_* rstb_clk clk_lolb scl sda rstb_i2c}]
+set_property IOSTANDARD LVCMOS33 [get_port {q_hdmi_* d_hdmi_* rstb_clk clk_lolb rstb_i2c}]
 set_property PACKAGE_PIN R7 [get_ports {q_hdmi_0}]
 set_property PACKAGE_PIN U4 [get_ports {q_hdmi_1}]
 set_property PACKAGE_PIN R8 [get_ports {q_hdmi_2}]
