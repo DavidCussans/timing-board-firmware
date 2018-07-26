@@ -1,7 +1,7 @@
 set_property BITSTREAM.Config.SPI_BUSWIDTH 4 [current_design]
 set_property BITSTREAM.CONFIG.CONFIGRATE 33 [current_design]
 
-create_clock -period 4.000 -name clk [get_ports clk_p]
+create_clock -period 20.000 -name clk [get_ports clk_p]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks clk] -group [get_clocks -include_generated_clocks -of_obj [get_pins -of_obj [get_cells infra/clocks/mmcm] -filter {NAME =~ *CLKOUT*}]]
 
