@@ -129,8 +129,8 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_MASTER_TOP),
 			ipb_out => ipbr(N_SLV_MASTER_TOP),
-			mclk => clk_pll,
-			clk => clk,
+			mclk => clk, --clk_pll,
+			clk => clk_pll, --clk,
 			rst => rst,
 		  	d => d,
 			q => q
