@@ -58,6 +58,7 @@ architecture rtl of pdts_tlu_io is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon: std_logic;
 	signal clk_i, clk_u: std_logic;
+	signal ctrl_hdmi_edge: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
 	signal d_hdmi_3_r, d_hdmi_3_f: std_logic;
@@ -110,6 +111,7 @@ begin
 	rstb_clk <= not ctrl(0)(3);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
+	ctrl_hdmi_edge <= ctrl(0)(22);
 	
 -- Config info
 

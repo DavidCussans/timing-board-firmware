@@ -132,7 +132,7 @@ begin
 			mclk => clk_pll,
 			clk => clk,
 			rst => rst,
-		  d => d,
+		  	d => d,
 			q => q
 		);
 

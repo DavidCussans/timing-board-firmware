@@ -7,6 +7,7 @@
 					<node id="pll_rst" mask="0x8"/>
 					<node id="rst_i2c" mask="0x20"/>
 					<node id="rst_lock_mon" mask="0x40"/>
+					<node id="hdmi_edge" mask="0x400000"/>
 				</node>
 				<node id="stat" address="0x1">
 					<node id="pll_lol" mask="0x1"/>
