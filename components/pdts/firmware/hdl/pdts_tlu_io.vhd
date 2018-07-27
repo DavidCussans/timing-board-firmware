@@ -11,6 +11,7 @@ use ieee.std_logic_misc.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 use work.ipbus_decode_pdts_tlu_io.all;
+use work.pdts_defs.all;
 
 library unisim;
 use unisim.VComponents.all;
@@ -31,7 +32,9 @@ entity pdts_tlu_io is
 		locked: in std_logic;
 		clk_p: in std_logic; -- 50MHz master clock from PLL
 		clk_n: in std_logic;
-		clk: out std_logic;
+		clk: out std_logic; -- 50MHz system clock out
+		mclk: out std_logic; -- 250MHz IO clock out
+		io_locked: out std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
 		q_hdmi: in std_logic;
@@ -57,9 +60,10 @@ architecture rtl of pdts_tlu_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon: std_logic;
-	signal clk_i, clk_u: std_logic;
+	signal rst_i, clk_i, clk_u, mclk_i, mclk_u: std_logic;
+	signal clkfbout, clkfbin, ioclk_locked, ioclk_rst: std_logic;
 	signal ctrl_hdmi_edge: std_logic;
-	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
+	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, ioclk_bad, ioclk_ok, mmcm_lm, pll_lm, ioclk_lm: std_logic;
 	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
 	signal d_hdmi_3_r, d_hdmi_3_f: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
@@ -103,15 +107,17 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"000000" & pll_lm & mmcm_lm & pll_ok & mmcm_ok & "000" & not clk_lolb;
+	stat(0) <= X"000000" & '0' & ioclk_lm & pll_lm & mmcm_lm & '0' & ioclk_io & pll_ok & mmcm_ok;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
-	rst <= ctrl(0)(2);
+	rst_i <= ctrl(0)(2);
 	rstb_clk <= not ctrl(0)(3);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
 	ctrl_hdmi_edge <= ctrl(0)(22);
+	
+	rst <= rst_i;
 	
 -- Config info
 
@@ -137,7 +143,7 @@ begin
 			o => clk_u
 		);
 		
-	bufg_in: BUFG
+	bufg_clk: BUFG
 		port map(
 			i => clk_u,
 			o => clk_i
@@ -145,24 +151,62 @@ begin
 		
 	clk <= clk_i;
 	
+-- Clock generation
+
+	ioclk_rst <= rst_i or not locked;
+
+	mmcm: MMCME2_BASE
+		generic map(
+			CLKIN1_PERIOD => 1000 / CLK_FREQ, -- 50MHz input
+			CLKFBOUT_MULT_F => 1000 / CLK_FREQ, -- 1GHz VCO freq
+			CLKOUT0_DIVIDE_F => (1000 / CLK_FREQ) / real(SCLK_RATIO) -- IO clock output
+		)
+		port map(
+			clkin1 => clk_i,
+			clkfbin => clkfbin,
+			clkout0 => mclk_u,
+			clkfbout => clkfbout,
+			locked => ioclk_locked,
+			rst => ioclk_rst,
+			pwrdwn => '0'
+		);
+
+	bufg_mclk: BUFG
+		port map(
+			i => mclk_u,
+			o => mclk_i
+		);
+		
+	bufg_fb: BUFG
+		port map(
+			i => clkfbout,
+			o => clkfbin
+		);
+		
+	mclk <= mclk_i;
+		
 -- Clock lock monitor
 
 	mmcm_bad <= not locked;
 	pll_bad <= not clk_lolb;
+	mmcm_m_bad <= not ioclk_locked;
 
 	chk: entity work.pdts_chklock
 		generic map(
-			N => 2
+			N => 3
 		)
 		port map(
 			clk => ipb_clk,
 			rst => ipb_rst,
 			los(0) => mmcm_bad,
 			los(1) => pll_bad,
+			los(2) => ioclk_bad,
 			ok(0) => mmcm_ok,
 			ok(1) => pll_ok,
+			ok(2) => ioclk_ok,
 			ok_sticky(0) => mmcm_lm,
-			ok_sticky(1) => pll_lm
+			ok_sticky(1) => pll_lm,
+			ok_sticky(2) => ioclk_lm
 		);
 		
 -- Data inputs
@@ -174,7 +218,7 @@ begin
 		port map(
 			q1 => d_hdmi_3_r,
 			q2 => d_hdmi_3_f,
-			c => clk_i,
+			c => mclk_i,
 			ce => '1',
 			d => d_hdmi_3,
 			r => '0',
@@ -182,33 +226,33 @@ begin
 		);
 		
 	d_hdmi <= d_hdmi_3_r when ctrl_hdmi_edge = '0' else d_hdmi_3_f;
-		
-		
+
 -- Data outputs
 
-	q_hdmi_0_i <= q_hdmi when falling_edge(clk_i); -- Replication needed to meet timing
-	q_hdmi_0 <= q_hdmi_0_i when falling_edge(clk_i);
-	q_hdmi_1_i <= q_hdmi when falling_edge(clk_i);
-	q_hdmi_1 <= q_hdmi_1_i when falling_edge(clk_i);
-	q_hdmi_2_i <= q_hdmi when falling_edge(clk_i);
-	q_hdmi_2 <= q_hdmi_2_i when falling_edge(clk_i);
-	q_hdmi_3_i <= q_hdmi when falling_edge(clk_i);
-	q_hdmi_3 <= q_hdmi_3_i when falling_edge(clk_i);
+	q_hdmi_0_i <= q_hdmi when falling_edge(mclk_i); -- Replication needed to meet timing
+	q_hdmi_0 <= q_hdmi_0_i when falling_edge(mclk_i);
+	q_hdmi_1_i <= q_hdmi when falling_edge(mclk_i);
+	q_hdmi_1 <= q_hdmi_1_i when falling_edge(mclk_i);
+	q_hdmi_2_i <= q_hdmi when falling_edge(mclk_i);
+	q_hdmi_2 <= q_hdmi_2_i when falling_edge(mclk_i);
+	q_hdmi_3_i <= q_hdmi when falling_edge(mclk_i);
+	q_hdmi_3 <= q_hdmi_3_i when falling_edge(mclk_i);
 
 -- Frequency measurement
 
 	div: entity work.freq_ctr_div
 		generic map(
-			N_CLK => 1
+			N_CLK => 2
 		)
 		port map(
 			clk(0) => clk_i,
+			clk(1) => mclk_i,
 			clkdiv => clkdiv
 		);
 
 	ctr: entity work.freq_ctr
 		generic map(
-			N_CLK => 1
+			N_CLK => 2
 		)
 		port map(
 			clk => ipb_clk,
