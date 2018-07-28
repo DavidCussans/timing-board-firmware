@@ -32,6 +32,8 @@ entity pdts_pc059_io is
 		clk_p: in std_logic; -- 50MHz master clock from PLL
 		clk_n: in std_logic;
 		clk: out std_logic;
+		mclk: out std_logic;
+		io_locked: out std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
 		d_p: in std_logic_vector(7 downto 0); -- data from fanout SFPs
@@ -196,6 +198,40 @@ begin
 		);
 		
 	clk_cdr <= clk_cdr_i;
+	
+-- Clock generation
+
+	ioclk_rst <= rst_i or not locked;
+
+	mmcm: MMCME2_BASE
+		generic map(
+			CLKIN1_PERIOD => (1000 / CLK_FREQ) / real(SCLK_RATIO), -- 250MHz input
+			CLKFBOUT_MULT_F => (1000 / CLK_FREQ) / real(SCLK_RATIO), -- 1GHz VCO freq
+			CLKOUT0_DIVIDE_F => 1000 / CLK_FREQ -- System clock output
+		)
+		port map(
+			clkin1 => clk_i,
+			clkfbin => clkfbin,
+			clkout0 => mclk_u,
+			clkfbout => clkfbout,
+			locked => ioclk_locked,
+			rst => ioclk_rst,
+			pwrdwn => '0'
+		);
+
+	bufg_mclk: BUFG
+		port map(
+			i => mclk_u,
+			o => mclk_i
+		);
+		
+	bufg_fb: BUFG
+		port map(
+			i => clkfbout,
+			o => clkfbin
+		);
+		
+	mclk <= mclk_i;
 	
 -- Clock lock monitor
 

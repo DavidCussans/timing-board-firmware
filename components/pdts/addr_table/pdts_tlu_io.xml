@@ -12,10 +12,8 @@
 				<node id="stat" address="0x1">
 					<node id="mmcm_ok" mask="0x1"/>
 					<node id="pll_ok" mask="0x2"/>
-					<node id="ioclk_ok" mask="0x4"/>
 					<node id="mmcm_sticky" mask="0x10"/>
 					<node id="pll_sticky" mask="0x20"/>
-					<node id="ioclk_sticky" mask="0x40"/>
 				</node>
 		</node>
 		<node id="config" address="0x2" description="board/firmware config" fwinfo="endpoint;width=0">
