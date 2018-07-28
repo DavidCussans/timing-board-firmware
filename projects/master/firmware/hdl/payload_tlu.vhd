@@ -85,7 +85,6 @@ begin
 			clk_n => clk_n,
 			clk => clk,
 			mclk => mclk,
-			io_locked => locked,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
 			q_hdmi => q,
@@ -100,7 +99,17 @@ begin
 			rstb_i2c => rstb_i2c
 		);
 
-	rsti <= rst_io or not locked;
+-- Clock divider
+
+	clkgen: entity work.pdts_rx_mul_mmcm
+		port map(
+			clk => clk,
+			sclk => mclk,
+			phase_rst => rst_io,
+			phase_locked => locked
+		);
+
+	rsti <= rst_io or not locked;	
 	
 	synchro: entity work.pdts_synchro
 		generic map(
@@ -124,7 +133,7 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
-		  	d => d,
+		  d => d,
 			q => q
 		);
 

@@ -1,6 +1,6 @@
 -- pdts_rx_mul_mmcm
 --
--- Clock divider for rx side
+-- Clock mutliplier for tlu
 --
 -- Dave Newbold, February 2017
 
@@ -15,8 +15,8 @@ use unisim.VComponents.all;
 
 entity pdts_rx_mul_mmcm is
 	port(
-		sclk: in std_logic;
-		clk: out std_logic;
+		clk: in std_logic;
+		sclk: out std_logic;
 		phase_rst: in std_logic;
 		phase_locked: out std_logic
 	);
@@ -25,7 +25,7 @@ end pdts_rx_mul_mmcm;
 
 architecture rtl of pdts_rx_mul_mmcm is
 
-	signal clkfbout, clkfbin, clki: std_logic;
+	signal clkfbout, clkfbin, sclki: std_logic;
 	
 begin
 
@@ -36,9 +36,9 @@ begin
 			CLKOUT0_DIVIDE_F => (1000 / CLK_FREQ) / real(SCLK_RATIO) -- IO clock output
 		)
 		port map(
-			clkin1 => sclk,
+			clkin1 => clk,
 			clkfbin => clkfbin,
-			clkout0 => clki,
+			clkout0 => sclki,
 			clkfbout => clkfbout,
 			locked => phase_locked,
 			rst => phase_rst,
@@ -47,8 +47,8 @@ begin
 
 	bufg0: BUFG
 		port map(
-			i => clki,
-			o => clk
+			i => sclki,
+			o => sclk
 	);
 	
 	bufgfb: BUFG

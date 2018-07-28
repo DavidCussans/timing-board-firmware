@@ -1,4 +1,4 @@
-<node id="io" description="FMC IO" fwinfo="endpoint">
+<node id="io" description="TLU IO" fwinfo="endpoint">
 		<node id="csr" address="0x0" description="ctrl/stat register" fwinfo="endpoint;width=1">
 				<node id="ctrl" address="0x0">
 					<node id="soft_rst" mask="0x1"/>
@@ -7,7 +7,7 @@
 					<node id="pll_rst" mask="0x8"/>
 					<node id="rst_i2c" mask="0x20"/>
 					<node id="rst_lock_mon" mask="0x40"/>
-					<node id="hdmi_edge" mask="0x400000"/>
+					<node id="hdmi_edge" mask="0x80"/>
 				</node>
 				<node id="stat" address="0x1">
 					<node id="mmcm_ok" mask="0x1"/>

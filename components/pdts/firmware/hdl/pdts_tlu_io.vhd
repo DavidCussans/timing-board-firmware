@@ -113,7 +113,7 @@ begin
 	rstb_clk <= not ctrl(0)(3);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
-	ctrl_hdmi_edge <= ctrl(0)(22);
+	ctrl_hdmi_edge <= ctrl(0)(7);
 	
 	rst <= rst_i;
 	
@@ -202,17 +202,16 @@ begin
 
 	div: entity work.freq_ctr_div
 		generic map(
-			N_CLK => 2
+			N_CLK => 1
 		)
 		port map(
 			clk(0) => clk_i,
-			clk(1) => mclk,
 			clkdiv => clkdiv
 		);
 
 	ctr: entity work.freq_ctr
 		generic map(
-			N_CLK => 2
+			N_CLK => 1
 		)
 		port map(
 			clk => ipb_clk,
