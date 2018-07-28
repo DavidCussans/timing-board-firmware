@@ -68,12 +68,11 @@ end payload;
 
 architecture rtl of payload is
 
-	constant DESIGN_TYPE: std_logic_vector := X"02";
-	constant N_EP: positive := 1;
+	constant DESIGN_TYPE: std_logic_vector := X"05";
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_loc, q_ep, d_hdmi, master_src: std_logic;
 	signal txd: std_logic_vector(N_EP - 1 downto 0);
 		
 begin
@@ -109,6 +108,7 @@ begin
 			nuke => nuke,
 			rst => rst_io,
 			locked => locked,
+			master_src => master_src,
 			clk_p => clk_p,
 			clk_n => clk_n,
 			clk => clk_pll,
@@ -123,17 +123,17 @@ begin
 			sfp_los => sfp_los,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => open,
+			d_cdr => open, -- This will go to phase adjuster and bridge
 			clk_cdr_p => clk_cdr_p,
 			clk_cdr_n => clk_cdr_n,
-			clk_cdr => open,
+			clk_cdr => open, -- This will go to phase measurement
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
 			inmux => inmux,
 			rstb_i2cmux => rstb_i2cmux,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
-			d_hdmi => d,
+			d_hdmi => d_hdmi,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
 			q_hdmi => '0',
@@ -180,8 +180,13 @@ begin
 			d(0) => rsti,
 			q(0) => rst
 		);
+		
+-- Switchyard
 
--- master block
+	q <= q_loc when master_src = '0' else d_hdmi; -- local or upstream input as data source
+	d_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
+
+-- Master block
 
 	master: entity work.master_top
 		port map(
@@ -192,32 +197,22 @@ begin
 			mclk => clk_pll,
 			clk => clk,
 			rst => rst,
-			q => q,
-			d => d
+			q => q_loc,
+			d => '0'
 		);
 
 -- Endpoint wrapper
 
-	egen: for i in N_EP - 1 downto 0 generate
-
-		wrapper: entity work.endpoint_wrapper_local
-			port map(
-				ipb_clk => ipb_clk,
-				ipb_rst => ipb_rst,
-				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
-				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
-				rec_clk => clk_pll,
-				rec_d => q,
-				clk => clk,
-				txd => txd(i)
-			);
-			
-	end generate;
-	
-	negen: for i in 3 downto N_EP generate
-	
-		ipbr(i + N_SLV_ENDPOINT0) <= IPB_RBUS_NULL;
-		
-	end generate;
+	wrapper: entity work.endpoint_wrapper_local
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(i + N_SLV_ENDPOINT0),
+			ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+			rec_clk => clk_pll,
+			rec_d => q,
+			clk => clk,
+			txd => q_ep
+		);
 
 end rtl;
