@@ -17,7 +17,7 @@ package ipbus_decode_endpoint_wrapper is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_endpoint_wrapper(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Wed May 23 20:23:05 2018 
+-- START automatically  generated VHDL the Sun Jul 29 10:27:54 2018 
   constant N_SLV_VERSION: integer := 0;
   constant N_SLV_CSR: integer := 1;
   constant N_SLV_TSTAMP: integer := 2;
@@ -25,8 +25,9 @@ package ipbus_decode_endpoint_wrapper is
   constant N_SLV_BUF: integer := 4;
   constant N_SLV_FREQ: integer := 5;
   constant N_SLV_CTRS: integer := 6;
-  constant N_SLV_SCMD_GEN: integer := 7;
-  constant N_SLAVES: integer := 8;
+  constant N_SLV_SYNC: integer := 7;
+  constant N_SLV_SCMD_GEN: integer := 8;
+  constant N_SLAVES: integer := 9;
 -- END automatically generated VHDL
 
     
@@ -38,21 +39,23 @@ package body ipbus_decode_endpoint_wrapper is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Wed May 23 20:23:05 2018 
-    if    std_match(addr, "-------------------------0-0000-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_VERSION, IPBUS_SEL_WIDTH)); -- version / base 0x00000000 / mask 0x0000005e
-    elsif std_match(addr, "-------------------------0-0001-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000002 / mask 0x0000005e
-    elsif std_match(addr, "-------------------------0-0010-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_TSTAMP, IPBUS_SEL_WIDTH)); -- tstamp / base 0x00000004 / mask 0x0000005e
-    elsif std_match(addr, "-------------------------0-0011-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_EVTCTR, IPBUS_SEL_WIDTH)); -- evtctr / base 0x00000006 / mask 0x0000005e
-    elsif std_match(addr, "-------------------------0-0100-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_BUF, IPBUS_SEL_WIDTH)); -- buf / base 0x00000008 / mask 0x0000005e
-    elsif std_match(addr, "-------------------------0-0101-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_FREQ, IPBUS_SEL_WIDTH)); -- freq / base 0x0000000a / mask 0x0000005e
-    elsif std_match(addr, "-------------------------0-1----") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_CTRS, IPBUS_SEL_WIDTH)); -- ctrs / base 0x00000010 / mask 0x00000050
+-- START automatically  generated VHDL the Sun Jul 29 10:27:54 2018 
+    if    std_match(addr, "-------------------------000000-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_VERSION, IPBUS_SEL_WIDTH)); -- version / base 0x00000000 / mask 0x0000007e
+    elsif std_match(addr, "-------------------------000001-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000002 / mask 0x0000007e
+    elsif std_match(addr, "-------------------------000010-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_TSTAMP, IPBUS_SEL_WIDTH)); -- tstamp / base 0x00000004 / mask 0x0000007e
+    elsif std_match(addr, "-------------------------000011-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_EVTCTR, IPBUS_SEL_WIDTH)); -- evtctr / base 0x00000006 / mask 0x0000007e
+    elsif std_match(addr, "-------------------------000100-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_BUF, IPBUS_SEL_WIDTH)); -- buf / base 0x00000008 / mask 0x0000007e
+    elsif std_match(addr, "-------------------------000101-") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_FREQ, IPBUS_SEL_WIDTH)); -- freq / base 0x0000000a / mask 0x0000007e
+    elsif std_match(addr, "-------------------------001----") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CTRS, IPBUS_SEL_WIDTH)); -- ctrs / base 0x00000010 / mask 0x00000070
+    elsif std_match(addr, "-------------------------0100---") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_SYNC, IPBUS_SEL_WIDTH)); -- sync / base 0x00000020 / mask 0x00000078
     elsif std_match(addr, "-------------------------1------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_SCMD_GEN, IPBUS_SEL_WIDTH)); -- scmd_gen / base 0x00000040 / mask 0x00000040
 -- END automatically generated VHDL

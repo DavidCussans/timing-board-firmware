@@ -9,7 +9,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
 use work.ipbus.all;
-use work.ipbus_decode_top_pc059.all;
+use work.ipbus_decode_top.all;
 
 entity payload is
 	generic(
@@ -72,8 +72,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_loc, q_ep, d_hdmi, master_src: std_logic;
-	signal txd: std_logic_vector(N_EP - 1 downto 0);
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_loc, q_ep, q_hdmi, d_hdmi, d_hdmi_r, master_src: std_logic;
 		
 begin
 
@@ -87,7 +86,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_top_pc059(ipb_in.ipb_addr),
+      sel => ipbus_sel_top(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
@@ -136,7 +135,7 @@ begin
 			d_hdmi => d_hdmi,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
-			q_hdmi => '0',
+			q_hdmi => q_hdmi,
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
 			d_usfp => open,
@@ -183,8 +182,9 @@ begin
 		
 -- Switchyard
 
-	q <= q_loc when master_src = '0' else d_hdmi; -- local or upstream input as data source
-	d_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
+    d_hdmi_r <= d_hdmi when rising_edge(clk_pll); -- pipeline to get across device
+	q <= q_loc when master_src = '0' else d_hdmi_r; -- local or upstream input as data source
+	q_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
 
 -- Master block
 
@@ -207,8 +207,8 @@ begin
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(i + N_SLV_ENDPOINT0),
-			ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+			ipb_in => ipbw(N_SLV_ENDPOINT0),
+			ipb_out => ipbr(N_SLV_ENDPOINT0),
 			rec_clk => clk_pll,
 			rec_d => q,
 			clk => clk,
