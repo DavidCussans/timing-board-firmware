@@ -136,5 +136,19 @@ begin
 		  d => d,
 			q => q
 		);
+		
+-- Endpoint wrapper
+
+	wrapper: entity work.endpoint_wrapper_local
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_ENDPOINT0),
+			ipb_out => ipbr(N_SLV_ENDPOINT0),
+			rec_clk => mclk,
+			rec_d => q,
+			clk => clk,
+			txd => open
+		);
 
 end rtl;
