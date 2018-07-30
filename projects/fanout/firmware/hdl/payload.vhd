@@ -182,7 +182,7 @@ begin
 		
 -- Switchyard
 
-    d_hdmi_r <= d_hdmi when rising_edge(clk_pll); -- pipeline to get across device
+	d_hdmi_r <= d_hdmi when rising_edge(clk_pll); -- pipeline to get across device
 	q <= q_loc when master_src = '0' else d_hdmi_r; -- local or upstream input as data source
 	q_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
 

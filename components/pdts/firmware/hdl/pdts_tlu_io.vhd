@@ -43,6 +43,17 @@ entity pdts_tlu_io is
 		q_hdmi_3: out std_logic; -- output to HDMI 3
 		d_hdmi_3: in std_logic;
 		d_hdmi: out std_logic;
+		q_sfp: in std_logic;
+		q_sfp_p: out std_logic;
+		q_sfp_n: out std_logic;
+		d_cdr_p: in std_logic;
+		d_cdr_n: in std_logic;
+		d_cdr: out std_logic;
+		sfp_los: in std_logic;
+		sfp_fault: in std_logic;
+		sfp_txdis: out std_logic;
+		cdr_lol: in std_logic;
+		cdr_los: in std_logic;
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
 		rstb_i2c: out std_logic -- reset for I2C expanders
@@ -60,15 +71,16 @@ architecture rtl of pdts_tlu_io is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon: std_logic;
 	signal rst_i, clk_i, clk_u, mclk_i, mclk_u: std_logic;
-	signal ctrl_hdmi_edge: std_logic;
+	signal ctrl_hdmi_edge, ctrl_cdr_edge: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
 	signal d_hdmi_3_r, d_hdmi_3_f: std_logic;
+	signal d_cdr_i, d_cdr_r, d_cdr_f, q_sfp_r, q_sfp_i: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal sda_o: std_logic;
 	
   attribute IOB: string;
-  attribute IOB of q_hdmi_0, q_hdmi_1, q_hdmi_2, q_hdmi_3: signal is "TRUE";
+  attribute IOB of q_hdmi_0, q_hdmi_1, q_hdmi_2, q_hdmi_3, q_sfp_i: signal is "TRUE";
   attribute KEEP: string;
   attribute KEEP of q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: signal is "TRUE";
 
@@ -105,7 +117,7 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= X"000000" & "00" & pll_lm & mmcm_lm & "00" & pll_ok & mmcm_ok;
+	stat(0) <= X"00000" & cdr_los & cdr_lol & sfp_los & sfp_fault & "00" & pll_lm & mmcm_lm & "00" & pll_ok & mmcm_ok;
 	
 	soft_rst <= ctrl(0)(0);
 	nuke <= ctrl(0)(1);
@@ -113,9 +125,12 @@ begin
 	rstb_clk <= not ctrl(0)(3);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
-	ctrl_hdmi_edge <= ctrl(0)(7);
+	ctrl_hdmi_edge <= ctrl(0)(8);
+	ctrl_cdr_edge <= ctrl(0)(9);
 	
 	rst <= rst_i;
+	
+	sfp_txdis <= '0';
 	
 -- Config info
 
@@ -171,6 +186,29 @@ begin
 		
 -- Data inputs
 
+	ibufds_cdr: IBUFDS
+		port map(
+			i => d_cdr_p,
+			ib => d_cdr_n,
+			o => d_cdr_i
+		);
+		
+	iddr_cdr: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => d_cdr_r,
+			q2 => d_cdr_f,
+			c => clk_cdr_i,
+			ce => '1',
+			d => d_cdr_i,
+			r => '0',
+			s => '0'
+		);
+		
+	d_cdr <= d_cdr_r when ctrl_cdr_edge = '0' else d_cdr_f;
+
 	iddr_hdmi: IDDR
 		generic map(
 			DDR_CLK_EDGE => "SAME_EDGE"
@@ -188,6 +226,16 @@ begin
 	d_hdmi <= d_hdmi_3_r when ctrl_hdmi_edge = '0' else d_hdmi_3_f;
 
 -- Data outputs
+	
+	q_sfp_r <= q_sfp when falling_edge(mclk);
+	q_sfp_i <= q_sfp_r when falling_edge(mclk);
+	
+	obuf_q_usfp: OBUFDS
+		port map(
+			i => q_sfp_i,
+			o => q_sfp_p,
+			ob => q_sfp_n
+		);
 
 	q_hdmi_0_i <= q_hdmi when falling_edge(mclk); -- Replication needed to meet timing
 	q_hdmi_0 <= q_hdmi_0_i when falling_edge(mclk);

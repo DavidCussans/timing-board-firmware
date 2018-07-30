@@ -33,6 +33,15 @@ entity payload is
 		q_hdmi_2: out std_logic; -- output to HDMI 2
 		q_hdmi_3: out std_logic; -- output to HDMI 3
 		d_hdmi_3: in std_logic; -- input from HDMI 3
+		q_sfp_p: out std_logic;
+		q_sfp_n: out std_logic;
+		d_cdr_p: in std_logic;
+		d_cdr_n: in std_logic;
+		sfp_los: in std_logic;
+		sfp_fault: in std_logic;
+		sfp_txdis: out std_logic;
+		cdr_lol: in std_logic;
+		cdr_los: in std_logic;
 		scl: out std_logic; -- main I2C
 		sda: inout std_logic;
 		rstb_i2c: out std_logic -- reset for I2C expanders
@@ -93,7 +102,18 @@ begin
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
 			d_hdmi_3 => d_hdmi_3,
-			d_hdmi => d,
+			d_hdmi => open,
+			q_sfp => q,
+			q_sfp_p => q_sfp_p,
+			q_sfp_n => q_sfp_n,
+			d_cdr_p => d_cdr_p,
+			d_cdr_n => d_cdr_n,
+			d_cdr => d,
+			sfp_los => sfp_los,
+			sfp_fault => sfp_fault,
+			sfp_txdis => sfp_txdis,
+			cdr_lol => cdr_lol,
+			cdr_los => cdr_los,
 			scl => scl,
 			sda => sda,
 			rstb_i2c => rstb_i2c
