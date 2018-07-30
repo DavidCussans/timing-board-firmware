@@ -31,9 +31,9 @@ begin
 
 	mmcm: MMCME2_BASE
 		generic map(
-			CLKIN1_PERIOD => 1000 / CLK_FREQ, -- 50MHz input
-			CLKFBOUT_MULT_F => 1000 / CLK_FREQ, -- 1GHz VCO freq
-			CLKOUT0_DIVIDE_F => (1000 / CLK_FREQ) / real(SCLK_RATIO) -- IO clock output
+			CLKIN1_PERIOD => 1000.0 / CLK_FREQ, -- 50MHz input
+			CLKFBOUT_MULT_F => 1000.0 / CLK_FREQ, -- 1GHz VCO freq
+			CLKOUT0_DIVIDE_F => (1000.0 / CLK_FREQ) / real(SCLK_RATIO) -- IO clock output
 		)
 		port map(
 			clkin1 => clk,
