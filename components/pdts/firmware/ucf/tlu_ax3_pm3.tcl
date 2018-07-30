@@ -14,6 +14,7 @@ set_property PACKAGE_PIN F1 [get_ports {q_sfp_p}]
 set_property PACKAGE_PIN E1 [get_ports {q_sfp_n}]
 set_property PACKAGE_PIN J3 [get_ports {d_cdr_p}]
 set_property PACKAGE_PIN J2 [get_ports {d_cdr_n}]
+set_property PULLUP TRUE [get_ports {q_sfp_*}]
 false_path {q_sfp_* d_cdr_*} sysclk
 
 set_property IOSTANDARD LVCMOS33 [get_port {q_hdmi_* d_hdmi_* rstb_clk clk_lolb rstb_i2c sfp_* cdr_*}]
