@@ -200,7 +200,7 @@ begin
 		port map(
 			q1 => d_cdr_r,
 			q2 => d_cdr_f,
-			c => clk_cdr_i,
+			c => mclk,
 			ce => '1',
 			d => d_cdr_i,
 			r => '0',
