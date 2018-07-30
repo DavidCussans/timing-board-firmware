@@ -72,7 +72,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_loc, q_ep, q_hdmi, d_hdmi, d_hdmi_r, master_src: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_loc, q_ep, q_hdmi, d_hdmi, d_hdmi_r, d_usfp, q_usfp, master_src: std_logic;
 		
 begin
 
@@ -138,10 +138,10 @@ begin
 			q_hdmi => q_hdmi,
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
-			d_usfp => open,
+			d_usfp => d_usfp,
 			q_usfp_p => q_usfp_p,
 			q_usfp_n => q_usfp_n,
-			q_usfp => '0',
+			q_usfp => q_usfp,
 			usfp_fault => usfp_fault,
 			usfp_los => usfp_los,
 			usfp_txdis => usfp_txdis,
@@ -183,9 +183,10 @@ begin
 -- Switchyard
 
 	d_hdmi_r <= d_hdmi when rising_edge(clk_pll); -- pipeline to get across device
-	q <= q_loc when master_src = '0' else d_hdmi_r; -- local or upstream input as data source
+	q <= q_loc when master_src = '0' else d_usfp; -- local or upstream input as data source
 	q_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
-
+	q_usfp <= q_ep;
+	
 -- Master block
 
 	master: entity work.master_top
