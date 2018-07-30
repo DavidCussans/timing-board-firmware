@@ -155,10 +155,18 @@ full_build:overlord_tlu:
     PROJECT_TOP_DEP: "top.dep"
 
 
-#--- TLU Overlord -------------------------
+#--- Fanout -------------------------
 # Dep and syntax check
 quick_check:fanout_0_pc059:
   <<: *template_job_vivado_quick_check
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip65.dep"
+
+# Build 
+full_build:fanout_0_pc059:
+  <<: *template_job_vivado_full_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip65.dep"
+
