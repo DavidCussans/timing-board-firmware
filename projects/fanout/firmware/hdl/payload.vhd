@@ -135,7 +135,7 @@ begin
 			d_hdmi => d_hdmi,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
-			q_hdmi => q_hdmi,
+			q_hdmi => '0',
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
 			d_usfp => d_usfp,
@@ -185,7 +185,7 @@ begin
 	d_hdmi_r <= d_hdmi when rising_edge(clk_pll); -- pipeline to get across device
 	d_usfp_r <= d_usfp when rising_edge(clk_pll); -- pipeline to get across device
 	q <= q_loc when master_src = '0' else d_usfp_r; -- local or upstream input as data source
-	q_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
+--	q_hdmi <= q_ep; -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
 	q_usfp <= q_ep;
 	
 -- Master block
