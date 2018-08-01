@@ -11,32 +11,32 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 
-package ipbus_decode_top is
+package ipbus_decode_crt_wrapper is
 
   constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
-  function ipbus_sel_top(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
+  function ipbus_sel_crt_wrapper(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
 -- START automatically  generated VHDL the Wed Aug  1 22:32:12 2018 
-  constant N_SLV_IO: integer := 0;
-  constant N_SLV_ENDPOINT0: integer := 1;
+  constant N_SLV_CSR: integer := 0;
+  constant N_SLV_PULSE: integer := 1;
   constant N_SLAVES: integer := 2;
 -- END automatically generated VHDL
 
     
-end ipbus_decode_top;
+end ipbus_decode_crt_wrapper;
 
-package body ipbus_decode_top is
+package body ipbus_decode_crt_wrapper is
 
-  function ipbus_sel_top(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
+  function ipbus_sel_crt_wrapper(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t is
     variable sel: ipbus_sel_t;
   begin
 
 -- START automatically  generated VHDL the Wed Aug  1 22:32:12 2018 
-    if    std_match(addr, "-------------------0------------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00001000
-    elsif std_match(addr, "-------------------1------------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_ENDPOINT0, IPBUS_SEL_WIDTH)); -- endpoint0 / base 0x00001000 / mask 0x00001000
+    if    std_match(addr, "----------------------------0---") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x00000008
+    elsif std_match(addr, "----------------------------1---") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_PULSE, IPBUS_SEL_WIDTH)); -- pulse / base 0x00000008 / mask 0x00000008
 -- END automatically generated VHDL
 
     else
@@ -45,7 +45,7 @@ package body ipbus_decode_top is
 
     return sel;
 
-  end function ipbus_sel_top;
+  end function ipbus_sel_crt_wrapper;
 
-end ipbus_decode_top;
+end ipbus_decode_crt_wrapper;
 
