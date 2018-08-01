@@ -82,9 +82,10 @@ begin
 			rxphy_locked => rxphy_locked,
 			rst => rst_i,
 			rx_err => rx_err,
-			rdy => rdy_i
+			tsrdy => rdy_i,
+			rdy => rdy
 		);
-		
+
 -- Clock divider
 
 	clkgen: entity work.pdts_rx_div_mmcm
@@ -156,8 +157,6 @@ begin
 			tstamp => tstamp,
 			rdy => rdy_i
 		);
-		
-	rdy <= rdy_i;
 	
 -- Echo command; send it back to the master
 

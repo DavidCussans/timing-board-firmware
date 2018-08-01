@@ -31,7 +31,8 @@ entity pdts_ep_startup is
 		rxphy_locked: in std_logic; -- RX phy locked
 		rst: out std_logic; -- 50MHz reset
 		rx_err: in std_logic_vector(2 downto 0); -- RX decoder error status 
-		rdy: in std_logic -- Timestamp ready
+		tsrdy: in std_logic -- Timestamp ready
+		rdy: out std_logic -- Output ready signal
 	);
 
 end pdts_ep_startup;
@@ -45,7 +46,7 @@ architecture rtl of pdts_ep_startup is
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
 	signal cdr_bad, sfp_los_ok, cdr_ok, f_en: std_logic;
-	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, rdy_i: std_logic;
+	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, tsrdy_i: std_logic;
 	signal rec_rst_i, rxphy_rst_i, rst_i, rst_u: std_logic;
 
 begin
@@ -102,7 +103,7 @@ begin
 						state <= W_ALIGN;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
-					elsif rdy_i = '1' then
+					elsif tsrdy_i = '1' then
 						state <= RUN;
 					end if;
 -- Running state
@@ -113,7 +114,7 @@ begin
 						state <= W_ALIGN;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
-					elsif rdy_i = '0' then
+					elsif tsrdy_i = '0' then
 						state <= ERR_T;
 					end if;
 -- Error states. Doomed.
@@ -225,11 +226,11 @@ begin
 			d(0) => rxphy_aligned,
 			d(1) => rxphy_locked,
 			d(2) => rx_err_f,
-			d(3) => rdy,
+			d(3) => tsrdy,
 			q(0) => rxphy_aligned_i,
 			q(1) => rxphy_locked_i,
 			q(2) => rx_err_i,
-			q(3) => rdy_i
+			q(3) => tsrdy_i
 		);
 
 -- Resets
@@ -237,6 +238,7 @@ begin
 	rec_rst_i <= '1' when state = W_RST or state = W_SFP or state = W_CDR or state = W_FREQ else '0';
 	rxphy_rst_i <= '1' when rec_rst_i = '1' or state = W_ALIGN else '0';
 	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK else '0';
+	rdy <= '1' when state = RUN else '0';
 
 -- CDC into rec_clk / clk domain
 
