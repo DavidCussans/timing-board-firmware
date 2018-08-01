@@ -89,7 +89,6 @@ architecture rtl of pdts_pc059_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_gpio: std_logic_vector(2 downto 0);
 	signal ctrl_rst_lock_mon, ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
 	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
@@ -142,15 +141,14 @@ begin
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
 	master_src <= ctrl(0)(9 downto 8);
-	inmux <= ctrl(0)(10 downto 8);
-	ctrl_gpio <= ctrl(0)(14 downto 12);
-	ledb <= not ctrl(0)(18 downto 16);
+	inmux <= ctrl(0)(14 downto 12);
 	ctrl_cdr_edge <= ctrl(0)(20);
 	ctrl_sfp_edge <= ctrl(0)(21);
 	ctrl_hdmi_edge <= ctrl(0)(22);
 	ctrl_usfp_edge <= ctrl(0)(23);
 	
 	usfp_txdis <= '0';
+	ledb <= "111";
 	
 -- Config info
 
@@ -356,7 +354,7 @@ begin
 		
 		obuf_g: OBUFDS
 			port map(
-				i => ctrl_gpio(i),
+				i => '0',
 				o => gpio_p(i),
 				ob => gpio_n(i)
 			);
