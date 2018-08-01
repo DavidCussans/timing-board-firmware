@@ -29,7 +29,7 @@ entity pdts_pc059_io is
 		nuke: out std_logic;
 		rst: out std_logic;
 		locked: in std_logic;
-		master_src: out std_logic;
+		master_src: out std_logic_vector(1 downto 0);
 		clk_p: in std_logic; -- 250MHz master clock from PLL
 		clk_n: in std_logic;
 		clk: out std_logic;
@@ -141,7 +141,7 @@ begin
 	rstb_i2cmux <= not ctrl(0)(4);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
-	master_src <= ctrl(0)(7);
+	master_src <= ctrl(0)(9 downto 8);
 	inmux <= ctrl(0)(10 downto 8);
 	ctrl_gpio <= ctrl(0)(14 downto 12);
 	ledb <= not ctrl(0)(18 downto 16);
