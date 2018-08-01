@@ -31,7 +31,7 @@ entity pdts_ep_startup is
 		rxphy_locked: in std_logic; -- RX phy locked
 		rst: out std_logic; -- 50MHz reset
 		rx_err: in std_logic_vector(2 downto 0); -- RX decoder error status 
-		tsrdy: in std_logic -- Timestamp ready
+		tsrdy: in std_logic; -- Timestamp ready
 		rdy: out std_logic -- Output ready signal
 	);
 
