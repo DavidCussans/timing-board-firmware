@@ -72,7 +72,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_loc, q_ep, q_hdmi, d_hdmi, d_hdmi_r, d_usfp, d_usfp_r, q_usfp: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_r, q_loc, q_ep, q_hdmi, d_hdmi, d_hdmi_r, d_usfp, d_usfp_r, q_usfp: std_logic;
 	signal master_src: std_logic_vector(1 downto 0);	
 	
 begin
@@ -119,7 +119,7 @@ begin
 			d => open,
 			q_p => q_p,
 			q_n => q_n,
-			q => q,
+			q => q_r,
 			sfp_los => sfp_los,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
@@ -190,6 +190,7 @@ begin
 		d_hdmi_r when "01",
 		d_usfp_r when "10",
 		'0' when others;
+	q_r <= q when rising_edge(clk_pll);
 	q_hdmi <= q_ep when rising_edge(clk_pll); -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
 	q_usfp <= q_ep when rising_edge(clk_pll);
 	
@@ -217,7 +218,7 @@ begin
 			ipb_in => ipbw(N_SLV_ENDPOINT0),
 			ipb_out => ipbr(N_SLV_ENDPOINT0),
 			rec_clk => clk_pll,
-			rec_d => q,
+			rec_d => q_r,
 			clk => clk,
 			txd => q_ep
 		);
