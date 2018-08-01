@@ -1,8 +1,8 @@
--- payload_tlu
+-- master
 --
--- Wrapper for TLU design
+-- Interface to timing FMC v1 for PDTS endpoint wrapper block
 --
--- Dave Newbold, July 2018
+-- Dave Newbold, February 2017
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -24,39 +24,50 @@ entity payload is
 		soft_rst: out std_logic;
 		userled: out std_logic;
 		clk125: in std_logic;
-		clk_p: in std_logic; -- 50MHz master clock from PLL
-		clk_n: in std_logic;
-		rstb_clk: out std_logic; -- reset for PLL
-		clk_lolb: in std_logic; -- PLL LOL
-		q_hdmi_0: out std_logic; -- output to HDMI 0
-		q_hdmi_1: out std_logic; -- output to HDMI 1
-		q_hdmi_2: out std_logic; -- output to HDMI 2
-		q_hdmi_3: out std_logic; -- output to HDMI 3
-		d_hdmi_3: in std_logic; -- input from HDMI 3
-		q_sfp_p: out std_logic;
-		q_sfp_n: out std_logic;
-		d_cdr_p: in std_logic;
-		d_cdr_n: in std_logic;
-		sfp_los: in std_logic;
-		sfp_fault: in std_logic;
-		sfp_txdis: out std_logic;
+		fmc_clk_p: in std_logic;
+		fmc_clk_n: in std_logic;
+		rec_clk_p: in std_logic;
+		rec_clk_n: in std_logic;
+		rec_d_p: in std_logic;
+		rec_d_n: in std_logic;
+		clk_out_p: out std_logic;
+		clk_out_n: out std_logic;
+		rj45_din_p: in std_logic;
+		rj45_din_n: in std_logic;
+		rj45_dout_p: out std_logic;
+		rj45_dout_n: out std_logic;
+		sfp_dout_p: out std_logic;
+		sfp_dout_n: out std_logic;
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
-		scl: out std_logic; -- main I2C
-		sda: inout std_logic;
-		rstb_i2c: out std_logic -- reset for I2C expanders
+		sfp_los: in std_logic;
+		sfp_tx_dis: out std_logic;
+		sfp_flt: in std_logic;
+		uid_scl: out std_logic;
+		uid_sda: inout std_logic;
+		sfp_scl: out std_logic;
+		sfp_sda: inout std_logic;
+		pll_scl: out std_logic;
+		pll_sda: inout std_logic;
+		pll_rstn: out std_logic;
+		gpin_0_p: in std_logic;
+		gpin_0_n: in std_logic;
+		gpout_0_p: out std_logic;
+		gpout_0_n: out std_logic;
+		gpout_1_p: out std_logic;
+		gpout_1_n: out std_logic		
 	);
 
 end payload;
 
 architecture rtl of payload is
 
-	constant DESIGN_TYPE: std_logic_vector := X"06";
+	constant DESIGN_TYPE: std_logic_vector := X"04";
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
-	
+	signal rec_clk, rec_d, sfp_dout, q: std_logic;
+
 begin
 
 -- ipbus address decode
@@ -76,7 +87,7 @@ begin
 
 -- IO
 
-	io: entity work.pdts_tlu_io
+	io: entity work.pdts_fmc_io
 		generic map(
 			CARRIER_TYPE => CARRIER_TYPE,
 			DESIGN_TYPE => DESIGN_TYPE
@@ -88,87 +99,65 @@ begin
 			ipb_out => ipbr(N_SLV_IO),
 			soft_rst => soft_rst,
 			nuke => nuke,
-			rst => rst_io,
-			locked => locked,
-			clk_p => clk_p,
-			clk_n => clk_n,
-			clk => clk,
-			mclk => mclk,
-			rstb_clk => rstb_clk,
-			clk_lolb => clk_lolb,
-			q_hdmi => q,
-			q_hdmi_0 => q_hdmi_0,
-			q_hdmi_1 => q_hdmi_1,
-			q_hdmi_2 => q_hdmi_2,
-			q_hdmi_3 => q_hdmi_3,
-			d_hdmi_3 => d_hdmi_3,
-			d_hdmi => open,
-			q_sfp => q,
-			q_sfp_p => q_sfp_p,
-			q_sfp_n => q_sfp_n,
-			d_cdr_p => d_cdr_p,
-			d_cdr_n => d_cdr_n,
-			d_cdr => d,
-			sfp_los => sfp_los,
-			sfp_fault => sfp_fault,
-			sfp_txdis => sfp_txdis,
+			rst => open,
+			locked => '0',
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
-			scl => scl,
-			sda => sda,
-			rstb_i2c => rstb_i2c
+			sfp_los => sfp_los,
+			sfp_tx_dis => open,
+			sfp_flt => sfp_flt,
+			userled => userled,
+			fmc_clk_p => fmc_clk_p,
+			fmc_clk_n => fmc_clk_n,
+			fmc_clk => open,
+			rec_clk_p => rec_clk_p,
+			rec_clk_n => rec_clk_n,
+			rec_clk => rec_clk,
+			rec_d_p => rec_d_p,
+			rec_d_n => rec_d_n,
+			rec_d => rec_d,
+			clk_out_p => clk_out_p,
+			clk_out_n => clk_out_n,
+			rj45_din_p => rj45_din_p,
+			rj45_din_n => rj45_din_n,
+			rj45_din => open,
+			rj45_dout => q,
+			rj45_dout_p => rj45_dout_p,
+			rj45_dout_n => rj45_dout_n,
+			sfp_dout => sfp_dout,
+			sfp_dout_p => sfp_dout_p,
+			sfp_dout_n => sfp_dout_n,
+			uid_scl => uid_scl,
+			uid_sda => uid_sda,
+			sfp_scl => sfp_scl,
+			sfp_sda => sfp_sda,
+			pll_scl => pll_scl,
+			pll_sda => pll_sda,
+			pll_rstn => pll_rstn,
+			gpin_0_p => gpin_0_p,
+			gpin_0_n => gpin_0_n,
+			gpout_0_p => gpout_0_p,
+			gpout_0_n => gpout_0_n,
+			gpout_1_p => gpout_1_p,
+			gpout_1_n => gpout_1_n
 		);
 
--- Clock divider
-
-	clkgen: entity work.pdts_rx_mul_mmcm
-		port map(
-			clk => clk,
-			sclk => mclk,
-			phase_rst => rst_io,
-			phase_locked => locked
-		);
-
-	rsti <= rst_io or not locked;	
-	
-	synchro: entity work.pdts_synchro
-		generic map(
-			N => 1
-		)
-		port map(
-			clk => ipb_clk,
-			clks => clk,
-			d(0) => rsti,
-			q(0) => rst
-		);
-
--- master block
-
-	master: entity work.master_top
-		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_MASTER_TOP),
-			ipb_out => ipbr(N_SLV_MASTER_TOP),
-			mclk => mclk,
-			clk => clk,
-			rst => rst,
-		  d => d,
-			q => q
-		);
-		
 -- Endpoint wrapper
 
-	wrapper: entity work.endpoint_wrapper_local
+	wrapper: entity work.endpoint_wrapper
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_ENDPOINT0),
-			ipb_out => ipbr(N_SLV_ENDPOINT0),
-			rec_clk => mclk,
-			rec_d => q,
-			clk => clk,
-			txd => open
+			ipb_in => ipbw(N_SLV_ENDPOINT),
+			ipb_out => ipbr(N_SLV_ENDPOINT),
+			rec_clk => rec_clk,
+			rec_d => rec_d,
+			txd => sfp_dout,
+			sfp_los => sfp_los,
+			cdr_los => cdr_los,
+			cdr_lol => cdr_lol,
+			sfp_tx_dis => sfp_tx_dis,
+			q => q
 		);
 
 end rtl;
