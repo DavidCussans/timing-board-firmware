@@ -3,7 +3,7 @@ stages:
   - builds
 
 .job_template: &template_job_base
-  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-06-29__ipbb_test_ci
+  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-08-08__ipbb_v0.3.3
   tags:
     - docker
     - xilinx-tools
