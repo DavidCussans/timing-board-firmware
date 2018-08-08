@@ -48,6 +48,7 @@ package pdts_defs is
 	constant SCMD_SPILL_STOP: std_logic_vector(3 downto 0) := X"3";
 	constant SCMD_RUN_START: std_logic_vector(3 downto 0) := X"4"; -- Start / stop run
 	constant SCMD_RUN_STOP: std_logic_vector(3 downto 0) := X"5";
+	constant SCMD_WIB_CALIB: std_logic_vector(3 downto 0) := X"6";
 	constant SCMD_FAKE_TRIG0: std_logic_vector(3 downto 0) := X"8"; -- Commands from 0xc to 0xf reserved for triggers / calib
 	constant SCMD_FAKE_TRIG1: std_logic_vector(3 downto 0) := X"9"; -- Commands from 0xc to 0xf reserved for triggers / calib
 	constant SCMD_FAKE_TRIG2: std_logic_vector(3 downto 0) := X"A"; -- Commands from 0xc to 0xf reserved for triggers / calib
