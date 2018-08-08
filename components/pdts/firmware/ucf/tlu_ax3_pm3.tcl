@@ -28,7 +28,7 @@ set_property PACKAGE_PIN G6 [get_ports {clk_lolb}]
 set_property PACKAGE_PIN C2 [get_ports {rstb_i2c}]
 set_property PACKAGE_PIN G2 [get_ports {sfp_los}]
 set_property PACKAGE_PIN H2 [get_ports {sfp_fault}]
-set_property PACKAGE_PIN H6 [get_ports {sfp_txdis}]
+set_property PACKAGE_PIN H6 [get_ports {sfp_tx_dis}]
 set_property PACKAGE_PIN D7 [get_ports {cdr_lol}]
 set_property PACKAGE_PIN E7 [get_ports {cdr_los}]
 false_path {q_hdmi_* d_hdmi_* rstb_clk clk_lolb rstb_i2c sfp_* cdr_*} sysclk

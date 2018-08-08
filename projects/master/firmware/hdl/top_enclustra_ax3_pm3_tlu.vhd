@@ -36,7 +36,7 @@ entity top is port(
 		d_cdr_n: in std_logic;
 		sfp_los: in std_logic;
 		sfp_fault: in std_logic;
-		sfp_txdis: out std_logic;
+		sfp_tx_dis: out std_logic;
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		scl: out std_logic; -- main I2C
@@ -118,7 +118,7 @@ begin
 			d_cdr_n => d_cdr_n,
 			sfp_los => sfp_los,
 			sfp_fault => sfp_fault,
-			sfp_txdis => sfp_txdis,
+			sfp_tx_dis => sfp_tx_dis,
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			scl => scl,

@@ -1,6 +1,6 @@
 -- payload_tlu
 --
--- Wrapper for TLU design
+-- Wrapper for TLU overlord design
 --
 -- Dave Newbold, July 2018
 
@@ -9,7 +9,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
 use work.ipbus.all;
-use work.ipbus_decode_top.all;
+use work.ipbus_decode_top_tlu.all;
 
 entity payload is
 	generic(
@@ -39,7 +39,7 @@ entity payload is
 		d_cdr_n: in std_logic;
 		sfp_los: in std_logic;
 		sfp_fault: in std_logic;
-		sfp_txdis: out std_logic;
+		sfp_tx_dis: out std_logic;
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		scl: out std_logic; -- main I2C
@@ -55,7 +55,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d_trig: std_logic;
 	
 begin
 
@@ -69,7 +69,7 @@ begin
     port map(
       ipb_in => ipb_in,
       ipb_out => ipb_out,
-      sel => ipbus_sel_top(ipb_in.ipb_addr),
+      sel => ipbus_sel_top_tlu(ipb_in.ipb_addr),
       ipb_to_slaves => ipbw,
       ipb_from_slaves => ipbr
     );
@@ -102,16 +102,16 @@ begin
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
 			d_hdmi_3 => d_hdmi_3,
-			d_hdmi => open,
+			d_hdmi => d_trig,
 			q_sfp => q,
 			q_sfp_p => q_sfp_p,
 			q_sfp_n => q_sfp_n,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => d,
+			d_cdr => open,
 			sfp_los => sfp_los,
 			sfp_fault => sfp_fault,
-			sfp_txdis => sfp_txdis,
+			sfp_tx_dis => sfp_tx_dis,
 			cdr_lol => cdr_lol,
 			cdr_los => cdr_los,
 			scl => scl,
@@ -153,7 +153,7 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
-		  d => d,
+		  d => d_trig,
 			q => q
 		);
 		
