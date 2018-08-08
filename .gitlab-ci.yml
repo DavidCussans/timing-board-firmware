@@ -76,7 +76,7 @@ stages:
     - cp package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
     when: on_success
-    name: "${CI_JOB_NAME#build:}-on-${CI_BUILD_REF_NAME}"
+    name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
       - package/*.tgz
 
