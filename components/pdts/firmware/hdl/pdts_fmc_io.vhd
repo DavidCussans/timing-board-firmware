@@ -30,6 +30,7 @@ entity pdts_fmc_io is
 		nuke: out std_logic;
 		rst: out std_logic;
 		locked: in std_logic;
+		master_src: out std_logic;
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		sfp_los: in std_logic;
@@ -130,6 +131,7 @@ begin
 	rst <= ctrl(0)(2);
 	sfp_tx_dis <= ctrl(0)(3);
 	pll_rstn <= not ctrl(0)(4);
+	master_src <= ctrl(0)(6);
 	
 	userled <= not (cdr_lol or cdr_los or sfp_los);
 	
