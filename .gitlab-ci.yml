@@ -144,15 +144,15 @@ full_build:ouroboros_pc059:
 quick_check:overlord_tlu:
   <<: *template_job_vivado_quick_check
   variables:
-    PROJECT_DIR_PATH: "projects/tlu"
-    PROJECT_TOP_DEP: "top.dep"
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
 
 # Build 
 full_build:overlord_tlu:
   <<: *template_job_vivado_full_build
   variables:
-    PROJECT_DIR_PATH: "projects/tlu"
-    PROJECT_TOP_DEP: "top.dep"
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
 
 
 #--- Fanout -------------------------
