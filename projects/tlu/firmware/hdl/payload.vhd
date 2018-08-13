@@ -55,7 +55,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d, q_hdmi: std_logic;
 	
 begin
 
@@ -96,7 +96,7 @@ begin
 			mclk => mclk,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
-			q_hdmi => q,
+			q_hdmi => q_hdmi,
 			q_hdmi_0 => q_hdmi_0,
 			q_hdmi_1 => q_hdmi_1,
 			q_hdmi_2 => q_hdmi_2,
@@ -156,6 +156,8 @@ begin
 		  d => d,
 			q => q
 		);
+		
+	q_hdmi <= q;
 		
 -- Endpoint wrapper
 
