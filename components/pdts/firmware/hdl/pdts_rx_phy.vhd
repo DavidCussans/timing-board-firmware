@@ -44,10 +44,12 @@ end pdts_rx_phy;
 
 architecture rtl of pdts_rx_phy is
 
+	constant KCTR_REQ: integer := 8;
+
 	signal rxdd, c: std_logic;
 	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
-	signal tr, f, fr, done, m, stb, aligned_i, done_d, rstu, kok: std_logic;
+	signal tr, f, fr, done, m, stb, aligned_i, rstu, rstu_q, kok: std_logic;
 	signal ctr: unsigned(7 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
 	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
@@ -94,7 +96,7 @@ begin
 			else
 				t <= t(0) & t(9 downto 1);
 			end if;
-			f <= (f or c) and not (rxrst or rstu);
+			f <= (f or c) and not (rxrst or rstu_q);
 		end if;
 	end process;
 
@@ -110,21 +112,27 @@ begin
 			fr <= f;
 			if phase_locked = '0' or fr = '0' then
 				ctr <= (others => '0');
-				m <= '1';
 				sctr <= fctr; -- CDC; randomise starting value of stb counter, don't care about bit synchronisation
 				kctr <= X"0";
+				m <= '1';				
 			else
 				if sctr = (10 / SCLK_RATIO) - 1 then
 					sctr <= X"0";
 				else
 					sctr <= sctr + 1;
 				end if;
-				if done = '0' and stb = '1' then
-					ctr <= ctr + 1;
-					if w = CCHAR_PD or w = CCHAR_ND then
-						kctr <= kctr + 1;
+				if stb = '1' then
+					if done = '1' then
+						ctr <= (others => '0');
+						kctr <= X"0";
+						m <= '1';
+					else
+						ctr <= ctr + 1;
+						if w = CCHAR_PD or w = CCHAR_ND then
+							kctr <= kctr + 1;
+						end if;
+						m <= m and tr;
 					end if;
-					m <= m and tr;
 				end if;
 			end if;
 		end if;
@@ -132,25 +140,27 @@ begin
 		
 	stb <= not or_reduce(std_logic_vector(sctr));
 	done <= and_reduce(std_logic_vector(ctr));
-	done_d <= done when rising_edge(clk);
-	kok <= '1' when kctr > 1 else '0';
-	phase_rst <= done and not (m and kok) and phase_locked;
-	rstu <= done and not (m and kok) when UPSTREAM_MODE else '0';
+	kok <= '1' when kctr > KCTR_REQ else '0';
+	phase_rst <= (phase_rst or (done and not (m and kok))) and phase_locked;
+	rstu <= (rstu or (done and not (m and kok))) and fr;	
+	rstu_q <= rstu when UPSTREAM_MODE else '0';
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if done = '1' and done_d = '0' and m = '0' then
+			if done = '1' and (m = '0' or kok = '0') then
 				if dctr = SCLK_RATIO - 1 then
 					dctr <= X"0";
 				else
 					dctr <= dctr + 1;
 				end if;
 			end if;
+			if done = '1' then
+				aligned_i <= m and kok;
+			end if;
 		end if;
 	end process;
-
-	aligned_i <= done and m and kok;
+	
 	aligned <= aligned_i;
 
 -- Coarse delay

@@ -39,7 +39,7 @@ end pdts_ep_startup;
 
 architecture rtl of pdts_ep_startup is
 
-	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T);
+	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T, 2ERR_P);
 	signal state: state_t;
 	signal rctr: unsigned(4 downto 0);
 	signal f_ok, t, td: std_logic;
@@ -85,6 +85,8 @@ begin
 				when W_ALIGN =>
 					if (sfp_los_ok = '0' or cdr_ok = '0') and not SIM then
 						state <= W_SFP;
+					elsif f_ok = '0' then
+						state <= W_FREQ;
 					elsif rxphy_aligned_i = '1' then
 						state <= W_LOCK;
 					end if;
@@ -92,15 +94,17 @@ begin
 				when W_LOCK =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
+					elsif f_ok = '0' then
+						state <= W_FREQ;
+					elsif rxphy_aligned_i = '0' then
+						state <= W_ALIGN;
 					elsif rxphy_locked_i = '1' then
 						state <= W_RDY;
 					end if;
 -- Wait for ready flag
 				when W_RDY =>
-					if sfp_los_ok = '0' or cdr_ok = '0' then
-						state <= W_SFP;
-					elsif rxphy_locked_i = '0' then
-						state <= W_ALIGN;
+					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '1' then
+						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
 					elsif tsrdy_i = '1' then
@@ -108,18 +112,17 @@ begin
 					end if;
 -- Running state
 				when RUN =>
-					if sfp_los_ok = '0' or cdr_ok = '0' then
-						state <= W_SFP;
-					elsif rxphy_locked_i = '0' then
-						state <= W_ALIGN;
+					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '1' then
+						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
 					elsif tsrdy_i = '0' then
 						state <= ERR_T;
 					end if;
 -- Error states. Doomed.
-				when ERR_R =>
-				when ERR_T =>
+				when ERR_R => -- Protocol error
+				when ERR_T => -- Timestamp error
+				when ERR_P => -- Physical layer error
 				end case;
 			end if;
 		end if;
@@ -277,6 +280,7 @@ begin
 		"0110" when W_RDY, -- Waiting for time stamp initialisation
 		"1000" when RUN, -- Good to go
 		"1100" when ERR_R, -- Error in rx
-		"1101" when ERR_T; -- Error in time stamp check
+		"1101" when ERR_T, -- Error in time stamp check
+		"1110" when ERR_P; -- Physical layer error after lock
 
 end rtl;

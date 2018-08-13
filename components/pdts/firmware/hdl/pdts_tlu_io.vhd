@@ -51,7 +51,7 @@ entity pdts_tlu_io is
 		d_cdr: out std_logic;
 		sfp_los: in std_logic;
 		sfp_fault: in std_logic;
-		sfp_txdis: out std_logic;
+		sfp_tx_dis: out std_logic;
 		cdr_lol: in std_logic;
 		cdr_los: in std_logic;
 		scl: out std_logic; -- main I2C
@@ -130,7 +130,7 @@ begin
 	
 	rst <= rst_i;
 	
-	sfp_txdis <= '0';
+	sfp_tx_dis <= '0';
 	
 -- Config info
 

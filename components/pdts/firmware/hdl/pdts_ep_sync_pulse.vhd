@@ -1,6 +1,6 @@
 -- pdts_ep_sync_pulse
 --
--- Provides a sync pulse (based on a programmable command type) and clock to external hardware.
+-- Provides a sync pulse (based on a programmable command type) for external hardware.
 --
 -- Dave Newbold, February 2017
 
@@ -13,7 +13,7 @@ use work.ipbus_reg_types.all;
 
 use work.pdts_defs.all;
 
-entity pdts_ep_decoder is
+entity pdts_ep_sync_pulse is
 	port(
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
@@ -71,6 +71,7 @@ begin
 			q <= '0';
 			if rst = '1' then
 				cnt <= 0;
+				t <= (others => '0');
 			elsif s = ctrl_cmd and s_stb = '1' and s_first = '1' then
 				cnt <= cnt + 1;
 				t <= tstamp;
