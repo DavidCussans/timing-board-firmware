@@ -49,17 +49,14 @@ architecture rtl of pdts_rx_phy is
 	signal rxdd, c: std_logic;
 	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
-	signal tr, f, fr, done, m, stb, aligned_i, rstu, rstu_q, kok: std_logic;
+	signal tr, f, fr, done, m, stb, aligned_i, kok, phase_rst_i: std_logic;
 	signal ctr: unsigned(7 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
 	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, ki, lock, ldone, kerr, cerr, derr: std_logic;
-	
-	attribute KEEP: string;
-	attribute KEEP of kctr, kok, rstu: signal is "true";
-	
+		
 begin
 
 -- Fine delay and shift register
@@ -96,7 +93,7 @@ begin
 			else
 				t <= t(0) & t(9 downto 1);
 			end if;
-			f <= (f or c) and not (rxrst or rstu_q);
+			f <= (f or c) and not (rxrst or phase_rst_i);
 		end if;
 	end process;
 
@@ -141,9 +138,8 @@ begin
 	stb <= not or_reduce(std_logic_vector(sctr));
 	done <= and_reduce(std_logic_vector(ctr));
 	kok <= '1' when kctr > KCTR_REQ else '0';
-	phase_rst <= (phase_rst or (done and not (m and kok))) and phase_locked;
-	rstu <= (rstu or (done and not (m and kok))) and fr;	
-	rstu_q <= rstu when UPSTREAM_MODE else '0';
+	phase_rst_i <= (phase_rst_i or (done and not (m and kok))) and phase_locked and fr and not rxrst when rising_edge(clk);
+	phase_rst <= phase_rst_i when not UPSTREAM_MODE else '0';
 
 	process(clk)
 	begin
