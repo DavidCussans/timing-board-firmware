@@ -13,11 +13,11 @@ use ieee.numeric_std.all;
 
 package ipbus_decode_trig_rx is
 
-  constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
+  constant IPBUS_SEL_WIDTH: positive := INSERT_SEL_WIDTH_HERE;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_trig_rx(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Thu May 10 09:51:43 2018 
+-- START automatically  generated VHDL the Mon Aug 13 13:56:16 2018 
   constant N_SLV_CSR: integer := 0;
   constant N_SLV_CTRS: integer := 1;
   constant N_SLAVES: integer := 2;
@@ -32,7 +32,7 @@ package body ipbus_decode_trig_rx is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Thu May 10 09:51:43 2018 
+-- START automatically  generated VHDL the Mon Aug 13 13:56:16 2018 
     if    std_match(addr, "---------------------------0----") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x00000010
     elsif std_match(addr, "---------------------------1----") then
