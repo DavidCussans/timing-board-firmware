@@ -26,7 +26,7 @@ end top;
 
 architecture rtl of top is
 
-	signal sysclk_u, sysclk, clk_u, clk, d_in, d: std_logic;
+	signal sysclk_u, sysclk, clk_u, clk, d_in, d, q: std_logic;
 	signal clkout: std_logic;
 
 begin
@@ -76,7 +76,8 @@ begin
 		port map(
 			sysclk => sysclk,
 			rec_clk => clk,
-			rec_d => d
+			rec_d => d,
+			q => q
 		);
 	
 -- Clock and data out
@@ -101,7 +102,7 @@ begin
 		
 	obuf_d: OBUFDS
 		port map(
-			i => '0',
+			i => q,
 			o => d_out_p,
 			ob => d_out_n
 		);	
