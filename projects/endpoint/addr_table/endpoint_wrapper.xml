@@ -27,15 +27,5 @@
 		</node>		
 		<node id="freq" address="0xa" module="file://freq_ctr.xml"/>
 		<node id="ctrs" address="0x10" mode="block" size="0x10" fwinfo="endpoint;width=4"/>
-		<node id="sync" address="0x20" fwinfo="endpoint;width=3">
-		    <node id="ctrl" address="0x0">
-		        <node id="en" mask="0x1"/>
-		        <node id="force" mask="0x2"/>
-		        <node id="cmd" mask="0xf0"/>
-		    </node>
-		    <node id="cnt" address="0x4"/>
-		    <node id="ts_l" address="0x5"/>
-		    <node id="ts_h" address="0x6"/>
-		</node>
 		<node id="scmd_gen" address="0x40" module="file://scmd_gen.xml"/>
 </node>

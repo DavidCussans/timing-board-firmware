@@ -1,0 +1,3 @@
+setup -c projects/master build_settings_a35.tcl
+include -c projects/master enclustra_ax3_pm3_a35.dep
+include payload.dep
