@@ -27,14 +27,16 @@ end top;
 
 architecture rtl of top is
 
-	signal sysclk_u, sysclk, clk_u, clk, d_in, d, q: std_logic;
+	signal sysclk_u, sysclk, clk_u, clk, d_in, d, dd, d_del, q: std_logic;
 	signal clkout: std_logic;
-	signal vio_rst_u, vio_init_u, vio_rst, vio_init: std_logic;
+	signal vio_rst_u, vio_init_u, vio_edge_u, vio_rst, vio_init, vio_edge, vio_inc: std_logic;
+	signal inc, vio_inc_d: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r: std_logic_vector(47 downto 0);
 	signal zflag, zflag_r: std_logic;
+	signal cntout: std_logic_vector(4 downto 0);
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r: signal is "TRUE";
+	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout: signal is "TRUE";
 	
 	COMPONENT vio_0
 		PORT (
@@ -83,8 +85,45 @@ begin
 		
 -- IOB registers
 
-	d <= d_in when rising_edge(clk);
-	q <= d when rising_edge(clk);
+	idel: IDELAYE2
+		generic map(
+			IDELAY_TYPE => "VARIABLE"
+		)
+		port map(
+			c => sysclk,
+			regrst => '0',
+			ld => vio_rst,
+			ce => inc,
+			inc => '1',
+			cinvctrl => '0',
+			cntvaluein => "00000",
+			idatain => d_in,
+			datain => '0',
+			ldpipeen => '0',
+			dataout => d_del,
+			cntvalueout => cntout
+		);
+		
+	vio_inc_d <= vio_inc when rising_edge(sysclk);
+	inc <= vio_inc and not vio_inc_d;
+
+	iddr: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => d_in_r,
+			q2 => d_in_f,
+			c => clk,
+			ce => '1',
+			d => d_del,
+			r => '0',
+			s => '0'
+		);
+		
+	d <= d_in_r when vio_edge = '0' else d_in_f;
+	dd <= d when rising_edge(clk);
+	q <= dd when rising_edge(clk);
 	
 -- Clock and data out
 
@@ -119,20 +158,24 @@ begin
 		port map(
 	    clk => sysclk,
 	    probe_out0(0) => vio_rst_u,
-	    probe_out1(0) => vio_init_u
+	    probe_out1(0) => vio_init_u,
+	    probe_out2(0) => vio_edge_u,
+	    probe_out3(0) => vio_inc    
 	   );
 	   
 	synchro: entity work.pdts_synchro
 		generic map(
-			N => 2
+			N => 3
 		)
 		port map(
 			clk => sysclk,
 			clks => clk,
 			d(0) => vio_rst_u,
 			d(1) => vio_init_u,
+			d(2) => vio_edge_u,
 			q(0) => vio_rst,
-			q(1) => vio_init
+			q(1) => vio_init,
+			q(2) => vio_edge
 		);
 	
 -- PRBS check
@@ -142,7 +185,7 @@ begin
 			clk => clk,
 			rst => vio_rst,
 			init => vio_init,
-			d => d,
+			d => dd,
 			err_ctr => err_ctr,
 			cyc_ctr => cyc_ctr,
 			zflag => zflag
