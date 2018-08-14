@@ -30,11 +30,11 @@ architecture rtl of top is
 	signal sysclk_u, sysclk, clk_u, clk, d_in, d, q: std_logic;
 	signal clkout: std_logic;
 	signal vio_rst, vio_init: std_logic;
-	signal cyc_ctr, err_ctr: std_logic_vector(47 downto 0);
-	signal zflag: std_logic;
+	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r: std_logic_vector(47 downto 0);
+	signal zflag, zflag_r: std_logic;
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of cyc_ctr, err_ctr, zflag: signal is "TRUE";
+	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r: signal is "TRUE";
 	
 	COMPONENT vio_0
 		PORT (
@@ -112,7 +112,7 @@ begin
 			o => d_out_p,
 			ob => d_out_n
 		);
-
+		
 -- VIO control
 
 	vio: vio_0
@@ -121,8 +121,7 @@ begin
 	    probe_out0(0) => vio_rst,
 	    probe_out1(0) => vio_init
 	   );
-
-		
+	
 -- PRBS check
 
 	prbs_chk: entity work.prbs7_chk
@@ -136,6 +135,15 @@ begin
 			zflag => zflag
 		);	
 
+	process(sysclk)
+	begin
+		if rising_edge(sysclk) then
+			cyc_ctr_r <= cyc_ctr; -- SHonky as hell
+			err_ctr_r <= err_ctr;
+			zflag_r <= zflag;
+		end if;
+	end process;
+		
 -- Debug
 
 	debug <= (others => '0');
