@@ -89,7 +89,7 @@ begin
 			sync_stb => ep_stb,
 			sync_first => ep_v,
 			tstamp => tstamp,
-			debug => debug(2 downto 0);
+			debug => debug(2 downto 0)
 		);
 	
 	debug(3) <= locked;
