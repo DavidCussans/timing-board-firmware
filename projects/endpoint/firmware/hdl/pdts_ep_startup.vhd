@@ -41,7 +41,7 @@ architecture rtl of pdts_ep_startup is
 
 	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T, ERR_P);
 	signal state: state_t;
-	signal rctr: unsigned(8 downto 0);
+	signal rctr: unsigned(7 downto 0);
 	signal f_ok, t, td: std_logic;
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
@@ -141,11 +141,11 @@ begin
 			q(0) => f_en
 		);
 
-	process(clk) -- Predivide by 32
+	process(clk) -- Predivide by 256
 	begin
 		if rising_edge(clk) then
 			if f_en = '0' then
-				rctr <= (others => '0');
+				rctr <= X"80"; -- Start with a half-count for rounding purposes
 			else
 				rctr <= rctr + 1;
 			end if;
@@ -159,7 +159,7 @@ begin
 		port map(
 			clk => clk,
 			clks => sclk,
-			d(0) => rctr(8),
+			d(0) => rctr(7),
 			q(0) => t
 		);
 
@@ -174,7 +174,7 @@ begin
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
-					if cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 128.0), 16) then
+					if cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 256.0), 16) then
 						f_ok <= '1';
 					else
 						f_ok <= '0';
