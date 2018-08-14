@@ -69,7 +69,7 @@ begin
 		
 -- IOB registers
 
-	d <= d_in when falling_edge(clk);
+	d <= d_in when rising_edge(clk);
 	
 -- Endpoint
 
