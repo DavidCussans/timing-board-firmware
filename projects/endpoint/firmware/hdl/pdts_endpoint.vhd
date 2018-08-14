@@ -38,7 +38,7 @@ entity pdts_endpoint is
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		tsync_in: in cmd_w := CMD_W_NULL; -- Tx sync command input
 		tsync_out: out cmd_r; -- Tx sync command handshake
-		debug: out std_logic_vector(2 downto 0)
+		debug: out std_logic_vector(11 downto 0)
 	);
 
 end pdts_endpoint;
@@ -100,9 +100,17 @@ begin
 	clk <= clk_i;
 	rst <= rst_i;
 	
+-- Debug
+
 	debug(0) <= phase_locked; -- Unsafe CDC for debugging
 	debug(1) <= phase_rst;
 	debug(2) <= rec_rst;
+	debug(3) <= rxphy_rst;
+	debug(7 downto 4) <= stat;
+	debug(8) <= rxphy_aligned;
+	debug(9) <= rxphy_locked;
+	debug(10) <= '0';
+	debug(11) <= '0';
 	
 -- Rx PHY
 
