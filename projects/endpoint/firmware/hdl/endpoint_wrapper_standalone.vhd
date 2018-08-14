@@ -19,7 +19,7 @@ entity endpoint_wrapper_standalone is
 		rec_clk: in std_logic; -- CDR recovered clock
 		rec_d: in std_logic; -- CDR recovered data (rec_clk domain)
 		q: out std_logic;
-		debug: out std_logic_vector(3 downto 0)
+		debug: out std_logic_vector(11 downto 0)
 	);
 		
 end endpoint_wrapper_standalone;
@@ -89,9 +89,7 @@ begin
 			sync_stb => ep_stb,
 			sync_first => ep_v,
 			tstamp => tstamp,
-			debug => debug(2 downto 0);
+			debug => debug;
 		);
-	
-	debug(3) <= locked;
 
 end rtl;
