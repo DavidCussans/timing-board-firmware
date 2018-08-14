@@ -19,6 +19,8 @@ create_clock -period 20.000 -name sysclk [get_ports sysclk_p]
 # System clock (250MHz)
 create_clock -period 4.000 -name clk [get_ports clk_in_p]
 
+set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks sysclk] -group [get_clocks -include_generated_clocks clk]
+
 set_property IOSTANDARD LVDS_25 [get_ports {sysclk_* clk_in_* d_in_* clk_out_* d_out_*}]
 set_property DIFF_TERM TRUE [get_ports {sysclk_* clk_in_* d_in_*}]
 set_property PACKAGE_PIN T9 [get_ports sysclk_p]

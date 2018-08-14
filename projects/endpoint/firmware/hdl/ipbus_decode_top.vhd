@@ -13,11 +13,11 @@ use ieee.numeric_std.all;
 
 package ipbus_decode_top is
 
-  constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
+  constant IPBUS_SEL_WIDTH: positive := 2;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_top(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Thu Apr 20 17:37:49 2017 
+-- START automatically  generated VHDL the Mon Aug 13 14:53:05 2018 
   constant N_SLV_IO: integer := 0;
   constant N_SLV_ENDPOINT: integer := 1;
   constant N_SLAVES: integer := 2;
@@ -32,11 +32,11 @@ package body ipbus_decode_top is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Thu Apr 20 17:37:49 2017 
-    if    std_match(addr, "-----------------------0--------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000100
-    elsif std_match(addr, "-----------------------1--------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_ENDPOINT, IPBUS_SEL_WIDTH)); -- endpoint / base 0x00000100 / mask 0x00000100
+-- START automatically  generated VHDL the Mon Aug 13 14:53:05 2018 
+    if    std_match(addr, "----------------------0---------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000200
+    elsif std_match(addr, "----------------------1---------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_ENDPOINT, IPBUS_SEL_WIDTH)); -- endpoint / base 0x00000200 / mask 0x00000200
 -- END automatically generated VHDL
 
     else

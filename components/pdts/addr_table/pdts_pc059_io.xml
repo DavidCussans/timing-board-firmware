@@ -8,10 +8,8 @@
 					<node id="rst_i2cmux" mask="0x10"/>
 					<node id="rst_i2c" mask="0x20"/>
 					<node id="rst_lock_mon" mask="0x40"/>
-					<node id="master_src" mask="0x80"/>
-					<node id="mux" mask="0x700"/>
-					<node id="gpio" mask="0x7000"/>
-					<node id="leds" mask="0x70000"/>
+					<node id="master_src" mask="0x300"/>
+					<node id="mux" mask="0x7000"/>
 					<node id="cdr_edge" mask="0x100000"/>
 					<node id="sfp_edge" mask="0x200000"/>
 					<node id="hdmi_edge" mask="0x400000"/>

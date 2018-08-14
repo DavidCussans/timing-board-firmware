@@ -13,11 +13,11 @@ use ieee.numeric_std.all;
 
 package ipbus_decode_endpoint_wrapper is
 
-  constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
+  constant IPBUS_SEL_WIDTH: positive := 4;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_endpoint_wrapper(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Wed May 23 20:23:05 2018 
+-- START automatically  generated VHDL the Mon Aug 13 14:13:30 2018 
   constant N_SLV_VERSION: integer := 0;
   constant N_SLV_CSR: integer := 1;
   constant N_SLV_TSTAMP: integer := 2;
@@ -38,7 +38,7 @@ package body ipbus_decode_endpoint_wrapper is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Wed May 23 20:23:05 2018 
+-- START automatically  generated VHDL the Mon Aug 13 14:13:30 2018 
     if    std_match(addr, "-------------------------0-0000-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_VERSION, IPBUS_SEL_WIDTH)); -- version / base 0x00000000 / mask 0x0000005e
     elsif std_match(addr, "-------------------------0-0001-") then

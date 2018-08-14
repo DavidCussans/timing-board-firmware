@@ -1,8 +1,8 @@
--- master
+-- payload_tlu
 --
--- Interface to timing FMC v1 for PDTS master block
+-- Wrapper for TLU design
 --
--- Dave Newbold, February 2017
+-- Dave Newbold, July 2018
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -46,7 +46,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
 	
 begin
 
@@ -83,7 +83,8 @@ begin
 			locked => locked,
 			clk_p => clk_p,
 			clk_n => clk_n,
-			clk => clk_pll,
+			clk => clk,
+			mclk => mclk,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
 			q_hdmi => q,
@@ -100,15 +101,15 @@ begin
 
 -- Clock divider
 
-	clkgen: entity work.pdts_rx_div_mmcm
+	clkgen: entity work.pdts_rx_mul_mmcm
 		port map(
-			sclk => clk_pll,
 			clk => clk,
+			sclk => mclk,
 			phase_rst => rst_io,
 			phase_locked => locked
 		);
 
-	rsti <= rst_io or not locked;
+	rsti <= rst_io or not locked;	
 	
 	synchro: entity work.pdts_synchro
 		generic map(
@@ -129,7 +130,7 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_MASTER_TOP),
 			ipb_out => ipbr(N_SLV_MASTER_TOP),
-			mclk => clk_pll,
+			mclk => mclk,
 			clk => clk,
 			rst => rst,
 		  d => d,

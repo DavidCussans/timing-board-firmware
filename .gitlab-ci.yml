@@ -3,7 +3,7 @@ stages:
   - builds
 
 .job_template: &template_job_base
-  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-06-29__ipbb_test_ci
+  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-08-08__ipbb_v0.3.3
   tags:
     - docker
     - xilinx-tools
@@ -56,7 +56,7 @@ stages:
     - ipbb vivado make-project
     - ipbb vivado check-syntax
 
-.job_template: &template_job_vivado_full_build
+.job_template: &template_job_vivado_build
   <<: *template_job_base
   stage: builds
   only:
@@ -66,8 +66,8 @@ stages:
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
-    - ipbb proj create vivado ${CI_JOB_NAME#full_build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
-    - cd proj/${CI_JOB_NAME#full_build:}
+    - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#build:}
     - ipbb vivado make-project
     - ipbb vivado -q synth -j3 
     - ipbb vivado -q impl 
@@ -76,6 +76,7 @@ stages:
     - cp package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
     when: on_success
+    name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
       - package/*.tgz
 
@@ -90,64 +91,96 @@ quick_check:ouroboros_sim:
     - cd proj/ouroboros_sim
     - ipbb sim setup-simlib ipcores fli make-project
 
+
+#--- Ouroboros ---------------------
+# Dep and syntax check
 quick_check:ouroboros_fmc:
   <<: *template_job_vivado_quick_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
 
+# Build
+build:ouroboros_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
+
+
+#--- Ouroloop FMC ------------------
+# Dep and syntax check
 quick_check:ouroloop_fmc:
   <<: *template_job_vivado_quick_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
+# Build
+build:ouroloop_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
+
+
+#--- Ouroboros PC059 -----------------
+# Dep and syntax check
 quick_check:ouroboros_pc059:
   <<: *template_job_vivado_quick_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
 
-quick_check:ouroboros_pc059_monitor:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
-
-quick_check:master_tlu:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/master"
-    PROJECT_TOP_DEP: "top_a35_tlu.dep"
-
-#--- Full builds ---
-full_build:ouroboros_fmc:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35.dep"
-
-full_build:ouroloop_fmc:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_loopback.dep"
-
-full_build:ouroboros_pc059:
-  <<: *template_job_vivado_full_build
+# Build
+build:ouroboros_pc059:
+  <<: *template_job_vivado_build
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
 
-full_build:ouroboros_pc059_monitor:
-  <<: *template_job_vivado_full_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_pc059_monitor.dep"
 
-full_build:master_tlu:
-  <<: *template_job_vivado_full_build
+#--- TLU Overlord -------------------------
+# Dep and syntax check
+quick_check:overlord_tlu:
+  <<: *template_job_vivado_quick_check
   variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_tlu.dep"
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
 
+# Build 
+build:overlord_tlu:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
+
+
+#--- Fanout -------------------------
+# Dep and syntax check
+quick_check:fanout_0_pc059:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip65.dep"
+
+# Build 
+build:fanout_0_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip65.dep"
+
+# Build 
+build:fanout_1_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip66.dep"
+
+# Build 
+build:fanout_2_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip67.dep"

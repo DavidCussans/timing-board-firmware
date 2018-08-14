@@ -65,7 +65,7 @@ begin
 			rxphy_locked => rxphy_locked,
 			rst => rst_i,
 			rx_err => rx_err,
-			rdy => '1'
+			tsrdy => '0'
 		);
 
 -- Rx PHY
