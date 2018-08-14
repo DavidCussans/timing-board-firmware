@@ -41,7 +41,7 @@ architecture rtl of pdts_ep_startup is
 
 	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T, ERR_P);
 	signal state: state_t;
-	signal rctr: unsigned(4 downto 0);
+	signal rctr: unsigned(8 downto 0);
 	signal f_ok, t, td: std_logic;
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
@@ -78,12 +78,12 @@ begin
 				when W_FREQ =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
-					elsif f_ok = '1' then
+					elsif f_ok = '1' or SIM then
 						state <= W_ALIGN;
 					end if;
 -- Wait for rxphy alignment
 				when W_ALIGN =>
-					if (sfp_los_ok = '0' or cdr_ok = '0') and not SIM then
+					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
 					elsif f_ok = '0' then
 						state <= W_FREQ;
@@ -159,7 +159,7 @@ begin
 		port map(
 			clk => clk,
 			clks => sclk,
-			d(0) => rctr(4),
+			d(0) => rctr(8),
 			q(0) => t
 		);
 
@@ -174,7 +174,7 @@ begin
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
-					if cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 2048.0), 16) then
+					if cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 128.0), 16) then
 						f_ok <= '1';
 					else
 						f_ok <= '0';
