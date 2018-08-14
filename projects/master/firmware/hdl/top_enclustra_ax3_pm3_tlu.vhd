@@ -29,7 +29,7 @@ entity top is port(
 		q_hdmi_1: out std_logic; -- output to downstream HDMI 1
 		q_hdmi_2: out std_logic; -- output to upstream HDMI 2
 		q_hdmi_3: out std_logic; -- output to downstream HDMI 3
-		d_hdmi_3: in std_logic;
+		d_hdmi_2: in std_logic;
 		q_sfp_p: out std_logic;
 		q_sfp_n: out std_logic;
 		d_cdr_p: in std_logic;
@@ -111,7 +111,7 @@ begin
 			q_hdmi_1 => q_hdmi_1,
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
-			d_hdmi_3 => d_hdmi_3,
+			d_hdmi_2 => d_hdmi_2,
 			q_sfp_p => q_sfp_p,
 			q_sfp_n => q_sfp_n,
 			d_cdr_p => d_cdr_p,

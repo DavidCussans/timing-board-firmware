@@ -46,6 +46,7 @@ end pdts_endpoint;
 architecture rtl of pdts_endpoint is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
+	signal stat_i: std_logic_vector(3 downto 0);
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
 	signal stb, k, s_stb, s_first: std_logic;
@@ -71,7 +72,7 @@ begin
 		port map(
 			sclk => sclk,
 			srst => srst,
-			stat => stat,
+			stat => stat_i,
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
@@ -86,6 +87,8 @@ begin
 			tsrdy => rdy_i,
 			rdy => rdy
 		);
+
+    stat <= stat_i;
 
 -- Clock divider
 
@@ -106,7 +109,7 @@ begin
 	debug(1) <= phase_rst;
 	debug(2) <= rec_rst;
 	debug(3) <= rxphy_rst;
-	debug(7 downto 4) <= stat;
+	debug(7 downto 4) <= stat_i;
 	debug(8) <= rxphy_aligned;
 	debug(9) <= rxphy_locked;
 	debug(10) <= '0';
