@@ -34,3 +34,10 @@ set_property PACKAGE_PIN P20 [get_ports clk_out_n]
 set_property PACKAGE_PIN N18 [get_ports d_out_p]
 set_property PACKAGE_PIN P19 [get_ports d_out_n]
 false_path {d_in_* d_out_*} sysclk
+
+set_property IOSTANDARD LVCMOS25 [get_ports {debug[*]}]
+set_property PACKAGE_PIN N17 [get_ports {debug[0]}]
+set_property PACKAGE_PIN P15 [get_ports {debug[1]}]
+set_property PACKAGE_PIN P18 [get_ports {debug[2]}]
+set_property PACKAGE_PIN P16 [get_ports {debug[3]}]
+false_path {debug[*]} sysclk
