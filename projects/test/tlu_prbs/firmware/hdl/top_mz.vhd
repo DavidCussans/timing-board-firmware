@@ -29,7 +29,7 @@ architecture rtl of top is
 
 	signal sysclk_u, sysclk, clk_u, clk, d_in, d, q: std_logic;
 	signal clkout: std_logic;
-	signal vio_rst, vio_init: std_logic;
+	signal vio_rst_u, vio_init_u, vio_rst, vio_init: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r: std_logic_vector(47 downto 0);
 	signal zflag, zflag_r: std_logic;
 	
@@ -117,10 +117,23 @@ begin
 
 	vio: vio_0
 		port map(
-	    clk => clk,
-	    probe_out0(0) => vio_rst,
-	    probe_out1(0) => vio_init
+	    clk => sysclk,
+	    probe_out0(0) => vio_rst_u,
+	    probe_out1(0) => vio_init_u
 	   );
+	   
+	synchro: entity work.pdts_synchro
+		generic map(
+			N => 2
+		)
+		port map(
+			clk => sysclk,
+			clks => clk,
+			d(0) => vio_rst_u,
+			d(1) => vio_init_u,
+			q(0) => vio_rst,
+			q(1) => vio_init
+		);
 	
 -- PRBS check
 
