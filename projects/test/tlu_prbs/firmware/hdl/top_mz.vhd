@@ -29,11 +29,20 @@ architecture rtl of top is
 
 	signal sysclk_u, sysclk, clk_u, clk, d_in, d, q: std_logic;
 	signal clkout: std_logic;
+	signal vio_rst, vio_init: std_logic;
 	signal cyc_ctr, err_ctr: std_logic_vector(47 downto 0);
 	signal zflag: std_logic;
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of cyc_ctr, err_ctr, zflag: signal is "TRUE";	
+	attribute MARK_DEBUG of cyc_ctr, err_ctr, zflag: signal is "TRUE";
+	
+	COMPONENT vio_0
+		PORT (
+			clk : IN STD_LOGIC;
+			probe_out0 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+			probe_out1 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+		);
+	END COMPONENT;
 
 begin
 
@@ -103,14 +112,24 @@ begin
 			o => d_out_p,
 			ob => d_out_n
 		);
+
+-- VIO control
+
+	vio: vio_0
+		port map(
+	    clk => clk,
+	    probe_out0 => vio_rst,
+	    probe_out1 => vio_init
+	   );
+
 		
 -- PRBS check
 
 	prbs_chk: entity work.prbs7_chk
 		port map(
 			clk => clk,
-			rst => '0',
-			init => '0',
+			rst => vio_rst,
+			init => vio_init,
 			d => d,
 			err_ctr => err_ctr,
 			cyc_ctr => cyc_ctr,
