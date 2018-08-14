@@ -37,14 +37,14 @@ entity pdts_endpoint is
 		sync_first: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		tsync_in: in cmd_w := CMD_W_NULL; -- Tx sync command input
-		tsync_out: out cmd_r -- Tx sync command handshake
+		tsync_out: out cmd_r; -- Tx sync command handshake
+		debug: out std_logic_vector(2 downto 0)
 	);
 
 end pdts_endpoint;
 
 architecture rtl of pdts_endpoint is
 
-	signal pl: std_logic;
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
@@ -58,10 +58,6 @@ architecture rtl of pdts_endpoint is
 	signal tp, tp_d: std_logic;
 	signal tx_q: std_logic_vector(7 downto 0);
 	signal tx_err, tx_stb, tx_k: std_logic;
-	
-	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of pl: signal is "TRUE";
-
 
 begin
 
@@ -104,7 +100,9 @@ begin
 	clk <= clk_i;
 	rst <= rst_i;
 	
-	pl <= phase_locked when rising_edge(sclk); -- Unsafe CDC for debugging
+	debug(0) <= phase_locked; -- Unsafe CDC for debugging
+	debug(1) <= phase_rst;
+	debug(2) <= rec_rst;
 	
 -- Rx PHY
 

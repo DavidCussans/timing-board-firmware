@@ -19,7 +19,8 @@ entity top is port(
 		clk_out_p: out std_logic;
 		clk_out_n: out std_logic;
 		d_out_p: out std_logic;
-		d_out_n: out std_logic
+		d_out_n: out std_logic;
+		debug: out std_logic_vector(3 downto 0)
 	);
 
 end top;
@@ -77,7 +78,8 @@ begin
 			sysclk => sysclk,
 			rec_clk => clk,
 			rec_d => d,
-			q => q
+			q => q,
+			debug => debug
 		);
 	
 -- Clock and data out
