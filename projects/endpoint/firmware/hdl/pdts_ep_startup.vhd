@@ -103,7 +103,7 @@ begin
 					end if;
 -- Wait for ready flag
 				when W_RDY =>
-					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '1' then
+					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '0' then
 						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
@@ -112,7 +112,7 @@ begin
 					end if;
 -- Running state
 				when RUN =>
-					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '1' then
+					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '0' then
 						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;

@@ -32,7 +32,7 @@ entity payload is
 		q_hdmi_1: out std_logic; -- output to HDMI 1
 		q_hdmi_2: out std_logic; -- output to HDMI 2
 		q_hdmi_3: out std_logic; -- output to HDMI 3
-		d_hdmi_3: in std_logic; -- input from HDMI 3
+		d_hdmi_2: in std_logic; -- input from HDMI 3
 		q_sfp_p: out std_logic;
 		q_sfp_n: out std_logic;
 		d_cdr_p: in std_logic;
@@ -101,7 +101,7 @@ begin
 			q_hdmi_1 => q_hdmi_1,
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
-			d_hdmi_3 => d_hdmi_3,
+			d_hdmi_2 => d_hdmi_2,
 			d_hdmi => d_trig,
 			q_sfp => q,
 			q_sfp_p => q_sfp_p,

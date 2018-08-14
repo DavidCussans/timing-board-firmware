@@ -41,7 +41,7 @@ entity pdts_tlu_io is
 		q_hdmi_1: out std_logic; -- output to HDMI 1
 		q_hdmi_2: out std_logic; -- output to HDMI 2
 		q_hdmi_3: out std_logic; -- output to HDMI 3
-		d_hdmi_3: in std_logic;
+		d_hdmi_2: in std_logic;
 		d_hdmi: out std_logic;
 		q_sfp: in std_logic;
 		q_sfp_p: out std_logic;
@@ -74,7 +74,7 @@ architecture rtl of pdts_tlu_io is
 	signal ctrl_hdmi_edge, ctrl_cdr_edge: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
-	signal d_hdmi_3_r, d_hdmi_3_f: std_logic;
+	signal d_hdmi_2_r, d_hdmi_2_f: std_logic;
 	signal d_cdr_i, d_cdr_r, d_cdr_f, q_sfp_r, q_sfp_i: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal sda_o: std_logic;
@@ -214,16 +214,16 @@ begin
 			DDR_CLK_EDGE => "SAME_EDGE"
 		)
 		port map(
-			q1 => d_hdmi_3_r,
-			q2 => d_hdmi_3_f,
+			q1 => d_hdmi_2_r,
+			q2 => d_hdmi_2_f,
 			c => mclk,
 			ce => '1',
-			d => d_hdmi_3,
+			d => d_hdmi_2,
 			r => '0',
 			s => '0'
 		);
 		
-	d_hdmi <= d_hdmi_3_r when ctrl_hdmi_edge = '0' else d_hdmi_3_f;
+	d_hdmi <= d_hdmi_2_r when ctrl_hdmi_edge = '0' else d_hdmi_2_f;
 
 -- Data outputs
 	
