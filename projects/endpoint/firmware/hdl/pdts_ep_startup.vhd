@@ -170,7 +170,6 @@ begin
 			if srst = '1' then
 				sctr <= (others => '0');
 				cctr <= (others => '0');
-				f_ok <= '0';
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
