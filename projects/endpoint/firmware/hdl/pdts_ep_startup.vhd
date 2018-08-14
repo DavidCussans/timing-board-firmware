@@ -86,8 +86,6 @@ begin
 				when W_ALIGN =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
-					elsif f_ok = '0' then
-						state <= W_FREQ;
 					elsif rxphy_aligned_i = '1' then
 						state <= W_LOCK;
 					end if;
@@ -95,8 +93,6 @@ begin
 				when W_LOCK =>
 					if sfp_los_ok = '0' or cdr_ok = '0' then
 						state <= W_SFP;
-					elsif f_ok = '0' then
-						state <= W_FREQ;
 					elsif rxphy_aligned_i = '0' then
 						state <= W_ALIGN;
 					elsif rxphy_locked_i = '1' then
@@ -104,7 +100,7 @@ begin
 					end if;
 -- Wait for ready flag
 				when W_RDY =>
-					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '0' then
+					if sfp_los_ok = '0' or cdr_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '0' then
 						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
@@ -113,7 +109,7 @@ begin
 					end if;
 -- Running state
 				when RUN =>
-					if sfp_los_ok = '0' or cdr_ok = '0' or f_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '0' then
+					if sfp_los_ok = '0' or cdr_ok = '0' or rxphy_aligned_i = '0' or rxphy_locked_i = '0' then
 						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
