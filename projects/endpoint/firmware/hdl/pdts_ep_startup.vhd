@@ -26,6 +26,7 @@ entity pdts_ep_startup is
 		rec_clk: in std_logic; -- CDR recovered clock
 		rec_rst: out std_logic; -- Reset out (rec_clk domain)
 		rxphy_aligned: in std_logic; -- RX phy is aligned
+		mclk: in std_logic; -- IO clock input
 		clk: in std_logic; -- 50MHz clock input
 		rxphy_rst: out std_logic; -- RX phy reset
 		rxphy_locked: in std_logic; -- RX phy locked
@@ -45,7 +46,7 @@ architecture rtl of pdts_ep_startup is
 	signal f_ok, t, td: std_logic;
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
-	signal cdr_bad, sfp_los_ok, cdr_ok, f_en: std_logic;
+	signal cdr_bad, sfp_los_ok, cdr_ok: std_logic;
 	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, tsrdy_i: std_logic;
 	signal rec_rst_i, rxphy_rst_i, rst_i, rst_u: std_logic;
 
@@ -136,14 +137,14 @@ begin
 		)
 		port map(
 			clk => sclk,
-			clks => clk,
+			clks => mclk,
 			d(0) => cdr_ok,
 			q(0) => f_en
 		);
 
-	process(clk) -- Predivide by 256
+	process(mclk) -- Predivide by 256
 	begin
-		if rising_edge(clk) then
+		if rising_edge(mclk) then
 			if f_en = '0' then
 				rctr <= X"80"; -- Start with a half-count for rounding purposes
 			else
@@ -157,7 +158,7 @@ begin
 			N => 1
 		)
 		port map(
-			clk => clk,
+			clk => mclk,
 			clks => sclk,
 			d(0) => rctr(7),
 			q(0) => t
@@ -173,11 +174,11 @@ begin
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
-					if t = '0' then
+--					if t = '0' then
 						cctr_rnd <= cctr;
-					else
-						cctr_rnd <= cctr + 1;
-					end if;
+--					else
+--						cctr_rnd <= cctr + 1;
+--					end if;
 					cctr <= (others => '0');
 				elsif t = '1' and td = '0' then
 					cctr <= cctr + 1;
@@ -186,7 +187,7 @@ begin
 		end if;
 	end process;
 	
-	f_ok <= '1' when cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 256.0), 16) else '0';
+	f_ok <= '1' when cctr_rnd = to_unsigned(integer((CLK_FREQ * real(SCLK_RATIO) / SCLK_FREQ) * 256.0), 16) else '0';
 	
 -- External signal debounce	
 

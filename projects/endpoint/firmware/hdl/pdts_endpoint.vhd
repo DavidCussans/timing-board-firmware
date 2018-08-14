@@ -79,6 +79,7 @@ begin
 			rec_clk => rec_clk,
 			rec_rst => rec_rst,
 			rxphy_aligned => rxphy_aligned,
+			mclk => rec_clk,
 			clk => clk_i,
 			rxphy_rst => rxphy_rst,
 			rxphy_locked => rxphy_locked,
