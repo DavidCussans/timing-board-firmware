@@ -174,10 +174,10 @@ begin
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
-					if cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 256.0), 16) then
-						f_ok <= '1';
+					if t = '0' then
+						cctr_rnd <= cctr;
 					else
-						f_ok <= '0';
+						cctr_rnd <= cctr + 1;
 					end if;
 					cctr <= (others => '0');
 				elsif t = '1' and td = '0' then
@@ -187,8 +187,8 @@ begin
 		end if;
 	end process;
 	
-	cctr_rnd <= cctr when t = '0' else cctr + 1;
-
+	f_ok <= '1' when cctr_rnd = to_unsigned(integer((CLK_FREQ / SCLK_FREQ) * 256.0), 16) else '0';
+	
 -- External signal debounce	
 
 	cdr_bad <= cdr_los or cdr_lol;
