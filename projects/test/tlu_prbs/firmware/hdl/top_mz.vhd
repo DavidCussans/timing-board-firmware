@@ -118,8 +118,8 @@ begin
 	vio: vio_0
 		port map(
 	    clk => clk,
-	    probe_out0 => vio_rst,
-	    probe_out1 => vio_init
+	    probe_out0(0) => vio_rst,
+	    probe_out1(0) => vio_init
 	   );
 
 		

@@ -10,6 +10,7 @@ use ieee.numeric_std.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_top.all;
+use work.ipbus_reg_types.all;
 
 entity payload is
 	generic(
