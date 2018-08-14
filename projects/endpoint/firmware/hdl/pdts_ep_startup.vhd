@@ -43,7 +43,7 @@ architecture rtl of pdts_ep_startup is
 	type state_t is (W_RST, W_SFP, W_CDR, W_FREQ, W_ALIGN, W_LOCK, W_RDY, RUN, ERR_R, ERR_T, ERR_P);
 	signal state: state_t;
 	signal rctr: unsigned(7 downto 0);
-	signal f_ok, t, td: std_logic;
+	signal f_ok, t, td, f_en: std_logic;
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal sfp_los_ctr, cdr_ctr: unsigned(7 downto 0);
 	signal cdr_bad, sfp_los_ok, cdr_ok: std_logic;
