@@ -138,8 +138,8 @@ begin
 	stb <= not or_reduce(std_logic_vector(sctr));
 	done <= and_reduce(std_logic_vector(ctr));
 	kok <= '1' when kctr > KCTR_REQ else '0';
-	phase_rst_i <= (phase_rst_i or (done and not (m and kok))) and phase_locked and fr and not rxrst when rising_edge(clk);
-	phase_rst <= phase_rst_i when not UPSTREAM_MODE else '0';
+	phase_rst_i <= (phase_rst_i or (done and not (m and kok))) and fr and not rxrst when rising_edge(clk);
+	phase_rst <= phase_rst_i and phase_locked when not UPSTREAM_MODE else '0';
 
 	process(clk)
 	begin
