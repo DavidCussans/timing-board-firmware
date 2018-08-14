@@ -29,6 +29,8 @@ architecture rtl of top is
 
 	signal sysclk_u, sysclk, clk_u, clk, d_in, d, q: std_logic;
 	signal clkout: std_logic;
+	signal cyc_ctr, err_ctr: std_logic_vector(47 downto 0);
+	signal zflag: std_logic;
 	
 	attribute MARK_DEBUG: string;
 	attribute MARK_DEBUG of cyc_ctr, err_ctr, zflag: signal is "TRUE";	
