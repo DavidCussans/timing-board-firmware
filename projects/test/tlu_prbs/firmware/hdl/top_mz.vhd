@@ -135,7 +135,7 @@ begin
 	
 	copy <= ctr(16);
 	ld <= ctr(16) and ctr(15) when rising_edge(clk);
-	load <= ctr(16) and not ld;
+	load <= ctr(16) and ctr(15) and not ld;
 	init <= ctr(16) and ctr(15) and ctr(14);
 	edge <= ctr(22);
 	cntval <= std_logic_vector(ctr(21 downto 17));
@@ -144,7 +144,7 @@ begin
 
 	idel: IDELAYE2
 		generic map(
-			IDELAY_TYPE => "VARIABLE"
+			IDELAY_TYPE => "VAR_LOAD"
 		)
 		port map(
 			c => sysclk,
