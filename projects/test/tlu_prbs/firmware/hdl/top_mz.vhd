@@ -31,13 +31,13 @@ architecture rtl of top is
 	signal clkout: std_logic;
 	signal vio_rst_u, vio_rst: std_logic;
 	signal ctr: unsigned(22 downto 0);
-	signal edge, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
+	signal edge, edge_r, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r, cyc_ctr_p, err_ctr_p: std_logic_vector(47 downto 0);
 	signal zflag, zflag_p, zflag_r: std_logic;
 	signal cntout: std_logic_vector(4 downto 0);
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout, edge, copy_sd: signal is "TRUE";
+	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout, edge_r, copy_sd: signal is "TRUE";
 	
 	COMPONENT vio_0
 		PORT (
@@ -235,6 +235,7 @@ begin
 				cyc_ctr_r <= cyc_ctr_p;
 				err_ctr_r <= err_ctr_p;
 				zflag_r <= zflag_p;
+				edge_r <= edge;
 		end if;
 	end process;
 		
