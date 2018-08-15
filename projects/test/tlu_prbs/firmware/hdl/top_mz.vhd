@@ -31,13 +31,13 @@ architecture rtl of top is
 	signal clk_u, clk, d_in, d, dd, d_del, q, d_in_r, d_in_f: std_logic;
 	signal clkout, clkfb, clk200, rst_idel, locked, rdy_idel, rst_s, rst: std_logic;
 	signal ctr: unsigned(22 downto 0);
-	signal edge, edge_r, ld, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
+	signal edge, edge_r, ld, load, init, init_r, copy, copy_d, copy_s, copy_sd: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r, cyc_ctr_p, err_ctr_p: std_logic_vector(47 downto 0);
 	signal zflag, zflag_p, zflag_r: std_logic;
 	signal cntval, cntout, cntout_r: std_logic_vector(4 downto 0);
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout_r, edge_r, copy_sd: signal is "TRUE";
+	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout_r, init_r, edge_r, copy_sd: signal is "TRUE";
 
 begin
 
@@ -253,6 +253,7 @@ begin
 				err_ctr_r <= err_ctr_p;
 				zflag_r <= zflag_p;
 				edge_r <= edge;
+				init_r <= init;
 				cntout_r <= cntout;
 			end if;
 		end if;
