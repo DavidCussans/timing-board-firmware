@@ -27,9 +27,9 @@ end top;
 
 architecture rtl of top is
 
-	signal sysclk_u, sysclk, clk_u, clk, d_in, d, dd, d_del, q, d_in_r, d_in_f: std_logic;
-	signal clkout: std_logic;
-	signal vio_rst_u, vio_rst: std_logic;
+	signal sysclk_u, sysclk: std_logic;
+	signal clk_u, clk, d_in, d, dd, d_del, q, d_in_r, d_in_f: std_logic;
+	signal clkout, clkfb, clk200, rst_idel, locked, rdy_idel: std_logic;
 	signal ctr: unsigned(22 downto 0);
 	signal edge, edge_r, ld, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r, cyc_ctr_p, err_ctr_p: std_logic_vector(47 downto 0);
@@ -82,15 +82,40 @@ begin
 			ib => d_in_n,
 			o => d_in
 		);
+		
+-- Startup reset
 
--- VIO control
-
-	vio: vio_0
+	mmcm: MMCME2_BASE
+		generic map(
+			CLKIN1_PERIOD => 20.0, -- 50MHz input
+			CLKFBOUT_MULT_F => 20.0, -- 1GHz VCO freq
+			CLKOUT0_DIVIDE_F => 5.0, -- 200MHz output
+		)
 		port map(
-	    clk => sysclk,
-	    probe_out0(0) => vio_rst_u
-	   );
-	   
+			clkin1 => sysclk,
+			clkfbin => clkfb,
+			clkout0 => clk200,
+			clkfbout => clkfb,
+			locked => locked,
+			rst => '0',
+			pwrdwn => '0'
+		);
+
+-- IDELAYCTRL
+
+	rst_idel <= not locked;
+
+	ctrl: IDELAYCTRL
+		port map(
+			refclk => clk200,
+			rst => rst_idel,
+			rdy => rdy_idel
+		);
+		
+	rst_s <= not (locked and rdy_idel) when rising_edge(sysclk);
+	
+-- Reset sync
+
 	synchro: entity work.pdts_synchro
 		generic map(
 			N => 1
@@ -98,8 +123,8 @@ begin
 		port map(
 			clk => sysclk,
 			clks => clk,
-			d(0) => vio_rst_u,
-			q(0) => vio_rst
+			d(0) => rst_s,
+			q(0) => rst
 		);
 
 -- Sweep control
@@ -107,7 +132,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if vio_rst = '1' then
+			if rst = '1' then
 				ctr <= (others => '0');
 			else
 				ctr <= ctr + 1;
@@ -193,7 +218,7 @@ begin
 	prbs_chk: entity work.prbs7_chk
 		port map(
 			clk => clk,
-			rst => vio_rst,
+			rst => rst,
 			init => init,
 			d => dd,
 			err_ctr => err_ctr,
