@@ -31,10 +31,10 @@ architecture rtl of top is
 	signal clkout: std_logic;
 	signal vio_rst_u, vio_rst: std_logic;
 	signal ctr: unsigned(22 downto 0);
-	signal edge, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
+	signal edge, ld, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r, cyc_ctr_p, err_ctr_p: std_logic_vector(47 downto 0);
 	signal zflag, zflag_p, zflag_r: std_logic;
-	signal cntout: std_logic_vector(4 downto 0);
+	signal cntval, cntout: std_logic_vector(4 downto 0);
 	
 	attribute MARK_DEBUG: string;
 	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout, edge, copy_sd: signal is "TRUE";
@@ -120,6 +120,7 @@ begin
 	load <= ctr(16) and not ld;
 	init <= ctr(16) and ctr(15) and ctr(14);
 	edge <= ctr(22);
+	cntval <= std_logic_vector(ctr(21 downto 17));
 		
 -- IOB registers
 
@@ -134,7 +135,7 @@ begin
 			ce => '0',
 			inc => '1',
 			cinvctrl => '0',
-			cntvaluein => ctr(21 downto 17),
+			cntvaluein => cntval,
 			idatain => d_in,
 			datain => '0',
 			ldpipeen => '0',
@@ -142,8 +143,6 @@ begin
 			cntvalueout => cntout
 		);
 		
-	vio_inc_d <= vio_inc when rising_edge(sysclk);
-
 	iddr0: IDDR
 		generic map(
 			DDR_CLK_EDGE => "SAME_EDGE"
@@ -208,7 +207,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			copy_d <= copy;
-			if copy = '1' and and copy_d = '0' then
+			if copy = '1' and copy_d = '0' then
 				cyc_ctr_p <= cyc_ctr;
 				err_ctr_p <= err_ctr;
 				zflag_p <= zflag;
@@ -235,6 +234,7 @@ begin
 				cyc_ctr_r <= cyc_ctr_p;
 				err_ctr_r <= err_ctr_p;
 				zflag_r <= zflag_p;
+			end if;
 		end if;
 	end process;
 		
