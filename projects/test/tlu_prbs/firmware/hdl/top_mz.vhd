@@ -38,13 +38,6 @@ architecture rtl of top is
 	
 	attribute MARK_DEBUG: string;
 	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout, edge_r, copy_sd: signal is "TRUE";
-	
-	COMPONENT vio_0
-		PORT (
-			clk : IN STD_LOGIC;
-			probe_out0 : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
-		);
-	END COMPONENT;
 
 begin
 
