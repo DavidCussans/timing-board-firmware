@@ -261,6 +261,6 @@ begin
 		
 -- Debug
 
-	debug <= (others => '0');
+	debug <= err_ctr(7 downto 0) & rst & init & d_in_r & d_in_f;
 		
 end rtl;
