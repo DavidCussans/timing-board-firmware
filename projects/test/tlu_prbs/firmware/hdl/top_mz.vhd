@@ -27,7 +27,7 @@ end top;
 
 architecture rtl of top is
 
-	signal sysclk_u, sysclk, clk_u, clk, d_in, d, dd, d_del, q: std_logic;
+	signal sysclk_u, sysclk, clk_u, clk, d_in, d, dd, d_del, q, d_in_r, d_in_f: std_logic;
 	signal clkout: std_logic;
 	signal vio_rst_u, vio_rst: std_logic;
 	signal ctr: unsigned(22 downto 0);
@@ -144,7 +144,7 @@ begin
 		
 	vio_inc_d <= vio_inc when rising_edge(sysclk);
 
-	iddr: IDDR
+	iddr0: IDDR
 		generic map(
 			DDR_CLK_EDGE => "SAME_EDGE"
 		)
