@@ -188,7 +188,7 @@ begin
 	copy <= ctr(16);
 	ld <= ctr(16) and ctr(15) when rising_edge(clk);
 	load <= ctr(16) and ctr(15) and not ld;
-	init <= ctr(16) and ctr(15) and ctr(14);
+	init <= (ctr(16) and ctr(15) and ctr(14)) and not vio_en;
 	edge <= ctr(22) when vio_en = '0' else vio_edge;
 	cntval <= std_logic_vector(ctr(21 downto 17)) when vio_en = '0' else vio_cntval;
 		
