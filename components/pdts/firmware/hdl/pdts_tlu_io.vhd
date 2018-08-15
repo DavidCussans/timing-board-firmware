@@ -36,6 +36,10 @@ entity pdts_tlu_io is
 		mclk: in std_logic; -- 250MHz IO clock out
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
+		q_hdmi_clk_0: out std_logic; -- output to HDMI 0
+		q_hdmi_clk_1: out std_logic; -- output to HDMI 1
+		q_hdmi_clk_2: out std_logic; -- output to HDMI 2
+		q_hdmi_clk_3: out std_logic; -- output to HDMI 3
 		q_hdmi: in std_logic;
 		q_hdmi_0: out std_logic; -- output to HDMI 0
 		q_hdmi_1: out std_logic; -- output to HDMI 1
@@ -245,7 +249,53 @@ begin
 	q_hdmi_2 <= q_hdmi_2_i when falling_edge(mclk);
 	q_hdmi_3_i <= q_hdmi when falling_edge(mclk);
 	q_hdmi_3 <= q_hdmi_3_i when falling_edge(mclk);
+	
+-- Clock outputs
 
+	oddr_clk_0: ODDR
+		port map(
+			q => q_hdmi_clk_0,
+			c => mclk,
+			ce => '1',
+			d1 => '0',
+			d2 => '1',
+			r => '0',
+			s => '0'
+		);
+
+	oddr_clk_1: ODDR
+		port map(
+			q => q_hdmi_clk_1,
+			c => mclk,
+			ce => '1',
+			d1 => '0',
+			d2 => '1',
+			r => '0',
+			s => '0'
+		);
+		
+	oddr_clk_2: ODDR
+		port map(
+			q => q_hdmi_clk_2,
+			c => mclk,
+			ce => '1',
+			d1 => '0',
+			d2 => '1',
+			r => '0',
+			s => '0'
+		);
+		
+	oddr_clk_3: ODDR
+		port map(
+			q => q_hdmi_clk_3,
+			c => mclk,
+			ce => '1',
+			d1 => '0',
+			d2 => '1',
+			r => '0',
+			s => '0'
+		);
+		
 -- Frequency measurement
 
 	div: entity work.freq_ctr_div

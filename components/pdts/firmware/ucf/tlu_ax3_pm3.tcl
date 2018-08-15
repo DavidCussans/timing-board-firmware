@@ -18,6 +18,10 @@ set_property PULLUP TRUE [get_ports {q_sfp_*}]
 false_path {q_sfp_* d_cdr_*} sysclk
 
 set_property IOSTANDARD LVCMOS33 [get_port {q_hdmi_* d_hdmi_* rstb_clk clk_lolb rstb_i2c sfp_* cdr_*}]
+set_property PACKAGE_PIN K3 [get_ports {q_hdmi_clk_0}]
+set_property PACKAGE_PIN F4 [get_ports {q_hdmi_clk_1}]
+set_property PACKAGE_PIN E2 [get_ports {q_hdmi_clk_2}]
+set_property PACKAGE_PIN G4 [get_ports {q_hdmi_clk_3}]
 set_property PACKAGE_PIN R7 [get_ports {q_hdmi_0}]
 set_property PACKAGE_PIN U4 [get_ports {q_hdmi_1}]
 set_property PACKAGE_PIN R8 [get_ports {q_hdmi_2}]
