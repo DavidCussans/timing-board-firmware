@@ -34,10 +34,10 @@ architecture rtl of top is
 	signal edge, edge_r, ld, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r, cyc_ctr_p, err_ctr_p: std_logic_vector(47 downto 0);
 	signal zflag, zflag_p, zflag_r: std_logic;
-	signal cntval, cntout: std_logic_vector(4 downto 0);
+	signal cntval, cntout, cntout_r: std_logic_vector(4 downto 0);
 	
 	attribute MARK_DEBUG: string;
-	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout, edge_r, copy_sd: signal is "TRUE";
+	attribute MARK_DEBUG of cyc_ctr_r, err_ctr_r, zflag_r, cntout_r, edge_r, copy_sd: signal is "TRUE";
 
 begin
 
@@ -147,7 +147,7 @@ begin
 			IDELAY_TYPE => "VAR_LOAD"
 		)
 		port map(
-			c => sysclk,
+			c => clk,
 			regrst => '0',
 			ld => load,
 			ce => '0',
@@ -253,6 +253,7 @@ begin
 				err_ctr_r <= err_ctr_p;
 				zflag_r <= zflag_p;
 				edge_r <= edge;
+				cntout_r <= cntout;
 			end if;
 		end if;
 	end process;
