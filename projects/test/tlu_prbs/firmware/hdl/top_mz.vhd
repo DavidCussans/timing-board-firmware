@@ -29,7 +29,7 @@ architecture rtl of top is
 
 	signal sysclk_u, sysclk: std_logic;
 	signal clk_u, clk, d_in, d, dd, d_del, q, d_in_r, d_in_f: std_logic;
-	signal clkout, clkfb, clk200, rst_idel, locked, rdy_idel: std_logic;
+	signal clkout, clkfb, clk200, rst_idel, locked, rdy_idel, rst_s, rst: std_logic;
 	signal ctr: unsigned(22 downto 0);
 	signal edge, edge_r, ld, load, init, copy, copy_d, copy_s, copy_sd: std_logic;
 	signal cyc_ctr, err_ctr, cyc_ctr_r, err_ctr_r, cyc_ctr_p, err_ctr_p: std_logic_vector(47 downto 0);
@@ -82,7 +82,7 @@ begin
 		generic map(
 			CLKIN1_PERIOD => 20.0, -- 50MHz input
 			CLKFBOUT_MULT_F => 20.0, -- 1GHz VCO freq
-			CLKOUT0_DIVIDE_F => 5.0, -- 200MHz output
+			CLKOUT0_DIVIDE_F => 5.0 -- 200MHz output
 		)
 		port map(
 			clkin1 => sysclk,
