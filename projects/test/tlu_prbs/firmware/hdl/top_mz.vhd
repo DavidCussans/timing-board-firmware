@@ -177,7 +177,7 @@ begin
 		
 	d <= d_in_r when edge = '0' else d_in_f;
 	dd <= not d when rising_edge(clk);
-	q <= not dd when rising_edge(clk);
+	q <= dd when rising_edge(clk);
 	
 -- Clock and data out
 
