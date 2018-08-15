@@ -148,7 +148,7 @@ begin
 
 	vio: vio_0
   	port map(
-			clk => clk,
+			clk => sysclk,
 			probe_out0(0) => vio_rst,
 			probe_out1(0) => vio_en,
 			probe_out2 => vio_cntval,
