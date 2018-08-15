@@ -109,7 +109,7 @@ begin
 			pwrdwn => '0'
 		);
 
-	bufg_clk: BUFG
+	bufg_f: BUFG
 		port map(
 			i => clk_ug,
 			o => clk
@@ -149,12 +149,12 @@ begin
 	vio: vio_0
   	port map(
 			clk => clk,
-			probe_out0 => vio_rst,
-			probe_out1 => vio_en,
+			probe_out0(0) => vio_rst,
+			probe_out1(0) => vio_en,
 			probe_out2 => vio_cntval,
-			probe_out3 => vio_edge,
-			probe_out4 => vio_inv_i,
-			probe_out5 => vio_inv_o
+			probe_out3(0) => vio_edge,
+			probe_out4(0) => vio_inv_i,
+			probe_out5(0) => vio_inv_o
 		);
 	
 -- Reset sync
@@ -327,7 +327,7 @@ begin
 		
 -- Debug
 
-	debug(10 downto 0) <= "00000" d & dd & rst & init & d_in_r & d_in_f;
+	debug(10 downto 0) <= "00000" & d & dd & rst & init & d_in_r & d_in_f;
 	debug(11) <= dd when rising_edge(clk);
 	
 end rtl;
