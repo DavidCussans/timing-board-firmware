@@ -230,7 +230,7 @@ begin
 		);
 		
 	d_hdmi_i <= d_hdmi_2_r when ctrl_hdmi_edge = '0' else d_hdmi_2_f;
-	d_hdmi <= d_hdmi_i when hdmi_inv_o = '0' else not d_hdmi_i;
+	d_hdmi <= d_hdmi_i when ctrl_hdmi_inv_o = '0' else not d_hdmi_i;
 
 -- Data outputs
 	
