@@ -28,6 +28,10 @@ entity payload is
 		clk_n: in std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
+		q_hdmi_clk_0: out std_logic;
+		q_hdmi_clk_1: out std_logic;
+		q_hdmi_clk_2: out std_logic;
+		q_hdmi_clk_3: out std_logic;
 		q_hdmi_0: out std_logic; -- output to HDMI 0
 		q_hdmi_1: out std_logic; -- output to HDMI 1
 		q_hdmi_2: out std_logic; -- output to HDMI 2
@@ -96,6 +100,10 @@ begin
 			mclk => mclk,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
+			q_hdmi_clk_0 => q_hdmi_clk_0,
+			q_hdmi_clk_1 => q_hdmi_clk_1,
+			q_hdmi_clk_2 => q_hdmi_clk_2,
+			q_hdmi_clk_3 => q_hdmi_clk_3,
 			q_hdmi => q,
 			q_hdmi_0 => q_hdmi_0,
 			q_hdmi_1 => q_hdmi_1,
