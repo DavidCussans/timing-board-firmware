@@ -75,10 +75,10 @@ architecture rtl of pdts_tlu_io is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon: std_logic;
 	signal rst_i, clk_i, clk_u, mclk_i, mclk_u: std_logic;
-	signal ctrl_hdmi_edge, ctrl_cdr_edge: std_logic;
+	signal ctrl_hdmi_edge, ctrl_cdr_edge, ctrl_hdmi_inv_i, ctrl_hdmi_inv_o: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
-	signal q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
-	signal d_hdmi_2_r, d_hdmi_2_f: std_logic;
+	signal q_hdmi_i, q_hdmi_0_i, q_hdmi_1_i, q_hdmi_2_i, q_hdmi_3_i: std_logic;
+	signal d_hdmi_2_r, d_hdmi_2_f, d_hdmi_i: std_logic;
 	signal d_cdr_i, d_cdr_r, d_cdr_f, q_sfp_r, q_sfp_i: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal sda_o: std_logic;
@@ -131,6 +131,8 @@ begin
 	ctrl_rst_lock_mon <= ctrl(0)(6);
 	ctrl_hdmi_edge <= ctrl(0)(8);
 	ctrl_cdr_edge <= ctrl(0)(9);
+	ctrl_hdmi_inv_i <= ctrl(0)(10);
+	ctrl_hdmi_inv_o <= ctrl(0)(11);
 	
 	rst <= rst_i;
 	
@@ -227,7 +229,8 @@ begin
 			s => '0'
 		);
 		
-	d_hdmi <= d_hdmi_2_r when ctrl_hdmi_edge = '0' else d_hdmi_2_f;
+	d_hdmi_i <= d_hdmi_2_r when ctrl_hdmi_edge = '0' else d_hdmi_2_f;
+	d_hdmi <= d_hdmi_i when hdmi_inv_o = '0' else not d_hdmi_i;
 
 -- Data outputs
 	
@@ -241,13 +244,14 @@ begin
 			ob => q_sfp_n
 		);
 
-	q_hdmi_0_i <= q_hdmi when falling_edge(mclk); -- Replication needed to meet timing
+	q_hdmi_i <= q_hdmi when ctrl_hdmi_inv_o = '0' else not q_hdmi;
+	q_hdmi_0_i <= q_hdmi_i when falling_edge(mclk); -- Replication needed to meet timing
 	q_hdmi_0 <= q_hdmi_0_i when falling_edge(mclk);
-	q_hdmi_1_i <= q_hdmi when falling_edge(mclk);
+	q_hdmi_1_i <= q_hdmi_i when falling_edge(mclk);
 	q_hdmi_1 <= q_hdmi_1_i when falling_edge(mclk);
-	q_hdmi_2_i <= q_hdmi when falling_edge(mclk);
+	q_hdmi_2_i <= q_hdmi_i when falling_edge(mclk);
 	q_hdmi_2 <= q_hdmi_2_i when falling_edge(mclk);
-	q_hdmi_3_i <= q_hdmi when falling_edge(mclk);
+	q_hdmi_3_i <= q_hdmi_i when falling_edge(mclk);
 	q_hdmi_3 <= q_hdmi_3_i when falling_edge(mclk);
 	
 -- Clock outputs
