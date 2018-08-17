@@ -28,7 +28,7 @@ end top;
 architecture rtl of top is
 
 	signal sysclk_u, sysclk: std_logic;
-	signal clk_u, clk, d, dd, q: std_logic;
+	signal clk_u, clk, d_in, dd, q: std_logic;
 	signal clkout, clk_uf, clk_ug, clkfb2: std_logic;
 	
 begin
@@ -95,8 +95,8 @@ begin
 		
 -- Registers
 
-	dd <= not d when rising_edge(clk);
-	q <= qq when rising_edge(clk);
+	dd <= not d_in when rising_edge(clk);
+	q <=  dd when rising_edge(clk);
 
 -- Clock and data out
 
