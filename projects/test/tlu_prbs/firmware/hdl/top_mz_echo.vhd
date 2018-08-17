@@ -95,7 +95,7 @@ begin
 		
 -- Registers
 
-	dd <= not d_in when rising_edge(clk);
+	dd <= d_in when rising_edge(clk);
 	q <=  dd when rising_edge(clk);
 
 -- Clock and data out
