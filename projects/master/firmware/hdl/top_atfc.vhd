@@ -12,48 +12,48 @@ use IEEE.STD_LOGIC_1164.ALL;
 use work.ipbus.ALL;
 
 entity top is port(
-                eth_clk_p: in std_logic; -- 125MHz MGT clock
-                eth_clk_n: in std_logic;
-                eth_rx_p: in std_logic; -- Ethernet MGT input
-                eth_rx_n: in std_logic;
-                eth_tx_p: out std_logic; -- Ethernet MGT output
-                eth_tx_n: out std_logic;
-                sfp_los: in std_logic;
-                sfp_tx_disable: out std_logic;
-                leds: out std_logic_vector(7 downto 0); -- TE712 LEDs
-                --dip_sw: in std_logic_vector(3 downto 0); -- carrier switches
-		        fmc_clk_p: in std_logic;
-		        fmc_clk_n: in std_logic;
-        		rec_clk_p: in std_logic;
-		        rec_clk_n: in std_logic;
-		        rec_d_p: in std_logic;
-		        rec_d_n: in std_logic;
-		        clk_out_p: out std_logic;
-		        clk_out_n: out std_logic;
-		        rj45_din_p: in std_logic;
-		        rj45_din_n: in std_logic;
-		        rj45_dout_p: out std_logic;
-		        rj45_dout_n: out std_logic;
-		        sfp_dout_p: out std_logic;
-		        sfp_dout_n: out std_logic;
-		        pll_rstn: out std_logic;
-        		cdr_lol: in std_logic;
-		        cdr_los: in std_logic;
-		        --sfp_los: in std_logic;
-		        --sfp_tx_dis: out std_logic;
-		        sfp_flt: in std_logic;
-		        uid_scl: out std_logic;
-		        uid_sda: inout std_logic;
-		        sfp_scl: out std_logic;
-		        sfp_sda: inout std_logic;
-		        pll_scl: out std_logic;
-		        pll_sda: inout std_logic;
-		        gpin_0_p: in std_logic;
-		        gpin_0_n: in std_logic;
-		        gpout_0_p: out std_logic;
-		        gpout_0_n: out std_logic;
-		        gpout_1_p: out std_logic;
-		        gpout_1_n: out std_logic
+        eth_clk_p: in std_logic; -- 125MHz MGT clock
+        eth_clk_n: in std_logic;
+        eth_rx_p: in std_logic; -- Ethernet MGT input
+        eth_rx_n: in std_logic;
+        eth_tx_p: out std_logic; -- Ethernet MGT output
+        eth_tx_n: out std_logic;
+        sfp_los: in std_logic;
+        sfp_tx_disable: out std_logic;
+        leds: out std_logic_vector(7 downto 0); -- TE712 LEDs
+        --dip_sw: in std_logic_vector(3 downto 0); -- carrier switches
+		fmc_clk_p: in std_logic;
+		fmc_clk_n: in std_logic;
+		rec_clk_p: in std_logic;
+		rec_clk_n: in std_logic;
+		rec_d_p: in std_logic;
+		rec_d_n: in std_logic;
+		clk_out_p: out std_logic;
+		clk_out_n: out std_logic;
+		rj45_din_p: in std_logic;
+		rj45_din_n: in std_logic;
+		rj45_dout_p: out std_logic;
+		rj45_dout_n: out std_logic;
+		sfp_dout_p: out std_logic;
+		sfp_dout_n: out std_logic;
+		pll_rstn: out std_logic;
+		cdr_lol: in std_logic;
+		cdr_los: in std_logic;
+		--sfp_los: in std_logic;
+		--sfp_tx_dis: out std_logic;
+		sfp_flt: in std_logic;
+		uid_scl: out std_logic;
+		uid_sda: inout std_logic;
+		sfp_scl: out std_logic;
+		sfp_sda: inout std_logic;
+		pll_scl: out std_logic;
+		pll_sda: inout std_logic;
+		gpin_0_p: in std_logic;
+		gpin_0_n: in std_logic;
+		gpout_0_p: out std_logic;
+		gpout_0_n: out std_logic;
+		gpout_1_p: out std_logic;
+		gpout_1_n: out std_logic
 	   );
 
 end top;
@@ -140,6 +140,7 @@ begin
 			cdr_los => cdr_los,
 			sfp_los => sfp_los,
 			sfp_tx_dis => sfp_tx_disable,
+			--sfp_tx_dis => open,
 			sfp_flt => sfp_flt,
 			uid_scl => uid_scl,
 			uid_sda => uid_sda,

@@ -30,11 +30,11 @@ set_property PACKAGE_PIN L3 [get_ports {gpout_1_p}]
 set_property PACKAGE_PIN K3 [get_ports {gpout_1_n}]
 false_path {rec_d_* clk_out_* rj45_din_* rj45_dout_* sfp_dout_* gpin_* gpout_*} eth_refclk
 
-set_property IOSTANDARD LVCMOS25 [get_port {pll_rstn cdr_lol cdr_los sfp_los sfp_tx_disable sfp_flt uid_scl uid_sda sfp_scl sfp_sda pll_scl pll_sda}]
+set_property IOSTANDARD LVCMOS25 [get_port {pll_rstn cdr_lol cdr_los  sfp_flt uid_scl uid_sda sfp_scl sfp_sda pll_scl pll_sda}]
 set_property PACKAGE_PIN K2 [get_ports {cdr_lol}]
 set_property PACKAGE_PIN J2 [get_ports {cdr_los}]
-set_property PACKAGE_PIN R3 [get_ports {sfp_los}]
-set_property PACKAGE_PIN Y3 [get_ports {sfp_tx_disable}]
+#set_property PACKAGE_PIN R3 [get_ports {sfp_los}]
+#set_property PACKAGE_PIN Y3 [get_ports {sfp_tx_disable}]
 set_property PACKAGE_PIN AA3 [get_ports {sfp_flt}]
 set_property PACKAGE_PIN AB21 [get_ports {uid_scl}]
 set_property PACKAGE_PIN AB22 [get_ports {uid_sda}]
@@ -43,4 +43,4 @@ set_property PACKAGE_PIN Y1 [get_ports {sfp_sda}]
 set_property PACKAGE_PIN T1 [get_ports {pll_scl}]
 set_property PACKAGE_PIN U1 [get_ports {pll_sda}]
 set_property PACKAGE_PIN V9 [get_ports {pll_rstn}]
-false_path {pll_rstn cdr_lol cdr_los sfp_los sfp_tx_disable sfp_flt uid_scl uid_sda sfp_scl sfp_sda pll_scl pll_sda} eth_refclk
+false_path {pll_rstn cdr_lol cdr_los  sfp_flt uid_scl uid_sda sfp_scl sfp_sda pll_scl pll_sda} eth_refclk
