@@ -17,7 +17,8 @@ proc false_path {patt clk} {
 create_clock -period 20.000 -name sysclk [get_ports sysclk_p]
 
 # System clock (250MHz)
-create_clock -period 4.000 -name clk [get_ports clk_in_p]
+#create_clock -period 4.000 -name clk [get_ports clk_in_p]
+create_clock -period 20.000 -name clk [get_ports clk_in_p]
 
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks sysclk] -group [get_clocks -include_generated_clocks clk]
 
