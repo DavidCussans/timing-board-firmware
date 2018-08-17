@@ -54,8 +54,8 @@ architecture rtl of pdts_rx_phy is
 	signal sctr: unsigned(3 downto 0);
 	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
-	signal lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
-	signal stbd, ki, lock, ldone, kerr, cerr, derr: std_logic;
+	signal ectr, lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
+	signal stbd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
 		
 begin
 
@@ -199,13 +199,19 @@ begin
 					lctr <= lctr + 1;
 				end if;
 				lock <= (lock or ki) and not (rst or ldone or (cerr or derr or kerr));
+				if lock = '0' then
+					ectr <= (others => '0');
+				elsif edone = '0' then
+					ectr <= ectr + 1;
+				end if;
 			end if;
 			stbd <= stb;
 		end if;
 	end process;
 
 	ldone <= and_reduce(std_logic_vector(lctr));
-	rx_locked <= lock and aligned_i;
+	edone <= and_reduce(std_logic_vector(ectr));
+	rx_locked <= edone and aligned_i;
 	
 	k <= ki;
 	
