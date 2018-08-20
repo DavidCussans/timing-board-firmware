@@ -111,7 +111,7 @@ begin
 
 	slaves: entity work.payload
 		generic map(
-			CARRIER_TYPE => X"00"
+			CARRIER_TYPE => X"03"
 		)
 		port map(
 			ipb_clk => clk_ipb,
