@@ -56,6 +56,10 @@ architecture rtl of pdts_rx_phy is
 	signal di: std_logic_vector(7 downto 0);
 	signal ectr, lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
+	
+	attribute MARK_DEBUG: string;
+	attribute MARK_DEBUG of w, tr, fr, ctr, stb, kctr, m, done, kok, phase_rst_i, dctr, aligned_i: signal is "TRUE";
+	attribute MARK_DEBUG of wd, di, ki, cerr, derr, kerr, lock, lctr, ectr: signal is "TRUE";
 		
 begin
 
