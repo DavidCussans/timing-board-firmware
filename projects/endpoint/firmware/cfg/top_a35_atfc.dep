@@ -1,0 +1,2 @@
+include -c projects/master atfc_a35.dep
+include payload.dep
