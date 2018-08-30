@@ -1,5 +1,7 @@
 src spill_gate.vhd
-addrtab spill.xml
-src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
-src -c components/pdts pdts_defs.vhd
+src ipbus_decode_spill.vhd
+addrtab -t spill.xml
+src -c ipbus-firmware:components/ipbus_core ipbus_fabric_sel.vhd
+include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep ipbus_ctrs_v.dep
+src -c components/pdts pdts_defs.vhd pdts_debounce.vhd
 src -c ipbus-firmware:components/ipbus_core ipbus_package.vhd

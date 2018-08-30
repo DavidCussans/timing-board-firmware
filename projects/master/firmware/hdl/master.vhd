@@ -24,6 +24,8 @@ entity master is
 		mclk: in std_logic; -- The serial IO clock
 		clk: in std_logic; -- The system clock
 		rst: in std_logic; -- Sync reset (clk domain)
+		spill_start: in std_logic; -- Spill signals from SPS (async signals)
+		spill_end: in std_logic;
 		q: out std_logic; -- Output (mclk domain)
 		scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
 		scmd_out: out cmd_r;
@@ -144,6 +146,8 @@ begin
 			ipb_out => ipbr(N_SLV_SPILL),
 			clk => clk,
 			rst => rst,
+			spill_start => spill_start,
+			spill_end => spill_end,
 			spill => spill,
 			scmd_out => scmdw_v(1),
 			scmd_in => scmdr_v(1)

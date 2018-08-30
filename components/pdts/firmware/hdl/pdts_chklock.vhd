@@ -11,7 +11,7 @@ use ieee.std_logic_misc.all;
 
 entity pdts_chklock is
 	generic(
-		N: natural := 1
+		N: positive := 1
 	);
 	port(
 		clk: in std_logic;

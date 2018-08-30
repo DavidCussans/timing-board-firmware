@@ -73,7 +73,7 @@ begin
 		port map(
 			sclk => clk,
 			srst => ep_rst,
-			addr => X"00",
+			addr => X"01",
 			tgrp => "00",
 			stat => ep_stat,
 			rec_clk => rec_clk,
