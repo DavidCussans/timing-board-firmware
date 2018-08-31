@@ -120,6 +120,7 @@ begin
 			nuke => nuke,
 			soft_rst => soft_rst,
 			userled => userled,
+			addr => ADDR,
 			clk125 => clk125,
 			clk_p => clk_p,
 			clk_n => clk_n,

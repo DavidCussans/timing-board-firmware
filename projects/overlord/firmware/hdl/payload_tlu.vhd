@@ -181,6 +181,7 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_ENDPOINT0),
 			ipb_out => ipbr(N_SLV_ENDPOINT0),
+			addr => X"f8",
 			rec_clk => mclk,
 			rec_d => q,
 			clk => clk,
