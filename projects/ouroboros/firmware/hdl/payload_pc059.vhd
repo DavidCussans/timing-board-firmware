@@ -199,6 +199,12 @@ begin
 -- Endpoint wrapper
 
 	egen: for i in N_EP - 1 downto 0 generate
+	
+		signal addri: std_logic_vector(7 downto 0);
+		
+	begin
+	
+		addri <= std_logic_vector(to_unsigned(i + 8, 8));
 
 		wrapper: entity work.endpoint_wrapper_local
 			port map(
@@ -206,6 +212,7 @@ begin
 				ipb_rst => ipb_rst,
 				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+				addr => addri,
 				rec_clk => clk_pll,
 				rec_d => q,
 				clk => clk,

@@ -153,7 +153,7 @@ begin
 			ipb_in => ipbw(N_SLV_ENDPOINT),
 			ipb_out => ipbr(N_SLV_ENDPOINT),
 			addr(3 downto 0) => addr,
-			addr(7 downto 4) => "0000",
+			addr(7 downto 4) => "0001",
 			rec_clk => rec_clk,
 			rec_d => rec_d,
 			txd => sfp_dout,
