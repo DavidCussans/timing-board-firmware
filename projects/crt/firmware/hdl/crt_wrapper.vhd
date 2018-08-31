@@ -23,6 +23,7 @@ entity crt_wrapper is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
+		addr: in std_logic_vector(7 downto 0);
 		rec_clk: in std_logic; -- CDR recovered clock
 		rec_d: in std_logic; -- CDR recovered data (rec_clk domain)
 		txd: out std_logic; -- Output data to timing link (rec_clk domain)
@@ -41,7 +42,6 @@ architecture rtl of crt_wrapper is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl, ctrl_cmd: ipb_reg_v(0 downto 0);
 	signal stat, stat_cmd: ipb_reg_v(0 downto 0);
-	signal ctrl_addr: std_logic_vector(7 downto 0);
 	signal ctrl_tgrp: std_logic_vector(1 downto 0);
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_clk, ep_rsto, ep_rdy, ep_v, ep_s: std_logic;
@@ -82,7 +82,6 @@ begin
 		);
 
 	ctrl_tgrp <= ctrl(0)(1 downto 0);
-	ctrl_addr <= ctrl(0)(15 downto 8);
 	stat(0) <= X"000000" & ep_stat & "000" & ep_rdy;
 
 -- The endpoint
@@ -95,7 +94,7 @@ begin
 		port map(
 			sclk => ipb_clk,
 			srst => ipb_rst,
-			addr => ctrl_addr,
+			addr => addr,
 			tgrp => ctrl_tgrp,
 			stat => ep_stat,
 			rec_clk => rec_clk,
