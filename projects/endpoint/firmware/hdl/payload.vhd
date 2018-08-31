@@ -23,6 +23,7 @@ entity payload is
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic;
+		addr: in std_logic_vector(3 downto 0);
 		clk125: in std_logic;
 		fmc_clk_p: in std_logic;
 		fmc_clk_n: in std_logic;
@@ -150,6 +151,8 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_ENDPOINT),
 			ipb_out => ipbr(N_SLV_ENDPOINT),
+			addr(3 downto 0) => addr,
+			addr(7 downto 4) => "0001",
 			rec_clk => rec_clk,
 			rec_d => rec_d,
 			txd => sfp_dout,

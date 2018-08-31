@@ -114,6 +114,7 @@ begin
 			nuke => nuke,
 			soft_rst => soft_rst,
 			userled => userled,
+			addr => cfg,
 			clk125 => clk125,
 			fmc_clk_p => fmc_clk_p,
 			fmc_clk_n => fmc_clk_n,

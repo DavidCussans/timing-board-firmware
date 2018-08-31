@@ -24,6 +24,7 @@ entity endpoint_wrapper_local is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
+		addr: in std_logic_vector(7 downto 0);
 		rec_clk: in std_logic; -- CDR recovered clock
 		rec_d: in std_logic; -- CDR recovered data (rec_clk domain)
 		clk: in std_logic; -- 50MHz clock in
@@ -39,9 +40,10 @@ architecture rtl of endpoint_wrapper_local is
 	signal ctrl, ctrl_cmd: ipb_reg_v(0 downto 0);
 	signal stat, stat_cmd: ipb_reg_v(0 downto 0);
 	signal stb_cmd: std_logic_vector(0 downto 0);
-	signal ctrl_ep_en, ctrl_buf_en, ctrl_ctr_rst, ctrl_mask_dis: std_logic;
+	signal ctrl_ep_en, ctrl_buf_en, ctrl_ctr_rst, ctrl_mask_dis, ctrl_int_addr: std_logic;
 	signal ctrl_addr: std_logic_vector(7 downto 0);
 	signal ctrl_tgrp: std_logic_vector(1 downto 0);
+	signal addr_ep: std_logic_vector(7 downto 0);
 	signal ep_stat: std_logic_vector(3 downto 0);
 	signal ep_rst, ep_clk, ep_rsto, ep_rdy, ep_v: std_logic;
 	signal ep_scmd: std_logic_vector(SCMD_W - 1 downto 0);
@@ -102,6 +104,7 @@ begin
 	ctrl_ep_en <= ctrl(0)(0);
 	ctrl_buf_en <= ctrl(0)(1);
 	ctrl_ctr_rst <= ctrl(0)(2);
+	ctrl_int_addr <= ctrl(0)(3);
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_mask_dis <= ctrl(0)(6);
 	ctrl_addr <= ctrl(0)(15 downto 8);
@@ -129,6 +132,8 @@ begin
 
 	ep_rst <= ipb_rst or not ctrl_ep_en;
 	ep_clk <= clk;
+	
+	addr_ep <= addr when ctrl_int_addr = '0' else ctrl_addr;
 
 	ep: entity work.pdts_endpoint_local
 		generic map(
@@ -138,7 +143,7 @@ begin
 		port map(
 			sclk => ipb_clk,
 			srst => ep_rst,
-			addr => ctrl_addr,
+			addr => addr_ep,
 			tgrp => ctrl_tgrp,
 			stat => ep_stat,
 			rec_clk => rec_clk,
