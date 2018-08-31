@@ -167,8 +167,8 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
-			spill_start => trig_in(1),
-			spill_end => trig_in(2),
+			spill_start => trig_in(4),
+			spill_end => trig_in(3),
 		  d => d_trig,
 			q => q
 		);
