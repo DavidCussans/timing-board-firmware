@@ -149,8 +149,8 @@ begin
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_ENDPOINT),
-			ipb_out => ipbr(N_SLV_ENDPOINT),
+			ipb_in => ipbw(N_SLV_ENDPOINT0),
+			ipb_out => ipbr(N_SLV_ENDPOINT0),
 			rec_clk => rec_clk,
 			rec_d => rec_d,
 			txd => sfp_dout,
