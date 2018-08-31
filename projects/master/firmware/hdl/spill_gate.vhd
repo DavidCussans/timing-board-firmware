@@ -43,7 +43,7 @@ architecture rtl of spill_gate is
 	signal stb: std_logic_vector(0 downto 0);
 	signal ectr: unsigned(23 downto 0) := (others => '0');
 	signal cctr: unsigned(7 downto 0) := (others => '0');
-	signal ctrl_en, ctrl_src, ctrl_force: std_logic;
+	signal ctrl_en, ctrl_src, ctrl_force, ctrl_clr: std_logic;
 	signal ctrl_fake_cyc_len, ctrl_fake_spill_len: std_logic_vector(7 downto 0);
 	signal spill_i, spill_f, spill_r, spill_e, ss, se, ss_d, se_d, ss_i, se_i, trst, sinc: std_logic;
 
@@ -119,7 +119,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			ectr <= ectr + 1;
-			if rst = '1' or ctrl_en_fake = '0' then
+			if rst = '1' or ctrl_en = '0' then
 				cctr <= (others => '0');
 				spill_f <= '0';
 			elsif and_reduce(std_logic_vector(ectr)) = '1' then
@@ -164,7 +164,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' then
+			if rst = '1' or ctrl_en = '0' then
 				spill_i <= '0';
 			elsif scmd_in.ack = '1' then
 				spill_i <= spill_r;
