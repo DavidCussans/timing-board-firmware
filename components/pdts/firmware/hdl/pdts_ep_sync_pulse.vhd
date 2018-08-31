@@ -32,12 +32,13 @@ end pdts_ep_sync_pulse;
 
 architecture rtl of pdts_ep_sync_pulse is
 
-	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
-	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(2 downto 0);
 	signal stb: std_logic_vector(0 downto 0);
+	signal ctrl_en, ctrl_force: std_logic;
+	signal ctrl_cmd: std_logic_vector(3 downto 0);
 	signal cnt: unsigned(31 downto 0);
+	signal t: std_logic_vector(63 downto 0);
 	
 begin
 
@@ -61,7 +62,7 @@ begin
 	ctrl_force <= ctrl(0)(1) and stb(0);
 	ctrl_cmd <= ctrl(0)(7 downto 4);
 	
-	stat(0) <= cnt;
+	stat(0) <= std_logic_vector(cnt);
 	stat(1) <= t(31 downto 0);
 	stat(2) <= t(63 downto 32);
 	
@@ -70,7 +71,7 @@ begin
 		if rising_edge(clk) then
 			q <= '0';
 			if rst = '1' then
-				cnt <= 0;
+				cnt <= (others => '0');
 				t <= (others => '0');
 			elsif s = ctrl_cmd and s_stb = '1' and s_first = '1' then
 				cnt <= cnt + 1;
