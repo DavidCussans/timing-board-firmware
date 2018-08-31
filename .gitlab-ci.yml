@@ -184,3 +184,18 @@ build:fanout_2_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip67.dep"
+
+#--- TLU Overlord -------------------------
+# Dep and syntax check
+quick_check:crt_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/crt"
+    PROJECT_TOP_DEP: "top.dep"
+
+# Build 
+build:crt_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/crt"
+    PROJECT_TOP_DEP: "top.dep"
