@@ -28,6 +28,8 @@ entity payload is
 		clk_n: in std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
+		trig_in_p: in std_logic_vector(5 downto 0);
+		trig_in_n: in std_logic_vector(5 downto 0);
 		q_hdmi_0: out std_logic; -- output to HDMI 0
 		q_hdmi_1: out std_logic; -- output to HDMI 1
 		q_hdmi_2: out std_logic; -- output to HDMI 2
@@ -47,6 +49,7 @@ architecture rtl of payload is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal trig_in: std_logic_vector(5 downto 0);
 	
 begin
 
@@ -87,6 +90,9 @@ begin
 			mclk => mclk,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
+			trig_in_p => trig_in_p,
+			trig_in_n => trig_in_n,
+			trig_in => trig_in,
 			q_hdmi => q,
 			q_hdmi_0 => q_hdmi_0,
 			q_hdmi_1 => q_hdmi_1,
@@ -133,6 +139,8 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
+			spill_start => trig_in(1),
+			spill_end => trig_in(2),
 		  d => d,
 			q => q
 		);

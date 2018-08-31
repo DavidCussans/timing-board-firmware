@@ -36,6 +36,9 @@ entity pdts_tlu_io is
 		mclk: in std_logic; -- 250MHz IO clock out
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
+		trig_in_p: in std_logic_vector(5 downto 0);
+		trig_in_n: in std_logic_vector(5 downto 0);
+		trig_in: out std_logic_vector(5 downto 0);
 		q_hdmi_clk_0: out std_logic; -- output to HDMI 0
 		q_hdmi_clk_1: out std_logic; -- output to HDMI 1
 		q_hdmi_clk_2: out std_logic; -- output to HDMI 2
@@ -189,6 +192,19 @@ begin
 			ok_sticky(0) => mmcm_lm,
 			ok_sticky(1) => pll_lm
 		);
+
+-- Trigger inputs (no IOB registers, we don't care much about timing)
+
+	tigen: for i in 5 downto 0 generate
+	
+		ibufds_ti: IBUFDS
+			port map(
+				i => trig_in_p(i),
+				ib => trig_in_n(i),
+				o => trig_in(i)
+			);
+			
+	end generate;
 		
 -- Data inputs
 

@@ -24,6 +24,8 @@ entity master_top is
 		mclk: in std_logic; -- The serial IO clock
 		clk: in std_logic; -- The system clock
 		rst: in std_logic; -- Sync reset (clk domain)
+		spill_start: in std_logic;
+		spill_end: in std_logic;
 		q: out std_logic; -- Output (mclk domain)
 		d: in std_logic -- Input from trigger
 	);
@@ -65,6 +67,8 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
+			spill_start => spill_start,
+			spill_end => spill_end,
 			q => q,
 			scmd_in => scmd_in,
 			scmd_out => scmd_out

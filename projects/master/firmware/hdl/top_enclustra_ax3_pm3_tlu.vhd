@@ -25,6 +25,8 @@ entity top is port(
 		clk_n: in std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
+		trig_in_p: in std_logic_vector(5 downto 0);
+		trig_in_n: in std_logic_vector(5 downto 0);
 		q_hdmi_clk_0: out std_logic;
 		q_hdmi_clk_1: out std_logic;
 		q_hdmi_clk_2: out std_logic;
@@ -111,6 +113,8 @@ begin
 			clk_n => clk_n,
 			rstb_clk => rstb_clk,
 			clk_lolb => clk_lolb,
+			trig_in_p => trig_in_p,
+			trig_in_n => trig_in_n,
 			q_hdmi_clk_0 => q_hdmi_clk_0,
 			q_hdmi_clk_1 => q_hdmi_clk_1,
 			q_hdmi_clk_2 => q_hdmi_clk_2,

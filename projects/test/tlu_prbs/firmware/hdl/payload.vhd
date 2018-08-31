@@ -29,6 +29,7 @@ entity payload is
 		clk_n: in std_logic;
 		rstb_clk: out std_logic; -- reset for PLL
 		clk_lolb: in std_logic; -- PLL LOL
+		trig_in: in std_logic_vector(5 downto 0);
 		q_hdmi_clk_0: out std_logic;
 		q_hdmi_clk_1: out std_logic;
 		q_hdmi_clk_2: out std_logic;
