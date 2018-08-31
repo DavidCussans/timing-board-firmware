@@ -17,7 +17,7 @@ package ipbus_decode_master is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_master(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Mon Aug 13 14:13:29 2018 
+-- START automatically  generated VHDL the Fri Aug 31 10:14:24 2018 
   constant N_SLV_GLOBAL: integer := 0;
   constant N_SLV_SPILL: integer := 1;
   constant N_SLV_TSTAMP: integer := 2;
@@ -38,13 +38,13 @@ package body ipbus_decode_master is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Mon Aug 13 14:13:29 2018 
-    if    std_match(addr, "-----------------------000--00--") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_GLOBAL, IPBUS_SEL_WIDTH)); -- global / base 0x00000000 / mask 0x000001cc
-    elsif std_match(addr, "-----------------------000--10--") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_SPILL, IPBUS_SEL_WIDTH)); -- spill / base 0x00000008 / mask 0x000001cc
-    elsif std_match(addr, "-----------------------000--11--") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_TSTAMP, IPBUS_SEL_WIDTH)); -- tstamp / base 0x0000000c / mask 0x000001cc
+-- START automatically  generated VHDL the Fri Aug 31 10:14:24 2018 
+    if    std_match(addr, "-----------------------000-00---") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_GLOBAL, IPBUS_SEL_WIDTH)); -- global / base 0x00000000 / mask 0x000001d8
+    elsif std_match(addr, "-----------------------000-01---") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_SPILL, IPBUS_SEL_WIDTH)); -- spill / base 0x00000008 / mask 0x000001d8
+    elsif std_match(addr, "-----------------------000-10---") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_TSTAMP, IPBUS_SEL_WIDTH)); -- tstamp / base 0x00000010 / mask 0x000001d8
     elsif std_match(addr, "-----------------------001------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_SCMD_GEN, IPBUS_SEL_WIDTH)); -- scmd_gen / base 0x00000040 / mask 0x000001c0
     elsif std_match(addr, "-----------------------100------") then
