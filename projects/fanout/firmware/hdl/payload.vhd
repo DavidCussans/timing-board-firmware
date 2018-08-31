@@ -219,7 +219,7 @@ begin
 			ipb_in => ipbw(N_SLV_ENDPOINT0),
 			ipb_out => ipbr(N_SLV_ENDPOINT0),
 			addr(2 downto 0) => addr(2 downto 0),
-			addr(7 downto 4) => "11111",
+			addr(7 downto 3) => "11111",
 			rec_clk => clk_pll,
 			rec_d => q_r,
 			clk => clk,

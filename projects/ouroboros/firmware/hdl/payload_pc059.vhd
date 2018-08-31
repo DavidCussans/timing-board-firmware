@@ -23,6 +23,7 @@ entity payload is
 		nuke: out std_logic;
 		soft_rst: out std_logic;
 		userled: out std_logic;
+		addr: in std_logic_vector(3 downto 0);
 		clk125: in std_logic;
 		clk_p: in std_logic; -- 50MHz master clock from PLL
 		clk_n: in std_logic;
