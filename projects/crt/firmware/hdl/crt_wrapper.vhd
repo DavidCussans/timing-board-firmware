@@ -1,6 +1,6 @@
 -- crt_wrapper
 --
--- Variant of endpoint wrapper to provide sync signal to CRT
+-- Variant of endpoint wrapper to provide sync signal to CRT / BI
 --
 -- Dave Newbold, July 2018
 

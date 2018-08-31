@@ -66,6 +66,7 @@ entity pdts_fmc_io is
 		pll_rstn: out std_logic;
 		gpin_0_p: in std_logic;
 		gpin_0_n: in std_logic;
+		gpout_0: in std_logic := '0';
 		gpout_0_p: out std_logic;
 		gpout_0_n: out std_logic;
 		gpout_1_p: out std_logic;
@@ -227,20 +228,9 @@ begin
 			ob => clk_out_n
 		);
 		
-	oddr_gp0: ODDR -- Monitoring pin
-		port map(
-			q => gp0out,
-			c => fmc_clk_i,
-			ce => '1',
-			d1 => '0',
-			d2 => '1',
-			r => '0',
-			s => '0'
-		);
-		
 	obuf_gp0: OBUFDS
 		port map(
-			i => gp0out,
+			i => gpout_0,
 			o => gpout_0_p,
 			ob => gpout_0_n
 		);

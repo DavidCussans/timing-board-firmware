@@ -136,6 +136,7 @@ begin
 			pll_rstn => pll_rstn,
 			gpin_0_p => gpin_0_p,
 			gpin_0_n => gpin_0_n,
+			gpout_0 => q,
 			gpout_0_p => gpout_0_p,
 			gpout_0_n => gpout_0_n,
 			gpout_1_p => gpout_1_p,
@@ -144,7 +145,7 @@ begin
 
 -- Endpoint wrapper
 
-	wrapper: entity work.endpoint_wrapper
+	wrapper: entity work.crt_wrapper
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
