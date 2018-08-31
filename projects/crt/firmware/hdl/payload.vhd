@@ -63,7 +63,7 @@ end payload;
 
 architecture rtl of payload is
 
-	constant DESIGN_TYPE: std_logic_vector := X"04";
+	constant DESIGN_TYPE: std_logic_vector := X"07";
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
