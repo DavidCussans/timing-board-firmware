@@ -31,7 +31,7 @@ end payload_sim;
 
 architecture rtl of payload_sim is
 
-	constant DESIGN_TYPE: std_logic_vector := X"02";
+	constant DESIGN_TYPE: std_logic_vector := X"01";
 	constant N_EP: positive := 1;
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
@@ -110,6 +110,8 @@ begin
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
+			spill_start => '0',
+			spill_end => '0',
 			q => q,
 			d => txd(0)
 		);
@@ -131,6 +133,7 @@ begin
 				ipb_rst => ipb_rst,
 				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
+				addr => X"08",
 				rec_clk => fmc_clk,
 				rec_d => d,
 				clk => clk,
