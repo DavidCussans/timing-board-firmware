@@ -145,7 +145,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' or spill_r = spill_i then
+			if rst = '1' or spill_r = spill_i or ctrl_en = '0' then
 				scmd_out <= CMD_W_NULL;
 			else
 				if spill_r = '1' and spill_i = '0' then
