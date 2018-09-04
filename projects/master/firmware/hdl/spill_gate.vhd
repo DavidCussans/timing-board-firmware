@@ -47,7 +47,7 @@ architecture rtl of spill_gate is
 	signal cctr: unsigned(7 downto 0) := (others => '0');
 	signal ctrl_en, ctrl_src, ctrl_force, ctrl_clr: std_logic;
 	signal ctrl_fake_cyc_len, ctrl_fake_spill_len: std_logic_vector(7 downto 0);
-	signal veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
+	signal veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, sw, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
 
 begin
 
