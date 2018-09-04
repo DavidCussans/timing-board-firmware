@@ -147,6 +147,7 @@ begin
 			ipb_out => ipbr(N_SLV_SPILL),
 			clk => clk,
 			rst => rst,
+			spill_warn => spill_warn,
 			spill_start => spill_start,
 			spill_end => spill_end,
 			spill => spill,

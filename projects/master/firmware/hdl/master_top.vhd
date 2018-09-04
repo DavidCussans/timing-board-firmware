@@ -68,6 +68,7 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
+			spill_warn => spill_warn,
 			spill_start => spill_start,
 			spill_end => spill_end,
 			q => q,

@@ -138,8 +138,8 @@ begin
 		end if;
 	end process;
 	
-	spill_f = '1' when cctr < unsigned(ctrl_fake_spill_len) else '0';
-	veto_f = '1' when cctr = unsigned(ctrl_fake_cyc_len) else '0';
+	spill_f <= '1' when cctr < unsigned(ctrl_fake_spill_len) else '0';
+	veto_f <= '1' when cctr = unsigned(ctrl_fake_cyc_len) else '0';
 	
 -- Combine spill sources
 	
