@@ -123,7 +123,7 @@ begin
 		else '0';
 		
 	tack <= grab;
-	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ)));
+	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ))); -- A physics trigger
 	
 -- Rate control
 
@@ -132,7 +132,7 @@ begin
 		if rising_edge(clk) then
 			if part_up = '0' or ctrl_rate_ctrl_en = '0' then
 				tctr <= (others => '0');
-			elsif thr = '1' or (grab = '1' and unsigned(typ) > 7) then
+			elsif thr = '1' or trig = '1' then
 				if tctr = THROTTLE_TICKS - 1 then
 					tctr <= (others => '0');
 				else
