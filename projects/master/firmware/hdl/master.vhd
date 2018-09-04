@@ -24,6 +24,7 @@ entity master is
 		mclk: in std_logic; -- The serial IO clock
 		clk: in std_logic; -- The system clock
 		rst: in std_logic; -- Sync reset (clk domain)
+		spill_warn: in std_logic;
 		spill_start: in std_logic; -- Spill signals from SPS (async signals)
 		spill_end: in std_logic;
 		q: out std_logic; -- Output (mclk domain)
@@ -42,7 +43,7 @@ architecture rtl of master is
 	signal sel: std_logic_vector(calc_width(N_PART) - 1 downto 0);
 	signal sctr: unsigned(3 downto 0) := X"0";
 	signal stb: std_logic;
-	signal spill: std_logic;
+	signal spill, veto: std_logic;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 2 downto 0);
 	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 2 downto 0);
@@ -149,6 +150,7 @@ begin
 			spill_start => spill_start,
 			spill_end => spill_end,
 			spill => spill,
+			veto => veto,
 			scmd_out => scmdw_v(1),
 			scmd_in => scmdr_v(1)
 		);
@@ -172,6 +174,7 @@ begin
 				rst => rst,
 				tstamp => tstamp,
 				spill => spill,
+				veto => veto,
 				scmd_out => scmdw_v(i + 3),
 				scmd_in => scmdr_v(i + 3),
 				typ => typ,

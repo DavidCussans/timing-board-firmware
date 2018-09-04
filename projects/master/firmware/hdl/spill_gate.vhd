@@ -25,9 +25,11 @@ entity spill_gate is
 		ipb_out: out ipb_rbus;		
 		clk: in std_logic;
 		rst: in std_logic;
+		spill_warn: in std_logic;
 		spill_start: in std_logic;
 		spill_end: in std_logic;
 		spill: out std_logic;
+		veto: out std_logic;
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r
 	);
@@ -45,7 +47,7 @@ architecture rtl of spill_gate is
 	signal cctr: unsigned(7 downto 0) := (others => '0');
 	signal ctrl_en, ctrl_src, ctrl_force, ctrl_clr: std_logic;
 	signal ctrl_fake_cyc_len, ctrl_fake_spill_len: std_logic_vector(7 downto 0);
-	signal spill_i, spill_f, spill_r, spill_e, ss, se, ss_d, se_d, ss_i, se_i, trst, sinc: std_logic;
+	signal veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
 
 begin
 
@@ -94,24 +96,30 @@ begin
 
 	debounce: entity work.pdts_debounce
 		generic map(
-			N => 2
+			N => 3
 		)
 		port map(
 			clk => clk,
 			rst => rst,
 			d(0) => spill_start,
 			d(1) => spill_end,
+			d(2) => spill_warn,
 			q(0) => ss,
-			q(1) => se
+			q(1) => se,
+			q(2) => sw
 		);
 		
 	ss_d <= ss when rising_edge(clk);
 	se_d <= se when rising_edge(clk);
+	sw_d <= sw when rising_edge(clk);
 	
 	ss_i <= ss and not ss_d;
 	se_i <= se and not se_d;
+	sw_i <= sw and not sw_d;
 	
 	spill_e <= (spill_e or ss_i) and not (se_i or rst) when rising_edge(clk);
+	veto_i <= (veto_i or sw_i) and not (ss_i or rst) when rising_edge(clk);
+	veto <= veto_i;
 
 -- Fake generator
 
@@ -181,7 +189,7 @@ begin
 
 	actrs: entity work.ipbus_ctrs_v
 		generic map(
-			N_CTRS => 3
+			N_CTRS => 4
 		)
 		port map(
 			ipb_clk => ipb_clk,
@@ -192,7 +200,8 @@ begin
 			rst => trst,
 			inc(0) => sinc,
 			inc(1) => ss_i,
-			inc(2) => se_i
+			inc(2) => se_i,
+			inc(3) => sw_i
 		);
 
 end rtl;

@@ -28,6 +28,7 @@ entity partition is
 		rst: in std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		spill: in std_logic;
+		veto: in std_logic;
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r;
 		typ: in std_logic_vector(SCMD_W - 1 downto 0);
@@ -118,7 +119,7 @@ begin
 
 	grab <= v when ((typ = SCMD_RUN_START or typ = SCMD_RUN_STOP) and scmd_in.ack = '1') -- Grab run start or stop only if we issued it
 		or (unsigned(typ) < 8 and typ /= SCMD_RUN_START and typ /= SCMD_RUN_STOP) -- Grab all other system commands if partition is running
-		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and not (ctrl_spill_gate_en = '1' and spill = '0') and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1' and thr = '0') -- Otherwise apply trigger masks
+		or (unsigned(typ) > 7 and ctrl_trig_en = '1' and veto = '0' and not (ctrl_spill_gate_en = '1' and spill = '0') and ctrl_trig_mask(to_integer(unsigned(typ(2 downto 0)))) = '1' and thr = '0') -- Otherwise apply trigger masks
 		else '0';
 		
 	tack <= grab;

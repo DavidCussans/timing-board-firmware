@@ -167,6 +167,7 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
+			spill_warn => trig_in(5),
 			spill_start => trig_in(4),
 			spill_end => trig_in(3),
 		  d => d_trig,

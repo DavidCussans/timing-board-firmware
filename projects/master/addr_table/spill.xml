@@ -16,5 +16,6 @@
 		    <node id="spill" address="0x0"/>
 		    <node id="spill_start" address="0x1"/>
 		    <node id="spill_end" address="0x2"/>
+		    <node id="spill_warn" address="0x3"/>
 		</node>
 </node>
