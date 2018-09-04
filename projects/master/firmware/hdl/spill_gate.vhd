@@ -47,7 +47,7 @@ architecture rtl of spill_gate is
 	signal cctr: unsigned(7 downto 0) := (others => '0');
 	signal ctrl_en, ctrl_src, ctrl_force, ctrl_clr: std_logic;
 	signal ctrl_fake_cyc_len, ctrl_fake_spill_len: std_logic_vector(7 downto 0);
-	signal veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, sw, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
+	signal veto_f, veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, sw, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
 
 begin
 
@@ -119,7 +119,6 @@ begin
 	
 	spill_e <= (spill_e or ss_i) and not (se_i or rst) when rising_edge(clk);
 	veto_i <= (veto_i or sw_i) and not (ss_i or rst) when rising_edge(clk);
-	veto <= veto_i;
 
 -- Fake generator
 
@@ -129,24 +128,23 @@ begin
 			ectr <= ectr + 1;
 			if rst = '1' or ctrl_en = '0' then
 				cctr <= (others => '0');
-				spill_f <= '0';
 			elsif and_reduce(std_logic_vector(ectr)) = '1' then
 				if cctr = unsigned(ctrl_fake_cyc_len) then
 					cctr <= (others => '0');
-					spill_f <= '1';
 				else
 					cctr <= cctr + 1;
-					if spill_f = '1' and cctr = unsigned(ctrl_fake_spill_len) then
-						spill_f <= '0';
-					end if;
 				end if;
 			end if;
 		end if;
 	end process;
 	
+	spill_f = '1' when cctr < unsigned(ctrl_fake_spill_len) else '0';
+	veto_f = '1' when cctr = unsigned(ctrl_fake_cyc_len) else '0';
+	
 -- Combine spill sources
 	
-	spill_r <= (spill_e and not ctrl_src) or (spill_f and ctrl_src) or ctrl_force;	
+	spill_r <= (spill_e and not ctrl_src) or (spill_f and ctrl_src) or ctrl_force;
+	veto <= ctrl_en and ((veto_i and not ctrl_src) or (veto_f and ctrl_src));
 
 -- Command generator
 
