@@ -123,7 +123,7 @@ begin
 		else '0';
 		
 	tack <= grab;
-	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ))); -- A physics trigger
+	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ))); -- A physics triggerg
 	
 -- Rate control
 
