@@ -3,21 +3,11 @@ stages:
   - builds
 
 .job_template: &template_job_base
-  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-08-08__ipbb_v0.3.3
+  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-09-05__ipbb_v0.3.4
   tags:
     - docker
     - xilinx-tools
   before_script:
-    # - yum -y install git python-pip python-virtualenv gcc-c++ make which libX11 libXext libXft
-    # - cd /tmp
-    # - curl -L https://github.com/ipbus/ipbb/archive/test/ci.tar.gz | tar xvz
-    # - source ipbb-test-ci/env.sh
-
-    ##
-    ## Run ssh-agent (inside the build environment)
-    ##
-    # - eval $(ssh-agent -s)
-
     ##
     ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
     ## We're using tr to fix line endings which makes ed25519 keys work
