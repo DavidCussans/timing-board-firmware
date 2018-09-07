@@ -3,8 +3,12 @@ stages:
   - builds
   - publish
 
+variables:
+  IPBB_DOKER_REGISTRY: gitlab-registry.cern.ch/thea/ecto-fw-docker
+  OUTPUT_ROOT_DIR: "/eos/user/p/pdtsbot/firmware"
+
 .job_template: &template_job_base
-  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-09-05__ipbb_v0.3.4
+  image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
   tags:
     - docker
     - xilinx-tools
@@ -95,10 +99,10 @@ publish_build_job:
     - deploy-eos
 
 
-quick_check:dummy:
-  stage: quick_checks
-  script:
-    - echo "Hello World"
+# quick_check:dummy:
+#   stage: quick_checks
+#   script:
+#     - echo "Hello World"
 
 build:dummy:
   stage: builds
@@ -110,7 +114,7 @@ build:dummy:
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
       - package/
-      
+
 # #--- Quick checks ---
 # quick_check:ouroboros_sim: 
 #   <<: *template_job_base
