@@ -37,7 +37,7 @@ variables:
     - cd buildArea
     - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
-    - env
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
     - export -p
 
 
@@ -104,16 +104,16 @@ publish_build_job:
 #   script:
 #     - echo "Hello World"
 
-build:dummy:
-  stage: builds
-  script:
-    - mkdir package
-    - echo "Hello World" > package/hello_world.txt
-  artifacts:
-    when: on_success
-    name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
-    paths:
-      - package/
+# build:dummy:
+#   stage: builds
+#   script:
+#     - mkdir package
+#     - echo "Hello World" > package/hello_world.txt
+#   artifacts:
+#     when: on_success
+#     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
+#     paths:
+#       - package/
 
 # #--- Quick checks ---
 # quick_check:ouroboros_sim: 
@@ -126,20 +126,20 @@ build:dummy:
 #     - ipbb sim setup-simlib ipcores fli make-project
 
 
-# #--- Ouroboros ---------------------
-# # Dep and syntax check
-# quick_check:ouroboros_fmc:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35.dep"
+#--- Ouroboros ---------------------
+# Dep and syntax check
+quick_check:ouroboros_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
 
-# # Build
-# build:ouroboros_fmc:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35.dep"
+# Build
+build:ouroboros_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35.dep"
 
 
 # #--- Ouroloop FMC ------------------
@@ -219,8 +219,8 @@ build:dummy:
 #     PROJECT_DIR_PATH: "projects/fanout"
 #     PROJECT_TOP_DEP: "top_ip67.dep"
 
-#--- CRT endpoint -------------------------
-# Dep and syntax check
+# #--- CRT endpoint -------------------------
+# # Dep and syntax check
 # quick_check:crt_fmc:
 #   <<: *template_job_vivado_quick_check
 #   variables:
