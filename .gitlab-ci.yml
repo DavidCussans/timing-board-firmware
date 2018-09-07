@@ -95,6 +95,22 @@ publish_build_job:
     - deploy-eos
 
 
+quick_check:dummy:
+  stage: quick_checks
+  script:
+    - echo "Hello World"
+
+build:dummy:
+  stage: builds
+  script:
+    - mkdir package
+    - echo "Hello World" > package/hello_world.txt
+  artifacts:
+    when: on_success
+    name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
+    paths:
+      - package/
+      
 # #--- Quick checks ---
 # quick_check:ouroboros_sim: 
 #   <<: *template_job_base
@@ -201,15 +217,15 @@ publish_build_job:
 
 #--- CRT endpoint -------------------------
 # Dep and syntax check
-quick_check:crt_fmc:
-  <<: *template_job_vivado_quick_check
-  variables:
-    PROJECT_DIR_PATH: "projects/crt"
-    PROJECT_TOP_DEP: "top.dep"
+# quick_check:crt_fmc:
+#   <<: *template_job_vivado_quick_check
+#   variables:
+#     PROJECT_DIR_PATH: "projects/crt"
+#     PROJECT_TOP_DEP: "top.dep"
 
-# Build 
-build:crt_fmc:
-  <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/crt"
-    PROJECT_TOP_DEP: "top.dep"
+# # Build 
+# build:crt_fmc:
+#   <<: *template_job_vivado_build
+#   variables:
+#     PROJECT_DIR_PATH: "projects/crt"
+#     PROJECT_TOP_DEP: "top.dep"
