@@ -74,6 +74,9 @@ stages:
 
 publish_build_job:
   stage: publish
+  only:
+    - web
+    - tags
   image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
   variables:
     CI_OUTPUT_DIR: "package/"
