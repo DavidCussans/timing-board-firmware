@@ -5,7 +5,7 @@ stages:
 
 variables:
   IPBB_DOKER_REGISTRY: gitlab-registry.cern.ch/thea/ecto-fw-docker
-  OUTPUT_ROOT_DIR: "/eos/user/p/pdtsbot/firmware"
+  OUTPUT_ROOT_DIR: "/eos/user/p/pdtsbot/ci"
 
 .job_template: &template_job_base
   image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
@@ -38,7 +38,7 @@ variables:
     - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
     - env | grep -v PASSWORD | grep -v TOKEN | sort
-    - export -p
+    - export -p | grep -v PASSWORD | grep -v TOKEN | sort
 
 
 .job_template: &template_job_vivado_quick_check
@@ -115,15 +115,15 @@ publish_build_job:
 #     paths:
 #       - package/
 
-# #--- Quick checks ---
-# quick_check:ouroboros_sim: 
-#   <<: *template_job_base
-#   stage: quick_checks
-#   script:
-#     - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
-#     - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
-#     - cd proj/ouroboros_sim
-#     - ipbb sim setup-simlib ipcores fli make-project
+#--- Quick checks ---
+quick_check:ouroboros_sim: 
+  <<: *template_job_base
+  stage: quick_checks
+  script:
+    - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
+    - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
+    - cd proj/ouroboros_sim
+    - ipbb sim setup-simlib ipcores fli make-project
 
 
 #--- Ouroboros ---------------------
@@ -142,94 +142,94 @@ build:ouroboros_fmc:
     PROJECT_TOP_DEP: "top_a35.dep"
 
 
-# #--- Ouroloop FMC ------------------
-# # Dep and syntax check
-# quick_check:ouroloop_fmc:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35_loopback.dep"
+#--- Ouroloop FMC ------------------
+# Dep and syntax check
+quick_check:ouroloop_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
-# # Build
-# build:ouroloop_fmc:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35_loopback.dep"
-
-
-# #--- Ouroboros PC059 -----------------
-# # Dep and syntax check
-# quick_check:ouroboros_pc059:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35_pc059.dep"
-
-# # Build
-# build:ouroboros_pc059:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/ouroboros"
-#     PROJECT_TOP_DEP: "top_a35_pc059.dep"
+# Build
+build:ouroloop_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_loopback.dep"
 
 
-# #--- TLU Overlord -------------------------
-# # Dep and syntax check
-# quick_check:overlord_tlu:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/overlord"
-#     PROJECT_TOP_DEP: "top_tlu.dep"
+#--- Ouroboros PC059 -----------------
+# Dep and syntax check
+quick_check:ouroboros_pc059:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059.dep"
 
-# # Build 
-# build:overlord_tlu:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/overlord"
-#     PROJECT_TOP_DEP: "top_tlu.dep"
+# Build
+build:ouroboros_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/ouroboros"
+    PROJECT_TOP_DEP: "top_a35_pc059.dep"
 
 
-# #--- Fanout -------------------------
-# # Dep and syntax check
-# quick_check:fanout_0_pc059:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/fanout"
-#     PROJECT_TOP_DEP: "top_ip65.dep"
+#--- TLU Overlord -------------------------
+# Dep and syntax check
+quick_check:overlord_tlu:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
 
-# # Build 
-# build:fanout_0_pc059:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/fanout"
-#     PROJECT_TOP_DEP: "top_ip65.dep"
+# Build 
+build:overlord_tlu:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
 
-# # Build 
-# build:fanout_1_pc059:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/fanout"
-#     PROJECT_TOP_DEP: "top_ip66.dep"
 
-# # Build 
-# build:fanout_2_pc059:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/fanout"
-#     PROJECT_TOP_DEP: "top_ip67.dep"
+#--- Fanout -------------------------
+# Dep and syntax check
+quick_check:fanout_0_pc059:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip65.dep"
 
-# #--- CRT endpoint -------------------------
-# # Dep and syntax check
-# quick_check:crt_fmc:
-#   <<: *template_job_vivado_quick_check
-#   variables:
-#     PROJECT_DIR_PATH: "projects/crt"
-#     PROJECT_TOP_DEP: "top.dep"
+# Build 
+build:fanout_0_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip65.dep"
 
-# # Build 
-# build:crt_fmc:
-#   <<: *template_job_vivado_build
-#   variables:
-#     PROJECT_DIR_PATH: "projects/crt"
-#     PROJECT_TOP_DEP: "top.dep"
+# Build 
+build:fanout_1_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip66.dep"
+
+# Build 
+build:fanout_2_pc059:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip67.dep"
+
+#--- CRT endpoint -------------------------
+# Dep and syntax check
+quick_check:crt_fmc:
+  <<: *template_job_vivado_quick_check
+  variables:
+    PROJECT_DIR_PATH: "projects/crt"
+    PROJECT_TOP_DEP: "top.dep"
+
+# Build 
+build:crt_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/crt"
+    PROJECT_TOP_DEP: "top.dep"
