@@ -199,7 +199,7 @@ publish_build_job:
 #     PROJECT_DIR_PATH: "projects/fanout"
 #     PROJECT_TOP_DEP: "top_ip67.dep"
 
-#--- TLU Overlord -------------------------
+#--- CRT endpoint -------------------------
 # Dep and syntax check
 quick_check:crt_fmc:
   <<: *template_job_vivado_quick_check
