@@ -152,6 +152,7 @@ begin
 			spill_end => spill_end,
 			spill => spill,
 			veto => veto,
+			tstamp => tstamp,
 			scmd_out => scmdw_v(1),
 			scmd_in => scmdr_v(1)
 		);

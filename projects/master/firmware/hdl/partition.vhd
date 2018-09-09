@@ -47,7 +47,7 @@ architecture rtl of partition is
 	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en, ctrl_rate_ctrl_en, ctrl_spill_gate_en: std_logic;
 	signal ctrl_trig_mask: std_logic_vector(7 downto 0);
 	signal run_int, part_up: std_logic;
-	signal v, grab, trig, trst: std_logic;
+	signal v, grab, trig, frag, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
 	signal t, tacc, trej: std_logic_vector(SCMD_MAX downto 0);
 	signal buf_warn, buf_err, in_spill, in_run, rob_en_s: std_logic;
@@ -123,7 +123,7 @@ begin
 		else '0';
 		
 	tack <= grab;
-	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ))); -- A physics triggerg
+	trig <= grab and EVTCTR_MASK(to_integer(unsigned(typ))); -- A physics trigger
 	
 -- Rate control
 
@@ -203,6 +203,8 @@ begin
 			q(0) => rob_en_s
 		);
 		
+	frag <= grab and FRAGMENT_MASK(to_integer(unsigned(typ))); -- Generate a fragment
+
 	rob: entity work.pdts_mon_buf
 		port map(
 			ipb_clk => ipb_clk,
@@ -213,7 +215,7 @@ begin
 			clk => clk,
 			rst => rst,
 			scmd => typ,
-			scmd_v => trig,
+			scmd_v => frag,
 			tstamp => tstamp,
 			evtctr => evtctr,
 			warn => buf_warn,
