@@ -4,7 +4,7 @@
 		<node id="tstamp" address="0x20" module="file://tstamp.xml"/>
 		<node id="acmd" address="0x30" fwinfo="endpoint;width=0"/>
 		<node id="scmd_gen" address="0x40" module="file://scmd_gen.xml"/>
-		<node id="echo" address="0x50" fwinfo="endpoint;width=0"/>
+		<node id="echo" address="0x50" module="file://echo_mon.xml"/>
 		<node id="partition0" address="0x100" module="file://partition.xml"/>
 		<node id="partition1" address="0x140" module="file://partition.xml"/>
 		<node id="partition2" address="0x180" module="file://partition.xml"/>

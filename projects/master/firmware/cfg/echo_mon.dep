@@ -1,0 +1,3 @@
+src echo_mon.vhd
+src -c components/pdts pdts_synchro.vhd pdts_defs.vhd
+src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
