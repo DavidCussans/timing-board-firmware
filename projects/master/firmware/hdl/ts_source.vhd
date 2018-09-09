@@ -25,7 +25,7 @@ entity ts_source is
 		ipb_clk: in std_logic;
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
-		ipb_out: out ipb_rbus;		
+		ipb_out: out ipb_rbus;
 		clk: in std_logic;
 		rst: in std_logic;
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0)

@@ -100,10 +100,14 @@ begin
 	
 	stb <= '1' when sctr = 0 else '0';
 
--- Idle pattern gen
+-- Async command source
 
-	idle: entity work.pdts_idle_gen
+	acmd: entity acmd_master
 		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_ACMD),
+			ipb_out => ipbr(N_SLV_ACMD),		
 			clk => clk,
 			rst => rst,
 			acmd_out => acmdw,
@@ -161,6 +165,21 @@ begin
 
 	scmdw_v(2) <= scmd_in;
 	scmd_out <= scmdr_v(2);
+	
+-- Echo command source
+
+	echo: entity work.echo_mon
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_ECHO),
+			ipb_out => ipbr(N_SLV_ECHO),
+			clk => clk,
+			rst => rst,
+			tstamp => tstamp,
+			scmd_out => scmdw_v(0),
+			scmd_in => scmdr_v(0)
+		);
 	
 -- Partitions
 
