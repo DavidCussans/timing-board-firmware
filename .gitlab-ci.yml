@@ -80,6 +80,8 @@ variables:
     # - ipbb vivado addrtab
     - mkdir ${CI_PROJECT_DIR}/{addtab,package}
     - cp -r addrtab package/*.tgz ${CI_PROJECT_DIR}/package
+  dependencies:
+    - check:${CI_JOB_NAME#build:}
   artifacts:
     when: on_success
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
