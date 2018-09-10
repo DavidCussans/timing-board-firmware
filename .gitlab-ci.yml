@@ -43,6 +43,7 @@ variables:
     # - export -p | grep -v PASSWORD | grep -v TOKEN | sort
 
 
+#------------------------------------------------------------------------------
 .job_template: &template_job_vivado_check
   <<: *template_job_base
   stage: checks
@@ -51,13 +52,16 @@ variables:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
     - ipbb proj create vivado ${CI_JOB_NAME#check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#check:}
-    - ipbb vivado make-project
-    - ipbb vivado check-syntax
+    # - ipbb vivado make-project
+    # - ipbb vivado check-syntax
   artifacts:
     paths: 
       - build_area
     expire_in: 1 day
-    
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
 .job_template: &template_job_vivado_build
   <<: *template_job_base
   stage: builds
@@ -68,7 +72,7 @@ variables:
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
-    - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    # - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#build:}
     # - ipbb vivado make-project
     # - ipbb vivado -q synth -j3 
@@ -76,15 +80,17 @@ variables:
     # - ipbb vivado bitfile package
     # - ipbb vivado addrtab
     - mkdir ${CI_PROJECT_DIR}/{addtab,package}
-    - cp package/*.tgz ${CI_PROJECT_DIR}/package
+    - cp -r addrtab package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
     when: on_success
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
       - addrtab
       - package/*.tgz
+#------------------------------------------------------------------------------
 
 
+#------------------------------------------------------------------------------
 setup_build_area:
   <<: *template_job_base
   stage: setup
@@ -99,7 +105,10 @@ setup_build_area:
     paths: 
       - build_area
     expire_in: 1 day
+#------------------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
 publish_build_job:
   stage: publish
   only:
