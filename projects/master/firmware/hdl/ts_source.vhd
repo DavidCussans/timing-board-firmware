@@ -13,6 +13,7 @@ use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
+use work.ipbus_decode_tstamp.all;
 
 use work.pdts_defs.all;
 use work.master_defs.all;
@@ -34,9 +35,47 @@ entity ts_source is
 end ts_source;
 
 architecture rtl of ts_source is
-	
+
+	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
+	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
+	signal ctrl, stat: ipb_reg_v(0 downto 0);
+
 begin
 
+-- ipbus address decode
+		
+	fabric: entity work.ipbus_fabric_sel
+		generic map(
+    	NSLV => N_SLAVES,
+    	SEL_WIDTH => IPBUS_SEL_WIDTH
+    )
+    port map(
+      ipb_in => ipb_in,
+      ipb_out => ipb_out,
+      sel => ipbus_sel_tstamp(ipb_in.ipb_addr),
+      ipb_to_slaves => ipbw,
+      ipb_from_slaves => ipbr
+    );
+    
+-- CSR
+
+	csr: entity work.ipbus_syncreg_v
+		generic map(
+			N_CTRL => 1,
+			N_STAT => 1
+		)
+		port map(
+			clk => ipb_clk,
+			rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_CSR),
+			ipb_out => ipbr(N_SLV_CSR),
+			slv_clk => clk,
+			d => stat,
+			q => ctrl
+		);
+		
+	stat(0) <= (others => '0');
+    
 -- Timestamp counter
 
 	ctr: entity work.ipbus_ctrs_v
@@ -47,8 +86,8 @@ begin
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipb_in,
-			ipb_out => ipb_out,
+			ipb_in => ipbw(N_SLV_TS),
+			ipb_out => ipbr(N_SLV_TS),
 			clk => clk,
 			rst => rst,
 			inc(0) => '1',
