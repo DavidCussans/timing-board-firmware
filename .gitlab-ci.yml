@@ -48,7 +48,6 @@ variables:
   <<: *template_job_base
   stage: checks
   script:
-    - cd build_area
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
     - ipbb proj create vivado ${CI_JOB_NAME#check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#check:}
