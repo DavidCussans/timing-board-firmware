@@ -1,4 +1,5 @@
 stages:
+  - setup
   - checks
   - builds
   - publish
@@ -31,26 +32,32 @@ variables:
     - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
     - export IPBB_SIMLIB_BASE=/scratch/xilinx-simlibs/modelsim_10.5
+    - if [ -d "build_area" ]; then cd build_area; ls; fi
 
-    - cd /tmp
-    - ipbb init buildArea
-    - cd buildArea
-    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
-    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
-    - env | grep -v PASSWORD | grep -v TOKEN | sort
-    - export -p | grep -v PASSWORD | grep -v TOKEN | sort
+    # - cd /tmp
+    # - ipbb init buildArea
+    # - cd buildArea
+    # - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
+    # - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    # - env | grep -v PASSWORD | grep -v TOKEN | sort
+    # - export -p | grep -v PASSWORD | grep -v TOKEN | sort
 
 
 .job_template: &template_job_vivado_check
   <<: *template_job_base
   stage: checks
   script:
+    - cd build_area
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
     - ipbb proj create vivado ${CI_JOB_NAME#check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#check:}
     - ipbb vivado make-project
     - ipbb vivado check-syntax
-
+  artifacts:
+    paths: 
+      - build_area
+    expire_in: 1 day
+    
 .job_template: &template_job_vivado_build
   <<: *template_job_base
   stage: builds
@@ -58,16 +65,17 @@ variables:
     - web
     - tags
   script:
+    - cd build_area
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#build:}
-    - ipbb vivado make-project
-    - ipbb vivado -q synth -j3 
-    - ipbb vivado -q impl 
-    - ipbb vivado bitfile package
-    - ipbb vivado addrtab
+    # - ipbb vivado make-project
+    # - ipbb vivado -q synth -j3 
+    # - ipbb vivado -q impl 
+    # - ipbb vivado bitfile package
+    # - ipbb vivado addrtab
     - mkdir ${CI_PROJECT_DIR}/{addtab,package}
     - cp package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
@@ -77,6 +85,21 @@ variables:
       - addrtab
       - package/*.tgz
 
+
+setup_build_area:
+  <<: *template_job_base
+  stage: setup
+  script:
+    - ipbb init build_area
+    - cd build_area
+    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
+    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
+    - export -p | grep -v PASSWORD | grep -v TOKEN | sort
+  artifacts:
+    paths: 
+      - build_area
+    expire_in: 1 day
 
 publish_build_job:
   stage: publish
