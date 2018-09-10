@@ -1,3 +1,12 @@
 <node id="tstamp" description="Timestamp generator" fwinfo="endpoint">
-		<node id="ctr" address="0x0" mode="block" size="0x2" fwinfo="endpoint;width=1"/>		
+		<node id="csr" address="0x0" fwinfo="endpoint;width=1">
+		    <node id="ctrl" address="0x0">
+		        <node id="src" mask="0x1"/>
+		        <node id="irigb_rst" mask="0x2"/>
+		    </node>
+			<node id="stat" address="0x0">
+				<node id="irigb_lock" mask="0x1"/>
+			</node>
+		</node>
+		<node id="ts" address="0x0" mode="block" size="0x2" fwinfo="endpoint;width=1"/>		
 </node>

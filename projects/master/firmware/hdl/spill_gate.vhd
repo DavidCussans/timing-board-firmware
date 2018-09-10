@@ -46,10 +46,11 @@ architecture rtl of spill_gate is
 	signal stb: std_logic_vector(0 downto 0);
 	signal ectr: unsigned(23 downto 0) := (others => '0');
 	signal cctr: unsigned(7 downto 0) := (others => '0');
-	signal ctrl_en, ctrl_src, ctrl_force, ctrl_clr, ctrl_ts_cap: std_logic;
+	signal ctrl_en, ctrl_src, ctrl_force, ctrl_clr: std_logic;
 	signal ctrl_fake_cyc_len, ctrl_fake_spill_len: std_logic_vector(7 downto 0);
 	signal veto_f, veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, sw, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
-	signal start_ts, end_ts, warn_ts, start_ts_r, end_ts_r, warn_ts_r: std_logic_vector(63 downto 0);
+	signal start_ts, end_ts, warn_ts: std_logic_vector(63 downto 0);
+	signal d: std_logic_vector(191 downto 0);
 	
 begin
 
@@ -91,7 +92,6 @@ begin
 	ctrl_src <= ctrl(0)(1);
 	ctrl_force <= ctrl(0)(2) and stb(0);
 	ctrl_clr <= ctrl(0)(3);
-	ctrl_ts_cap <= ctrl(0)(4) and stb(0);
 	ctrl_fake_cyc_len <= ctrl(0)(23 downto 16);
 	ctrl_fake_spill_len <= ctrl(0)(31 downto 24);
 	
@@ -225,30 +225,23 @@ begin
 					warn_ts <= tstamp;
 				end if;
 			end if;
-			if ctrl_ts_cap = '1' then
-				start_ts_r <= start_ts;
-				end_ts_r <= end_ts;
-				warn_ts_r <= warn_ts;
-			end if;
 		end if;
 	end process;
 	
-	ts_csr: entity work.ipbus_ctrlreg_v
+	d <= warn_rs & end_ts & start_ts;
+	
+	ts_ctrs: entity work.ipbus_ctrs_samp
 		generic map(
-			N_CTRL => 0,
-			N_STAT => 6
+			N_CTRS => 3,
+			CTR_WDS => 2
 		)
 		port map(
-			clk => ipb_clk,
-			reset => ipb_rst,
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
 			ipbus_in => ipbw(N_SLV_TSTAMP),
 			ipbus_out => ipbr(N_SLV_TSTAMP),
-			d(0) => start_ts_r(31 downto 0),
-			d(1) => start_ts_r(63 downto 32),
-			d(2) => end_ts_r(31 downto 0),
-			d(3) => end_ts_r(63 downto 32),
-			d(4) => warn_ts_r(31 downto 0),
-			d(5) => warn_ts_r(63 downto 32)
+			clk => clk,
+			d => d
 		);
 
 end rtl;
