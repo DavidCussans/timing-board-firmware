@@ -1,5 +1,5 @@
 stages:
-  - quick_checks
+  - checks
   - builds
   - publish
 
@@ -41,13 +41,13 @@ variables:
     - export -p | grep -v PASSWORD | grep -v TOKEN | sort
 
 
-.job_template: &template_job_vivado_quick_check
+.job_template: &template_job_vivado_check
   <<: *template_job_base
-  stage: quick_checks
+  stage: checks
   script:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
-    - ipbb proj create vivado ${CI_JOB_NAME#quick_check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
-    - cd proj/${CI_JOB_NAME#quick_check:}
+    - ipbb proj create vivado ${CI_JOB_NAME#check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#check:}
     - ipbb vivado make-project
     - ipbb vivado check-syntax
 
@@ -67,12 +67,14 @@ variables:
     - ipbb vivado -q synth -j3 
     - ipbb vivado -q impl 
     - ipbb vivado bitfile package
-    - mkdir ${CI_PROJECT_DIR}/package
+    - ipbb vivado addrtab
+    - mkdir ${CI_PROJECT_DIR}/{addtab,package}
     - cp package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
     when: on_success
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
+      - addrtab
       - package/*.tgz
 
 
@@ -99,8 +101,8 @@ publish_build_job:
     - deploy-eos
 
 
-# quick_check:dummy:
-#   stage: quick_checks
+# check:dummy:
+#   stage: checks
 #   script:
 #     - echo "Hello World"
 
@@ -116,9 +118,9 @@ publish_build_job:
 #       - package/
 
 #--- Quick checks ---
-quick_check:ouroboros_sim: 
+check:ouroboros_sim: 
   <<: *template_job_base
-  stage: quick_checks
+  stage: checks
   script:
     - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
     - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
@@ -128,8 +130,8 @@ quick_check:ouroboros_sim:
 
 #--- Ouroboros ---------------------
 # Dep and syntax check
-quick_check:ouroboros_fmc:
-  <<: *template_job_vivado_quick_check
+check:ouroboros_fmc:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
@@ -144,8 +146,8 @@ build:ouroboros_fmc:
 
 #--- Ouroloop FMC ------------------
 # Dep and syntax check
-quick_check:ouroloop_fmc:
-  <<: *template_job_vivado_quick_check
+check:ouroloop_fmc:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
@@ -160,8 +162,8 @@ build:ouroloop_fmc:
 
 #--- Ouroboros PC059 -----------------
 # Dep and syntax check
-quick_check:ouroboros_pc059:
-  <<: *template_job_vivado_quick_check
+check:ouroboros_pc059:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
@@ -176,8 +178,8 @@ build:ouroboros_pc059:
 
 #--- TLU Overlord -------------------------
 # Dep and syntax check
-quick_check:overlord_tlu:
-  <<: *template_job_vivado_quick_check
+check:overlord_tlu:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/overlord"
     PROJECT_TOP_DEP: "top_tlu.dep"
@@ -192,8 +194,8 @@ build:overlord_tlu:
 
 #--- Fanout -------------------------
 # Dep and syntax check
-quick_check:fanout_0_pc059:
-  <<: *template_job_vivado_quick_check
+check:fanout_0_pc059:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip65.dep"
@@ -221,8 +223,8 @@ build:fanout_2_pc059:
 
 #--- CRT endpoint -------------------------
 # Dep and syntax check
-quick_check:crt_fmc:
-  <<: *template_job_vivado_quick_check
+check:crt_fmc:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/crt"
     PROJECT_TOP_DEP: "top.dep"
