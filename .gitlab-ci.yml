@@ -51,8 +51,8 @@ variables:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
     - ipbb proj create vivado ${CI_JOB_NAME#check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#check:}
-    # - ipbb vivado make-project
-    # - ipbb vivado check-syntax
+    - ipbb vivado make-project
+    - ipbb vivado check-syntax
   artifacts:
     paths: 
       - build_area
@@ -74,10 +74,10 @@ variables:
     # - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#build:}
     # - ipbb vivado make-project
-    # - ipbb vivado -q synth -j3 
-    # - ipbb vivado -q impl 
-    # - ipbb vivado bitfile package
-    # - ipbb vivado addrtab
+    - ipbb vivado -q synth -j3 
+    - ipbb vivado -q impl 
+    - ipbb vivado bitfile package
+    - ipbb vivado addrtab
     - mkdir ${CI_PROJECT_DIR}/{addtab,package}
     - cp -r addrtab package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
