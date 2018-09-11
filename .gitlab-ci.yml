@@ -27,7 +27,7 @@ variables:
     # ##
     # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
-    - pwd
+    # - pwd
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
     - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
@@ -80,8 +80,6 @@ variables:
     # - ipbb vivado addrtab
     - mkdir ${CI_PROJECT_DIR}/{addtab,package}
     - cp -r addrtab package/*.tgz ${CI_PROJECT_DIR}/package
-  dependencies:
-    - check:${CI_JOB_NAME#build:}
   artifacts:
     when: on_success
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
@@ -174,7 +172,8 @@ build:ouroboros_fmc:
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
-
+  dependencies:
+    - check:ouroboros_fmc
 
 #--- Ouroloop FMC ------------------
 # Dep and syntax check
@@ -190,7 +189,8 @@ build:ouroloop_fmc:
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
-
+  dependencies:
+    - check:ouroloop_fmc
 
 #--- Ouroboros PC059 -----------------
 # Dep and syntax check
@@ -206,7 +206,8 @@ build:ouroboros_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
-
+  dependencies:
+    - check:ouroboros_pc059
 
 #--- TLU Overlord -------------------------
 # Dep and syntax check
@@ -222,7 +223,8 @@ build:overlord_tlu:
   variables:
     PROJECT_DIR_PATH: "projects/overlord"
     PROJECT_TOP_DEP: "top_tlu.dep"
-
+  dependencies:
+    - check:overlord_tlu
 
 #--- Fanout -------------------------
 # Dep and syntax check
@@ -238,6 +240,15 @@ build:fanout_0_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip65.dep"
+  dependencies:
+    - check:fanout_0_pc059
+
+# Dep and syntax check
+check:fanout_1_pc059:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip66.dep"
 
 # Build 
 build:fanout_1_pc059:
@@ -245,6 +256,15 @@ build:fanout_1_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip66.dep"
+  dependencies:
+    - check:fanout_1_pc059
+
+# Dep and syntax check
+check:fanout_2_pc059:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip67.dep"
 
 # Build 
 build:fanout_2_pc059:
@@ -252,6 +272,8 @@ build:fanout_2_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip67.dep"
+  dependencies:
+    - check:fanout_2_pc059
 
 #--- CRT endpoint -------------------------
 # Dep and syntax check
@@ -261,9 +283,13 @@ check:crt_fmc:
     PROJECT_DIR_PATH: "projects/crt"
     PROJECT_TOP_DEP: "top.dep"
 
+
 # Build 
 build:crt_fmc:
   <<: *template_job_vivado_build
   variables:
     PROJECT_DIR_PATH: "projects/crt"
     PROJECT_TOP_DEP: "top.dep"
+  dependencies:
+    - check:crt_fmc
+    
