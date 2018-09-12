@@ -99,7 +99,6 @@ setup_build_area:
     - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
     - env | grep -v PASSWORD | grep -v TOKEN | sort
-    - export -p | grep -v PASSWORD | grep -v TOKEN | sort
   artifacts:
     paths: 
       - build_area
