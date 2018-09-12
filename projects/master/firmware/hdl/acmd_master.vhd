@@ -36,8 +36,8 @@ begin
 		port map(
 			clk => clk,
 			rst => rst,
-			acmd_out => acmdw,
-			acmd_in => acmdr
+			acmd_out => acmd_out,
+			acmd_in => acmd_in
 		);
 	
 end rtl;

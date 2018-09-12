@@ -25,7 +25,7 @@ entity echo_mon is
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r;
-		rscmd_in: in cmd_w;
+		rscmd_in: in cmd_w
 	);
 
 end echo_mon;
@@ -53,7 +53,7 @@ begin
 			q => ctrl
 		);
 		
-	stat(0) <= (others => '0', 0 => done);
+	stat(0) <= (0 => done, others => '0');
 	stat(1) <= tx_ts(31 downto 0); -- CDC, peseudo static signals
 	stat(2) <= tx_ts(63 downto 32);
 	stat(3) <= rx_ts(31 downto 0);
@@ -81,7 +81,7 @@ begin
 	
 -- Timestamp capture
 
-	rxgood <= '1' when rscmd_in.d = SCMD_ECHO and rscmd_req = '1' else '0';
+	rxgood <= '1' when rscmd_in.d = SCMD_ECHO and rscmd_in.req = '1' else '0';
 
 	process(clk)
 	begin

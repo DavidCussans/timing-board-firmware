@@ -102,7 +102,7 @@ begin
 
 -- Async command source
 
-	acmd: entity acmd_master
+	acmd: entity work.acmd_master
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -178,7 +178,8 @@ begin
 			rst => rst,
 			tstamp => tstamp,
 			scmd_out => scmdw_v(0),
-			scmd_in => scmdr_v(0)
+			scmd_in => scmdr_v(0),
+			rscmd_in => CMD_W_NULL
 		);
 	
 -- Partitions

@@ -228,7 +228,7 @@ begin
 		end if;
 	end process;
 	
-	d <= warn_rs & end_ts & start_ts;
+	d <= warn_ts & end_ts & start_ts;
 	
 	ts_ctrs: entity work.ipbus_ctrs_samp
 		generic map(
@@ -238,8 +238,8 @@ begin
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipbus_in => ipbw(N_SLV_TSTAMP),
-			ipbus_out => ipbr(N_SLV_TSTAMP),
+			ipb_in => ipbw(N_SLV_TSTAMP),
+			ipb_out => ipbr(N_SLV_TSTAMP),
 			clk => clk,
 			d => d
 		);
