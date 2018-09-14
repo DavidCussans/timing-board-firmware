@@ -75,7 +75,7 @@ begin
 	
 -- Echo command output
 
-	scmd_out.d <= SCMD_ECHO;
+	scmd_out.d <= X"0" & SCMD_ECHO;
 	scmd_out.req <= pend;
 	scmd_out.last <= '1';
 	
