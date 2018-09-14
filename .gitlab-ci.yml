@@ -1,9 +1,15 @@
 stages:
-  - quick_checks
+  - setup
+  - checks
   - builds
+  - publish
+
+variables:
+  IPBB_DOKER_REGISTRY: gitlab-registry.cern.ch/thea/ecto-fw-docker
+  OUTPUT_ROOT_DIR: "/eos/user/p/pdtsbot/ci"
 
 .job_template: &template_job_base
-  image: gitlab-registry.cern.ch/thea/ecto-fw-docker:2018-09-05__ipbb_v0.3.4
+  image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
   tags:
     - docker
     - xilinx-tools
@@ -21,31 +27,40 @@ stages:
     # ##
     # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
-    - pwd
+    # - pwd
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
     - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
     - export IPBB_SIMLIB_BASE=/scratch/xilinx-simlibs/modelsim_10.5
+    - if [ -d "build_area" ]; then cd build_area; ls; fi
 
-    - cd /tmp
-    - ipbb init buildArea
-    - cd buildArea
-    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
-    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
-    - env
-    - export -p
+    # - cd /tmp
+    # - ipbb init buildArea
+    # - cd buildArea
+    # - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
+    # - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    # - env | grep -v PASSWORD | grep -v TOKEN | sort
+    # - export -p | grep -v PASSWORD | grep -v TOKEN | sort
 
 
-.job_template: &template_job_vivado_quick_check
+#------------------------------------------------------------------------------
+.job_template: &template_job_vivado_check
   <<: *template_job_base
-  stage: quick_checks
+  stage: checks
   script:
     - ipbb toolbox check-dep -t vivado timing-board-firmware:${PROJECT_DIR_PATH} ${PROJECT_TOP_DEP}
-    - ipbb proj create vivado ${CI_JOB_NAME#quick_check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
-    - cd proj/${CI_JOB_NAME#quick_check:}
+    - ipbb proj create vivado ${CI_JOB_NAME#check:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    - cd proj/${CI_JOB_NAME#check:}
     - ipbb vivado make-project
     - ipbb vivado check-syntax
+  artifacts:
+    paths: 
+      - build_area
+    expire_in: 1 day
+#------------------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
 .job_template: &template_job_vivado_build
   <<: *template_job_base
   stage: builds
@@ -56,25 +71,85 @@ stages:
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
-    - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
+    # - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#build:}
-    - ipbb vivado make-project
+    # - ipbb vivado make-project
     - ipbb vivado -q synth -j3 
     - ipbb vivado -q impl 
     - ipbb vivado bitfile package
-    - mkdir ${CI_PROJECT_DIR}/package
-    - cp package/*.tgz ${CI_PROJECT_DIR}/package
+    - ipbb vivado addrtab
+    - mkdir ${CI_PROJECT_DIR}/{addtab,package}
+    - cp -r addrtab package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
     when: on_success
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
+      - addrtab
       - package/*.tgz
+#------------------------------------------------------------------------------
 
+
+#------------------------------------------------------------------------------
+setup_build_area:
+  <<: *template_job_base
+  stage: setup
+  script:
+    - ipbb init build_area
+    - cd build_area
+    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
+    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
+  artifacts:
+    paths: 
+      - build_area
+    expire_in: 1 day
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+publish_build_job:
+  stage: publish
+  only:
+    - web
+    - tags
+  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer:latest
+  variables:
+    CI_OUTPUT_DIR: "package/"
+  before_script:
+    - yum -y install openssh-clients
+    - export EOS_PATH=${OUTPUT_ROOT_DIR}/commits/${CI_COMMIT_TAG:-${CI_COMMIT_SHA}}/pipeline${CI_PIPELINE_ID}
+    - if [ -n "${CI_COMMIT_TAG}" ]; then export EOS_PATH=${EOS_PATH/commits/tags} ; fi
+  script:
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
+    - echo "${EOS_ACCOUNT_PASSWORD}" | kinit ${EOS_ACCOUNT_USERNAME}@CERN.CH
+    - klist
+    - ssh -F ${CI_PROJECT_DIR}/ci/ssh_config ${EOS_ACCOUNT_USERNAME}@lxplus "rm -rf ${EOS_PATH} && mkdir -p ${EOS_PATH}"
+    - ssh -F ${CI_PROJECT_DIR}/ci/ssh_config ${EOS_ACCOUNT_USERNAME}@lxplus "ln -sfnv ${EOS_PATH} `dirname ${EOS_PATH}`/latest"
+    - kdestroy
+    - ls -lt ${CI_OUTPUT_DIR}
+    - deploy-eos
+
+
+# check:dummy:
+#   stage: checks
+#   script:
+#     - echo "Hello World"
+
+# build:dummy:
+#   stage: builds
+#   script:
+#     - mkdir package
+#     - echo "Hello World" > package/hello_world.txt
+#   artifacts:
+#     when: on_success
+#     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
+#     paths:
+#       - package/
 
 #--- Quick checks ---
-quick_check:ouroboros_sim: 
+check:ouroboros_sim: 
   <<: *template_job_base
-  stage: quick_checks
+  stage: checks
   script:
     - ipbb toolbox check-dep -t sim timing-board-firmware:projects/ouroboros top_sim.dep
     - ipbb proj create sim ouroboros_sim timing-board-firmware:projects/ouroboros -t top_sim.dep
@@ -84,8 +159,8 @@ quick_check:ouroboros_sim:
 
 #--- Ouroboros ---------------------
 # Dep and syntax check
-quick_check:ouroboros_fmc:
-  <<: *template_job_vivado_quick_check
+check:ouroboros_fmc:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
@@ -96,12 +171,13 @@ build:ouroboros_fmc:
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35.dep"
-
+  dependencies:
+    - check:ouroboros_fmc
 
 #--- Ouroloop FMC ------------------
 # Dep and syntax check
-quick_check:ouroloop_fmc:
-  <<: *template_job_vivado_quick_check
+check:ouroloop_fmc:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
@@ -112,12 +188,13 @@ build:ouroloop_fmc:
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_loopback.dep"
-
+  dependencies:
+    - check:ouroloop_fmc
 
 #--- Ouroboros PC059 -----------------
 # Dep and syntax check
-quick_check:ouroboros_pc059:
-  <<: *template_job_vivado_quick_check
+check:ouroboros_pc059:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
@@ -128,12 +205,13 @@ build:ouroboros_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/ouroboros"
     PROJECT_TOP_DEP: "top_a35_pc059.dep"
-
+  dependencies:
+    - check:ouroboros_pc059
 
 #--- TLU Overlord -------------------------
 # Dep and syntax check
-quick_check:overlord_tlu:
-  <<: *template_job_vivado_quick_check
+check:overlord_tlu:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/overlord"
     PROJECT_TOP_DEP: "top_tlu.dep"
@@ -144,12 +222,13 @@ build:overlord_tlu:
   variables:
     PROJECT_DIR_PATH: "projects/overlord"
     PROJECT_TOP_DEP: "top_tlu.dep"
-
+  dependencies:
+    - check:overlord_tlu
 
 #--- Fanout -------------------------
 # Dep and syntax check
-quick_check:fanout_0_pc059:
-  <<: *template_job_vivado_quick_check
+check:fanout_0_pc059:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip65.dep"
@@ -160,6 +239,15 @@ build:fanout_0_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip65.dep"
+  dependencies:
+    - check:fanout_0_pc059
+
+# Dep and syntax check
+check:fanout_1_pc059:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip66.dep"
 
 # Build 
 build:fanout_1_pc059:
@@ -167,6 +255,15 @@ build:fanout_1_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip66.dep"
+  dependencies:
+    - check:fanout_1_pc059
+
+# Dep and syntax check
+check:fanout_2_pc059:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/fanout"
+    PROJECT_TOP_DEP: "top_ip67.dep"
 
 # Build 
 build:fanout_2_pc059:
@@ -174,14 +271,17 @@ build:fanout_2_pc059:
   variables:
     PROJECT_DIR_PATH: "projects/fanout"
     PROJECT_TOP_DEP: "top_ip67.dep"
+  dependencies:
+    - check:fanout_2_pc059
 
-#--- TLU Overlord -------------------------
+#--- CRT endpoint -------------------------
 # Dep and syntax check
-quick_check:crt_fmc:
-  <<: *template_job_vivado_quick_check
+check:crt_fmc:
+  <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/crt"
     PROJECT_TOP_DEP: "top.dep"
+
 
 # Build 
 build:crt_fmc:
@@ -189,3 +289,6 @@ build:crt_fmc:
   variables:
     PROJECT_DIR_PATH: "projects/crt"
     PROJECT_TOP_DEP: "top.dep"
+  dependencies:
+    - check:crt_fmc
+    
