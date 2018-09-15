@@ -81,7 +81,7 @@ begin
 	
 -- Timestamp capture
 
-	rxgood <= '1' when rscmd_in.d = SCMD_ECHO and rscmd_in.req = '1' else '0';
+	rxgood <= '1' when rscmd_in.d(3 downto 0) = SCMD_ECHO and rscmd_in.req = '1' else '0';
 
 	process(clk)
 	begin
