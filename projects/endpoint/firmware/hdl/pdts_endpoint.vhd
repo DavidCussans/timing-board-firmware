@@ -178,7 +178,7 @@ begin
 			a_valid <= a_valid,
 			a_last <= a_last,
 			q => ph_data,
-			qs = ph_update
+			s => ph_update
 		);
 		
 	adj: entity work.pdts_adjust
