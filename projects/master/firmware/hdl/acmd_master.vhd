@@ -33,6 +33,7 @@ architecture rtl of acmd_master is
 
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
 	signal go, go_d, pend, done, last, c, s: std_logic;
+	signal s_i: integer range 1 downto 0 := 0;
 	signal acmd_out_i: cmd_w_array(1 downto 0);
 	signal acmd_in_i: cmd_r_array(1 downto 0);
 
@@ -65,7 +66,7 @@ begin
 			q => ctrl
 		);
 		
-	stat <= (others => '0');
+	stat(0) <= (others => '0');
 
 -- Packet generator
 	
@@ -97,22 +98,22 @@ begin
 	
 -- Arbitrator
 
-	si <= 0 when s = '0' else 1;
+	s_i <= 0 when s = '0' else 1;
 
 	process(clk)
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				s <= '0';
-			elsif acmd_out_i(si).last = '1' and acmd_in.ren = '1' then
+			elsif acmd_out_i(s_i).last = '1' and acmd_in.ren = '1' then
 				s <= pend;
 			end if;
 		end if;
 	end process;
 	
-	acmd_out.d <= acmd_out_i(si).d;
-	acmd_out.last <= acmd_out_i(si).last;
-	acmd_out.req <= acmd_out_i(si).req;
+	acmd_out.d <= acmd_out_i(s_i).d;
+	acmd_out.last <= acmd_out_i(s_i).last;
+	acmd_out.req <= acmd_out_i(s_i).req;
 
 	acmd_in_i(0).ren <= acmd_in.ren when s = '0' else '0';
 	acmd_in_i(1).ren <= acmd_in.ren when s = '1' else '0';
