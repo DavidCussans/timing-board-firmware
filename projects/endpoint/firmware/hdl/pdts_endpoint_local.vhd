@@ -44,7 +44,7 @@ architecture rtl of pdts_endpoint_local is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
-	signal stb, k, s_stb, s_first: std_logic;
+	signal stb, k, s_stb, s_first, a_valid, a_last: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
 	signal ph_data: std_logic_vector(15 downto 0);
