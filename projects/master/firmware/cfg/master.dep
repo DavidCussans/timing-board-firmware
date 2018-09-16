@@ -6,4 +6,5 @@ include global.dep spill_gate.dep ts_source.dep partition.dep echo_mon.dep
 src ts_bcast.vhd acmd_master.vhd
 include -c components/pdts scmd_gen.dep pdts_tx.dep
 src -c components/pdts pdts_idle_gen.vhd pdts_prio_enc.vhd pdts_scmd_merge.vhd pdts_defs.vhd
+include -c projects/endpoint pdts_endpoint_upstream.dep
 src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_types.vhd
