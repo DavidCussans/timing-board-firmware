@@ -8,7 +8,7 @@
 			<node id="ctrl" address="0x0">
 				<node id="ep_en" mask="0x1"/>
 			</node>		    
-			<node id="stat" address="0x0">
+			<node id="stat" address="0x1">
 			    <node id="ep_stat" mask="0xf"/>
 			    <node id="ep_rdy" mask="0x10"/>				
 				<node id="tx_err" mask="0x20"/>
