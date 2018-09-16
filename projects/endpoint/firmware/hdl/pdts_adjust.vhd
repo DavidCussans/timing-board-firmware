@@ -49,6 +49,8 @@ begin
 			if srst = '1' then
 				adj_req <= '0';
 				tx_en <= '0';
+				fdel <= (others => '0');
+				cdel <= (others => '0');
 			else
 				if adj_ack = '1' then
 					fdel <= d(7 downto 4);
