@@ -49,9 +49,13 @@ architecture rtl of pdts_endpoint is
 	signal stat_i: std_logic_vector(3 downto 0);
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
-	signal stb, k, s_stb, s_first: std_logic;
+	signal stb, k, s_stb, s_first, a_valid, a_last: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
+	signal ph_data: std_logic_vector(15 downto 0);
+	signal fdel: std_logic_vector(3 downto 0);
+	signal cdel: std_logic_vector(5 downto 0);
+	signal adj_req, adj_ack, tx_en: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
 	signal scmdr_v: cmd_r_array(1 downto 0);
 	signal scmdw, acmdw: cmd_w;
@@ -151,17 +155,41 @@ begin
 			q => dr,
 			s_stb => s_stb,
 			s_first => s_first,
-			a_valid => open,
-			a_last => open,
+			a_valid => a_valid,
+			a_last => a_last,
 			err => rx_err
 		);
 	
--- Temporary sync output
+-- Temporary sync and async output
 
 	sync <= dr(SCMD_W - 1 downto 0);
 	sync_first <= s_first and rdy_i;
 	sync_stb <= s_stb and rdy_i;
-	
+		
+-- Async command rx and phase adjust
+
+	acmd_rx: entity work.pdts_acmd_rx
+		port map(
+			clk => clk_i,
+			rst => rst_i,
+			a_d <= sync,
+			a_valid <= a_valid,
+			a_last <= a_last,
+			q => ph_data
+		);
+		
+	adj: entity work.pdts_adjust
+		port map(
+			sclk => sclk,
+			srst => srst,
+			d => ph_data,
+			fdel => fdel,
+			cdel => cdel,
+			adj_req => adj_req,
+			adj_ack => adj_ack,
+			tx_en => tx_en
+		);
+			
 -- Timestamp / event counter
 
 	ts: entity work.pdts_tstamp
@@ -248,6 +276,6 @@ begin
 		
 -- SFP control
 
-	sfp_tx_dis <= '0' when EN_TX else '1';
+	sfp_tx_dis <= '0' when EN_TX else not tx_en;
 		
 end rtl;

@@ -24,7 +24,7 @@ entity pdts_rx_phy is
 	port(
 		fclk: in std_logic; -- free-running clock
 		fdel: in std_logic_vector(3 downto 0); -- Fine delay setting (rxclk cycles)
-		cdel: in std_logic_vector(4 downto 0); -- Coarse delay setting (clk cycles)
+		cdel: in std_logic_vector(5 downto 0); -- Coarse delay setting (clk cycles)
 		fdel_out: out std_logic_vector(3 downto 0); -- Actual fine delay (upstream mode)
 		rxclk: in std_logic; -- serial data clock
 		rxrst: in std_logic; -- reset (rxclk domain)
@@ -168,7 +168,7 @@ begin
 	c_del: entity work.pdts_del
 		generic map(
 			WIDTH => 10,
-			DEL_RADIX => 5
+			DEL_RADIX => 6
 		)
 		port map(
 			clk => rxclk,
