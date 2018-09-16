@@ -48,7 +48,9 @@ begin
 	startup: entity work.pdts_ep_startup
 		generic map(
 			SCLK_FREQ => SCLK_FREQ,
-			SIM => SIM
+			SIM => SIM,
+			NEED_ADJUST => false,
+			NEED_TSTAMP => false
 		)
 		port map(
 			sclk => sclk,
@@ -57,6 +59,8 @@ begin
 			sfp_los => '0',
 			cdr_los => '0',
 			cdr_lol => '0',
+			adj_req => '0',
+			adj_ack => open,
 			rec_clk => rec_clk,
 			rec_rst => rec_rst,
 			rxphy_aligned => rxphy_aligned,

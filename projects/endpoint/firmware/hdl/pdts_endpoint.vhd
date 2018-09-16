@@ -80,6 +80,8 @@ begin
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
+			adj_req => adj_req,
+			adj_ack => adj_ack,
 			rec_clk => rec_clk,
 			rec_rst => rec_rst,
 			rxphy_aligned => rxphy_aligned,
