@@ -17,9 +17,9 @@ package ipbus_decode_tstamp is
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_tstamp(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Mon Sep 10 16:22:24 2018 
+-- START automatically  generated VHDL the Sun Sep 16 08:31:14 2018 
   constant N_SLV_CSR: integer := 0;
-  constant N_SLV_TS: integer := 1;
+  constant N_SLV_CTR: integer := 1;
   constant N_SLAVES: integer := 2;
 -- END automatically generated VHDL
 
@@ -32,11 +32,11 @@ package body ipbus_decode_tstamp is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Mon Sep 10 16:22:24 2018 
+-- START automatically  generated VHDL the Sun Sep 16 08:31:14 2018 
     if    std_match(addr, "------------------------------0-") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_CSR, IPBUS_SEL_WIDTH)); -- csr / base 0x00000000 / mask 0x00000002
     elsif std_match(addr, "------------------------------1-") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_TS, IPBUS_SEL_WIDTH)); -- ts / base 0x00000002 / mask 0x00000002
+      sel := ipbus_sel_t(to_unsigned(N_SLV_CTR, IPBUS_SEL_WIDTH)); -- ctr / base 0x00000002 / mask 0x00000002
 -- END automatically generated VHDL
 
     else
