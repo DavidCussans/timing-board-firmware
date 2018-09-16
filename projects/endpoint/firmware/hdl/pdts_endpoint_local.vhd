@@ -158,6 +158,7 @@ begin
 		port map(
 			sclk => sclk,
 			srst => srst,
+			clk => clk_i,
 			d => ph_data,
 			s => ph_update,
 			fdel => fdel,
