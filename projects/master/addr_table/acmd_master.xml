@@ -9,7 +9,7 @@
 				<node id="update" mask="0x40000000"/>
 				<node id="tx_en" mask="0x80000000"/>				
 			</node>
-			<node id="stat" address="0x8">
+			<node id="stat" address="0x1">
 				<node id="done" mask="0x1"/>
 			</node>
 		</node>
