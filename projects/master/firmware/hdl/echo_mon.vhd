@@ -60,9 +60,6 @@ begin
 	stat(4) <= rx_ts(63 downto 32);
 
 	sync_tx: entity work.pdts_synchro
-		generic map(
-			N => 1
-		)
 		port map(
 			clk => ipb_clk,
 			clks => clk,
@@ -103,9 +100,6 @@ begin
 	done <= (done or rxgood) and not (pend or rst) when rising_edge(clk);
 	
 	sync_rx: entity work.pdts_synchro
-		generic map(
-			N => 1
-		)
 		port map(
 			clk => clk,
 			clks => ipb_clk,

@@ -2,7 +2,9 @@
 --
 -- Source of async commands
 --
--- Dave Newbold, October 2016
+-- Hardwired to produce endpoint control command only for now
+--
+-- Dave Newbold, October 2016	
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -28,16 +30,90 @@ end acmd_master;
 
 architecture rtl of acmd_master is
 
+	signal ctrl, stat: ipb_reg_v(0 downto 0);
+	signal go, go_d, pend, done, last, c, s: std_logic;
+	signal acmd_out_i: cmd_w_array(1 downto 0);
+	signal acmd_in_i: cmd_r_array(1 downto 0);
+
 begin
 
-	ipb_out <= IPB_RBUS_NULL;
+
+-- Idle generator
 
 	idle: entity work.pdts_idle_gen
 		port map(
 			clk => clk,
 			rst => rst,
-			acmd_out => acmd_out,
-			acmd_in => acmd_in
+			acmd_out => acmd_out_i(0),
+			acmd_in => acmd_in_i(0)
 		);
+		
+-- CSR
+
+	csr: entity work.ipbus_ctrlreg_v
+		generic map(
+			N_CTRL => 1,
+			N_STAT => 1
+		)
+		port map(
+			clk => ipb_clk,
+			reset => ipb_rst,
+			ipbus_in => ipb_in,
+			ipbus_out => ipb_out,
+			d => stat,
+			q => ctrl
+		);
+		
+	stat <= (others => '0');
+
+-- Packet generator
+	
+	sync: entity work.pdts_synchro
+		port map(
+			clk => ipb_clk,
+			clks => clk,
+			d(0) => ctrl(0)(0),
+			q(0) => go
+		);
+		
+	go_d <= go when rising_edge(clk);
+	pend <= (pend or (go and not go_d)) and not ((c and acmd_in_i(1).ren) or rst) when rising_edge(clk);
+	
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				c <= '0';
+			elsif acmd_in_i(1).ren = '1' then
+				c <= not c;
+			end if;
+		end if;
+	end process;
+	
+	acmd_out_i(1).d <= ctrl(0)(23 downto 16) when c = '0' else ctrl(0)(31 downto 24);
+	acmd_out_i(1).last <= c;
+	acmd_out_i(1).req <= pend;
+	
+-- Arbitrator
+
+	si <= 0 when s = '0' else 1;
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				s <= '0';
+			elsif acmd_out_i(si).last = '1' and acmd_in.ren = '1' then
+				s <= pend;
+			end if;
+		end if;
+	end process;
+	
+	acmd_out.d <= acmd_out_i(si).d;
+	acmd_out.last <= acmd_out_i(si).last;
+	acmd_out.req <= acmd_out_i(si).req;
+
+	acmd_in_i(0).ren <= acmd_in.ren when s = '0' else '0';
+	acmd_in_i(1).ren <= acmd_in.ren when s = '1' else '0';
 	
 end rtl;

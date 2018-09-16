@@ -1,0 +1,4 @@
+src acmd_master.vhd
+addrtab acmd_master.xml
+src -c components/pdts pdts_defs.vhd
+src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
