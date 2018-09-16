@@ -85,10 +85,14 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if rst = '1' or c = "10" then
+			if rst = '1' then
 				c <= "00";
 			elsif acmd_in_i(1).ren = '1' then
-				c <= c + 1;
+				if c = "10" then
+					c <= "00"
+				else
+					c <= c + 1;
+				end if;
 			end if;
 		end if;
 	end process;
