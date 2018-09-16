@@ -28,7 +28,8 @@ entity master_top is
 		spill_start: in std_logic := '0';
 		spill_end: in std_logic := '0';
 		q: out std_logic; -- Output (mclk domain)
-		d: in std_logic -- Input from trigger
+		d: in std_logic; -- Input (mclk domain)
+		t_d: in std_logic -- Input from trigger
 	);
 
 end master_top;
@@ -60,6 +61,9 @@ begin
 -- The master
 
 	master: entity work.master
+		generic map(
+			SIM => SIM
+		)
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -72,8 +76,9 @@ begin
 			spill_start => spill_start,
 			spill_end => spill_end,
 			q => q,
-			scmd_in => scmd_in,
-			scmd_out => scmd_out
+			d => d,
+			t_scmd_in => scmd_in,
+			t_scmd_out => scmd_out
 		);
 
 -- Trigger receiver
@@ -89,7 +94,7 @@ begin
 			ipb_out => ipbr(N_SLV_TRIG),
 			mclk => mclk,
 			clk => clk,
-			d => d,
+			d => t_d,
 			scmd_out => scmd_in,
 			scmd_in => scmd_out
 		);

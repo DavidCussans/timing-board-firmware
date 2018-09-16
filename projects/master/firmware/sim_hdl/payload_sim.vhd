@@ -108,7 +108,9 @@ begin
 			mclk => fmc_clk,
 			clk => clk,
 			rst => rst,
-			q => open
+			q => open,
+			d => '0',
+			t_d => '0'
 		);
 
 end rtl;

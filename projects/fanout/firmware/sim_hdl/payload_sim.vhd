@@ -111,7 +111,8 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q,
-			d => txd(0)
+			d => txd(0),
+			t_d => '0'
 		);
 		
 -- The loopback

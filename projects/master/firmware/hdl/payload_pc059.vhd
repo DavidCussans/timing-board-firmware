@@ -191,7 +191,9 @@ begin
 			mclk => clk_pll,
 			clk => clk,
 			rst => rst,
-			q => q
+			q => q,
+			d => '0',
+			t_d => '0'
 		);
 
 end rtl;

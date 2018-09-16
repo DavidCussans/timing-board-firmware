@@ -177,8 +177,9 @@ begin
 			mclk => mclk,
 			clk => clk,
 			rst => rst,
-		  d => d_trig,
-			q => q
+			q => q,
+			d => '0',
+		  t_d => d_trig,
 		);
 		
 -- Endpoint wrapper

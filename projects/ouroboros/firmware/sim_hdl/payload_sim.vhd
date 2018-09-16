@@ -113,7 +113,8 @@ begin
 			spill_start => '0',
 			spill_end => '0',
 			q => q,
-			d => txd(0)
+			d => txd(0),
+			t_d => '0'
 		);
 		
 -- The loopback

@@ -16,6 +16,9 @@ use work.pdts_defs.all;
 use work.master_defs.all;
 
 entity master is
+	generic(
+		SIM: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic; -- IPbus connection
 		ipb_rst: in std_logic;
@@ -27,11 +30,10 @@ entity master is
 		spill_warn: in std_logic;
 		spill_start: in std_logic; -- Spill signals from SPS (async signals)
 		spill_end: in std_logic;
-		q: out std_logic; -- Output (mclk domain)
-		scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
-		scmd_out: out cmd_r;
-		acmd_in: in cmd_w := CMD_W_NULL; -- Async command input, and handshake
-		acmd_out: out cmd_r
+		q: out std_logic; -- Downstream output (mclk domain)
+		d: in std_logic; -- Downstream input (mclk domain)
+		t_scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
+		t_scmd_out: out cmd_r
 	);
 		
 end master;
@@ -163,8 +165,8 @@ begin
 
 -- Trigger command input
 
-	scmdw_v(2) <= scmd_in;
-	scmd_out <= scmdr_v(2);
+	scmdw_v(2) <= t_scmd_in;
+	t_scmd_out <= scmdr_v(2);
 	
 -- Echo command source
 
@@ -279,5 +281,24 @@ begin
 			txclk => mclk,
 			q => q
 		);
+		
+-- Downstream rx
+
+	ep: entity work.pdts_endpoint_upstream
+		generic map(
+			SCLK_FREQ => 31.25,
+			SIM => SIM
+		)	
+		port map(
+			sclk => ipb_clk,
+			srst => ep_rst,
+			stat => ep_stat,
+			rec_clk => mclk,
+			rec_d => d,
+			clk => clk,
+			rdy => ep_rdy,
+			scmd => scmd,
+			acmd => open
+		);	
 
 end rtl;

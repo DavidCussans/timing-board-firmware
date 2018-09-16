@@ -195,7 +195,7 @@ begin
 	q_hdmi <= q_ep when rising_edge(clk_pll); -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
 	q_usfp <= q_ep when rising_edge(clk_pll);
 	
--- Master block
+-- Master block (should really be master without the trigger stuff)
 
 	master: entity work.master_top
 		port map(
@@ -207,7 +207,8 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q_loc,
-			d => '0'
+			d => '0',
+			t_d => '0'
 		);
 
 -- Endpoint wrapper
