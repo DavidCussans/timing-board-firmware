@@ -101,8 +101,8 @@ begin
 		)
 		port map(
 			fclk => sclk,
-			fdel => "0000",
-			cdel => "000000",
+			fdel => fdel,
+			cdel => cdel,
 			rxclk => rec_clk,
 			rxrst => rec_rst,
 			rxd => rec_d,
