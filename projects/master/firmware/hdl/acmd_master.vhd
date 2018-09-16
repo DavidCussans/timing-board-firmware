@@ -32,7 +32,7 @@ end acmd_master;
 architecture rtl of acmd_master is
 
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
-	signal go, go_d, pend, done, last, c, s: std_logic;
+	signal go, go_d, pend, c, s: std_logic;
 	signal s_i: integer range 1 downto 0 := 0;
 	signal acmd_out_i: cmd_w_array(1 downto 0);
 	signal acmd_in_i: cmd_r_array(1 downto 0);

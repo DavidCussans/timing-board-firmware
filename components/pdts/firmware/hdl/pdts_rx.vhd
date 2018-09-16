@@ -123,7 +123,7 @@ begin
 		end if;
 	end process;
 
--- Address match (looks like needs fixing)
+-- Address match
 
 	s_match <= d(4 + to_integer(unsigned(tgrp)));
 
@@ -131,10 +131,10 @@ begin
 	begin
 		if rising_edge(clk) then
 			if ka = '1' then
-				a_match <= '1';
+				a_match <= '0';
 			elsif state = ASYNC and actr < ADDR_WDS and stb = '1' then
 				if d = X"00" or d = addr(8 * (to_integer(actr) + 1) - 1 downto 8 * to_integer(actr)) then
-					a_match <= '0'; -- fancier address sub-field matching here later
+					a_match <= '1'; -- fancier address sub-field matching here later
 				end if;
 			end if;
 		end if;
