@@ -50,7 +50,7 @@ architecture rtl of pdts_endpoint_local is
 	signal ph_data: std_logic_vector(15 downto 0);
 	signal fdel: std_logic_vector(3 downto 0);
 	signal cdel: std_logic_vector(5 downto 0);
-	signal adj_req, adj_ack, tx_en: std_logic;
+	signal adj_req, adj_ack, tx_en, ph_update: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
 	signal scmdr_v: cmd_r_array(1 downto 0);
 	signal scmdw, acmdw: cmd_w;
@@ -150,7 +150,8 @@ begin
 			a_d => dr,
 			a_valid => a_valid,
 			a_last => a_last,
-			q => ph_data
+			q => ph_data,
+			qs = ph_update
 		);
 		
 	adj: entity work.pdts_adjust
@@ -158,6 +159,7 @@ begin
 			sclk => sclk,
 			srst => srst,
 			d => ph_data,
+			s => ph_update,
 			fdel => fdel,
 			cdel => cdel,
 			adj_req => adj_req,

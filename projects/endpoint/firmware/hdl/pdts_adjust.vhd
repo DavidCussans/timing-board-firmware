@@ -15,7 +15,9 @@ entity pdts_adjust is
 	port(
 		sclk: in std_logic; -- Free-running system clock
 		srst: in std_logic; -- System reset (sclk domain)
+		clk: in std_logic;
 		d: in std_logic_vector(15 downto 0);
+		s: in std_logic;
 		fdel: out std_logic_vector(3 downto 0);
 		cdel: out std_logic_vector(5 downto 0);
 		adj_req: out std_logic;
@@ -27,11 +29,37 @@ end pdts_adjust;
 
 architecture rtl of pdts_adjust is
 
+	signal u, ud: std_logic;
+
 begin
 
-	fdel <= (others => '0');
-	cdel <= (others => '0');
-	adj_req <= '0';
-	tx_en <= '0';
+	sync: entity work.pdts_synchro
+		port map(
+			clk => clk,
+			clks => sclk,
+			d => s,
+			q => u
+		);
+		
+	ud <= u when rising_edge(sclk);
+	
+	process(sclk)
+	begin
+		if rising_edge(sclk) then
+			if srst = '1' then
+				adj_req <= '0';
+				tx_en <= '0';
+			else
+				if adj_ack = '1' then
+					fdel <= d(7 downto 4);
+					cdel <= d(13 downto 8);
+					adj_req <= '0';
+				elsif u = '1' and ud = '0' then
+					adj_req <= d(14);
+					tx_en <= d(15);
+				end if;
+			end if;
+		end if;
+	end process;
 
 end rtl;
