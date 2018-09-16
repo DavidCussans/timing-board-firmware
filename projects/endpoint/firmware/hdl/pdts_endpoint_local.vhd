@@ -147,9 +147,9 @@ begin
 		port map(
 			clk => clk_i,
 			rst => rst_i,
-			a_d <= dr(SCMD_W - 1 downto 0),
-			a_valid <= a_valid,
-			a_last <= a_last,
+			a_d => dr(SCMD_W - 1 downto 0),
+			a_valid => a_valid,
+			a_last => a_last,
 			q => ph_data
 		);
 		
