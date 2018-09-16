@@ -41,7 +41,7 @@ begin
 				if c = '0' then
 					qi <= a_d;
 				else
-					q <= a_d & qi
+					q <= a_d & qi;
 				end if;
 			end if;
 		end if;
