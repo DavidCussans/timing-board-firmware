@@ -56,6 +56,8 @@ architecture rtl of master is
 	signal tgrp: std_logic_vector(N_PART - 1 downto 0);
 	signal tx_q: std_logic_vector(7 downto 0);
 	signal tx_err, tx_stb, tx_k: std_logic;
+	signal ep_en, ep_rdy, ep_rst: std_logic;
+	signal ep_stat: std_logic_vector(3 downto 0);
 	
 begin
 
@@ -84,6 +86,9 @@ begin
 			ipb_out => ipbr(N_SLV_GLOBAL),
 			clk => clk,
 			rst => rst,
+			ep_en => ep_en,
+			ep_stat => ep_stat,
+			ep_rdy => ep_rdy,
 			tx_err => tx_err
 		);
 		
@@ -284,6 +289,8 @@ begin
 		
 -- Downstream rx
 
+	ep_rst <= ipb_rst or not ep_en;
+
 	ep: entity work.pdts_endpoint_upstream
 		generic map(
 			SCLK_FREQ => 31.25,
@@ -297,7 +304,7 @@ begin
 			rec_d => d,
 			clk => clk,
 			rdy => ep_rdy,
-			scmd => scmd,
+			scmd => open,
 			acmd => open
 		);	
 
