@@ -40,7 +40,7 @@ begin
 				if c = '0' then
 					qi <= a_d;
 				else
-					q <= a_d & q_i;
+					q <= a_d & qi;
 				end if;
 			end if;
 		end if;
