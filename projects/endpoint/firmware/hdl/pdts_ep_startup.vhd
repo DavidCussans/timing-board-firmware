@@ -67,7 +67,7 @@ begin
 -- Startup; wait for SFP signal
 				when W_LINK =>
 					if link_ok = '1' then
-						state <= W_CDR;
+						state <= W_FREQ;
 					end if;
 -- Wait for frequency match
 				when W_FREQ =>
@@ -156,7 +156,7 @@ begin
 		end if;
 	end process;
 
-	adj_ack_i <= adj_request when state = W_ADJUST else '0';
+	adj_ack_i <= adj_req when state = W_ADJUST else '0';
 
 -- Freq check
 
@@ -167,7 +167,7 @@ begin
 		port map(
 			clk => sclk,
 			clks => mclk,
-			d(0) => cdr_ok,
+			d(0) => link_ok,
 			q(0) => f_en
 		);
 
