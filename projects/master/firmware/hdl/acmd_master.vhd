@@ -32,7 +32,8 @@ end acmd_master;
 architecture rtl of acmd_master is
 
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
-	signal go, go_d, pend, c, s: std_logic;
+	signal go, go_d, pend, s: std_logic;
+	signal c: unsigned(1 downto 0);
 	signal s_i: integer range 1 downto 0 := 0;
 	signal acmd_out_i: cmd_w_array(1 downto 0);
 	signal acmd_in_i: cmd_r_array(1 downto 0);
@@ -85,15 +86,19 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rst = '1' then
-				c <= '0';
+				c <= "00";
 			elsif acmd_in_i(1).ren = '1' then
-				c <= not c;
+				c <= c + 1;
 			end if;
 		end if;
 	end process;
 	
-	acmd_out_i(1).d <= ctrl(0)(23 downto 16) when c = '0' else ctrl(0)(31 downto 24);
-	acmd_out_i(1).last <= c;
+	with c select acmd_out_i(1).d <=
+		ctrl(0)(15 downto 8) when "00",
+		ctrl(0)(23 downto 16) when "01",
+		ctrl(0)(31 downto 24) when others;
+	
+	acmd_out_i(1).last <= '1' when c = "10" else '0';
 	acmd_out_i(1).req <= pend;
 	
 -- Arbitrator
