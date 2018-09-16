@@ -11,6 +11,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
 use work.ipbus.all;
+use work.ipbus_reg_types.all;
 
 use work.pdts_defs.all;
 
