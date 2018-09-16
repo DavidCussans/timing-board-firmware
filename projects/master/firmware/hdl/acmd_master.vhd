@@ -79,7 +79,7 @@ begin
 		);
 		
 	go_d <= go when rising_edge(clk);
-	pend <= (pend or (go and not go_d)) and not ((c and acmd_in_i(1).ren) or rst) when rising_edge(clk);
+	pend <= (pend or (go and not go_d)) and not (acmd_in_i(1).ren or rst) when rising_edge(clk);
 	
 	process(clk)
 	begin
