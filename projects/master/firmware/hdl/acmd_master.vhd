@@ -89,7 +89,7 @@ begin
 				c <= "00";
 			elsif acmd_in_i(1).ren = '1' then
 				if c = "10" then
-					c <= "00"
+					c <= "00";
 				else
 					c <= c + 1;
 				end if;
