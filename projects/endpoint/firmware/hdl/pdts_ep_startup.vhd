@@ -162,8 +162,8 @@ begin
 		port map(
 			clk => sclk,
 			a => "00100", -- Delay ack by a few cycles to allow external logic to go into reset
-			d => adj_ack_i,
-			q => adj_ack
+			d(0) => adj_ack_i,
+			q(0) => adj_ack
 		);
 
 -- Freq check
