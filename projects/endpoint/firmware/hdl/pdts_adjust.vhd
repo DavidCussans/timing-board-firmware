@@ -37,8 +37,8 @@ begin
 		port map(
 			clk => clk,
 			clks => sclk,
-			d => s,
-			q => u
+			d(0) => s,
+			q(0) => u
 		);
 		
 	ud <= u when rising_edge(sclk);
