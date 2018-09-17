@@ -17,6 +17,7 @@ entity pdts_rx_mul_mmcm is
 	port(
 		clk: in std_logic;
 		sclk: out std_logic;
+		clk10: out std_logic;
 		phase_rst: in std_logic;
 		phase_locked: out std_logic
 	);
@@ -25,7 +26,7 @@ end pdts_rx_mul_mmcm;
 
 architecture rtl of pdts_rx_mul_mmcm is
 
-	signal clkfbout, clkfbin, sclki: std_logic;
+	signal clkfbout, clkfbin, sclki, clk10u: std_logic;
 	
 begin
 
@@ -33,12 +34,14 @@ begin
 		generic map(
 			CLKIN1_PERIOD => 1000.0 / CLK_FREQ, -- 50MHz input
 			CLKFBOUT_MULT_F => 1000.0 / CLK_FREQ, -- 1GHz VCO freq
-			CLKOUT0_DIVIDE_F => (1000.0 / CLK_FREQ) / real(SCLK_RATIO) -- IO clock output
+			CLKOUT0_DIVIDE_F => (1000.0 / CLK_FREQ) / real(SCLK_RATIO), -- IO clock output
+			CLKOUT1_DIVIDE => 100
 		)
 		port map(
 			clkin1 => clk,
 			clkfbin => clkfbin,
 			clkout0 => sclki,
+			clkout1 => clk10u,
 			clkfbout => clkfbout,
 			locked => phase_locked,
 			rst => phase_rst,
@@ -56,5 +59,11 @@ begin
 			i => clkfbout,
 			o => clkfbin
 	);
+	
+	bufg10: BUFG
+		port map(
+			i => clk10u,
+			o => clk10
+		);
 
 end rtl;

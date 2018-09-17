@@ -30,6 +30,8 @@ entity master is
 		spill_warn: in std_logic;
 		spill_start: in std_logic; -- Spill signals from SPS (async signals)
 		spill_end: in std_logic;
+		clk10: in std_logic;
+		irig: in std_logic;
 		q: out std_logic; -- Downstream output (mclk domain)
 		d: in std_logic; -- Downstream input (mclk domain)
 		t_scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
@@ -132,6 +134,8 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_TSTAMP),
 			ipb_out => ipbr(N_SLV_TSTAMP),
+			clk10 => clk10,
+			irig => irig,
 			clk => clk,
 			rst => rst,
 			tstamp => tstamp

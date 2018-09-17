@@ -27,6 +27,8 @@ entity master_top is
 		spill_warn: in std_logic := '0';
 		spill_start: in std_logic := '0';
 		spill_end: in std_logic := '0';
+		clk10: in std_logic := '0';
+		irig: in std_logic := '0';
 		q: out std_logic; -- Output (mclk domain)
 		d: in std_logic; -- Input (mclk domain)
 		t_d: in std_logic -- Input from trigger
@@ -75,6 +77,8 @@ begin
 			spill_warn => spill_warn,
 			spill_start => spill_start,
 			spill_end => spill_end,
+			clk10 => clk10,
+			irig => irig,
 			q => q,
 			d => d,
 			t_scmd_in => scmd_in,

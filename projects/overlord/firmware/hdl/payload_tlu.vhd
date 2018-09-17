@@ -61,7 +61,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d_trig: std_logic;
+	signal mclk, rst_io, rsti, clk, clk10, stb, rst, locked, q, d_trig: std_logic;
 	signal trig_in: std_logic_vector(5 downto 0);
 	
 begin
@@ -122,7 +122,7 @@ begin
 			q_sfp_n => q_sfp_n,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => open,
+			d_cdr => d,
 			sfp_los => sfp_los,
 			sfp_fault => sfp_fault,
 			sfp_tx_dis => sfp_tx_dis,
@@ -139,6 +139,7 @@ begin
 		port map(
 			clk => clk,
 			sclk => mclk,
+			clk10 => clk10,
 			phase_rst => rst_io,
 			phase_locked => locked
 		);
@@ -170,8 +171,10 @@ begin
 			spill_warn => trig_in(5),
 			spill_start => trig_in(4),
 			spill_end => trig_in(3),
+			clk10 => clk10,
+			irig => trig_in(0),
 			q => q,
-			d => '0',
+			d => d,
 		  t_d => d_trig,
 		);
 		
