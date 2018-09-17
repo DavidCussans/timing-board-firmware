@@ -27,20 +27,30 @@ variables:
     # ##
     # - mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
-    # - pwd
     - source /software/Xilinx/Vivado/2016.4/settings64.sh
     - export MODELSIM_ROOT="/software/mentor/modelsim_10.5/modeltech/"
     - export PATH="${MODELSIM_ROOT}/bin/:${PATH}"
     - export IPBB_SIMLIB_BASE=/scratch/xilinx-simlibs/modelsim_10.5
     - if [ -d "build_area" ]; then cd build_area; ls; fi
-
-    # - cd /tmp
-    # - ipbb init buildArea
-    # - cd buildArea
-    # - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
-    # - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
-    # - env | grep -v PASSWORD | grep -v TOKEN | sort
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
     # - export -p | grep -v PASSWORD | grep -v TOKEN | sort
+
+
+#------------------------------------------------------------------------------
+setup_build_area:
+  <<: *template_job_base
+  stage: setup
+  script:
+    - ipbb init build_area
+    - cd build_area
+    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
+    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
+    - env | grep -v PASSWORD | grep -v TOKEN | sort
+  artifacts:
+    paths: 
+      - build_area
+    expire_in: 1 day
+#------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
@@ -78,31 +88,13 @@ variables:
     - ipbb vivado -q impl 
     - ipbb vivado bitfile package
     - ipbb vivado addrtab
-    - mkdir ${CI_PROJECT_DIR}/{addtab,package}
-    - cp -r addrtab package/*.tgz ${CI_PROJECT_DIR}/package
+    - mkdir ${CI_PROJECT_DIR}/package
+    - cp -r package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
     when: on_success
     name: "${CI_JOB_NAME#build:}-on-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA:0:8}"
     paths:
-      - addrtab
       - package/*.tgz
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-setup_build_area:
-  <<: *template_job_base
-  stage: setup
-  script:
-    - ipbb init build_area
-    - cd build_area
-    - ipbb add git https://github.com/ipbus/ipbus-firmware -b v1.2
-    - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
-    - env | grep -v PASSWORD | grep -v TOKEN | sort
-  artifacts:
-    paths: 
-      - build_area
-    expire_in: 1 day
 #------------------------------------------------------------------------------
 
 
@@ -291,4 +283,3 @@ build:crt_fmc:
     PROJECT_TOP_DEP: "top.dep"
   dependencies:
     - check:crt_fmc
-    
