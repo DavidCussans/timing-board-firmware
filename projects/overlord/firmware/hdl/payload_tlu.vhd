@@ -172,7 +172,7 @@ begin
 			spill_end => trig_in(3),
 			q => q,
 			d => '0',
-		  t_d => d_trig,
+		    t_d => d_trig
 		);
 		
 -- Endpoint wrapper
