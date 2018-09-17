@@ -235,6 +235,6 @@ begin
 		end if;
 	end process;
 	
-	stbo <= stbd;
+	stbo <= stbd and edone and aligned_i;
 
 end rtl;
