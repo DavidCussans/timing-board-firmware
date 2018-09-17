@@ -34,7 +34,7 @@ architecture rtl of echo_mon is
 
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(4 downto 0);
-	signal go, done, sent, go_d, pend, rxgood, done_i: std_logic;
+	signal go, done, go_d, pend, rxgood, done_i: std_logic;
 	signal tx_ts, rx_ts: std_logic_vector(63 downto 0);
 
 begin

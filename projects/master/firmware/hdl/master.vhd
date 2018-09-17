@@ -49,7 +49,7 @@ architecture rtl of master is
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 3 downto 0);
 	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 3 downto 0);
-	signal scmdw, acmdw: cmd_w;
+	signal scmdw, acmdw, rscmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal typ: std_logic_vector(SCMD_W - 1 downto 0);
 	signal tv: std_logic;
@@ -186,7 +186,7 @@ begin
 			tstamp => tstamp,
 			scmd_out => scmdw_v(3),
 			scmd_in => scmdr_v(3),
-			rscmd_in => CMD_W_NULL
+			rscmd_in => rscmdw
 		);
 	
 -- Partitions
@@ -304,7 +304,7 @@ begin
 			rec_d => d,
 			clk => clk,
 			rdy => ep_rdy,
-			scmd => open,
+			scmd => rscmdw,
 			acmd => open
 		);	
 
