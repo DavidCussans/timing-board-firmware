@@ -32,7 +32,8 @@ end acmd_master;
 architecture rtl of acmd_master is
 
 	signal ctrl, stat: ipb_reg_v(0 downto 0);
-	signal go, go_d, pend, s: std_logic;
+	signal stb: std_logic_vector(0 downto 0);
+	signal ctrl_go, pend, s: std_logic;
 	signal c: unsigned(1 downto 0);
 	signal s_i: integer range 1 downto 0 := 0;
 	signal acmd_out_i: cmd_w_array(1 downto 0);
@@ -53,34 +54,28 @@ begin
 		
 -- CSR
 
-	csr: entity work.ipbus_ctrlreg_v
+	csr: entity work.ipbus_syncreg_v
 		generic map(
 			N_CTRL => 1,
 			N_STAT => 1
 		)
 		port map(
 			clk => ipb_clk,
-			reset => ipb_rst,
-			ipbus_in => ipb_in,
-			ipbus_out => ipb_out,
+			rst => ipb_rst,
+			ipb_in => ipb_in,
+			ipb_out => ipb_out,
+			slv_clk => clk,
 			d => stat,
-			q => ctrl
+			q => ctrl,
+			stb => stb
 		);
 		
 	stat(0) <= (others => '0');
+	ctrl_go <= ctrl(0)(0) and stb(0);
 
 -- Packet generator
-	
-	sync: entity work.pdts_synchro
-		port map(
-			clk => ipb_clk,
-			clks => clk,
-			d(0) => ctrl(0)(0),
-			q(0) => go
-		);
-		
-	go_d <= go when rising_edge(clk);
-	pend <= (pend or (go and not go_d)) and not (acmd_in_i(1).ren or rst) when rising_edge(clk);
+
+	pend <= (pend or ctrl_go) and not (acmd_in_i(1).ren or rst) when rising_edge(clk);
 	
 	process(clk)
 	begin
