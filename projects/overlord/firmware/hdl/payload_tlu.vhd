@@ -175,7 +175,7 @@ begin
 			irig => trig_in(0),
 			q => q,
 			d => d,
-		  t_d => d_trig,
+		  t_d => d_trig
 		);
 		
 -- Endpoint wrapper
