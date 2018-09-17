@@ -97,7 +97,7 @@ begin
 					elsif rxphy_aligned_i = '0' then
 						state <= W_ALIGN;
 					elsif rxphy_locked_i = '1' then
-						state <= W_RDY;
+						state <= W_PHASE;
 					end if;
 -- Wait for phase adjustment if needed
 				when W_PHASE =>
