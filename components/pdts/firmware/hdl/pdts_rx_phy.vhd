@@ -55,7 +55,7 @@ architecture rtl of pdts_rx_phy is
 	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal ectr, lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
-	signal stbd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
+	signal stbd, stbdd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
 	
 	attribute MARK_DEBUG: string;
 	attribute MARK_DEBUG of w, tr, fr, ctr, stb, kctr, m, done, kok, phase_rst_i, dctr, aligned_i: signal is "TRUE";
@@ -170,14 +170,16 @@ begin
 
 	c_del: entity work.pdts_del
 		generic map(
-			WIDTH => 10,
+			WIDTH => 11,
 			DEL_RADIX => 6
 		)
 		port map(
-			clk => rxclk,
+			clk => clk,
 			a => cdel, -- CDC, treat cdel as static signal
-			d => w,
-			q => wd
+			d(10) => stb,
+			d(9 downto 0) => w,
+			q(10) => stbd,
+			q(9 downto 0) => wd
 		);
 	
 -- Decoder
@@ -199,7 +201,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if stbd = '1' then
+			if stbdd = '1' then
 				if ki = '1' or rst = '1' then
 					lctr <= (others => '0');
 				else
@@ -212,7 +214,7 @@ begin
 					ectr <= ectr + 1;
 				end if;
 			end if;
-			stbd <= stb;
+			stbdd <= stbd;
 		end if;
 	end process;
 
@@ -235,6 +237,6 @@ begin
 		end if;
 	end process;
 	
-	stbo <= stbd and edone and aligned_i;
+	stbo <= stbdd and edone and aligned_i;
 
 end rtl;
