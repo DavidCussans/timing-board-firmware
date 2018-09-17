@@ -86,12 +86,11 @@ begin
 			rxphy_rst => rxphy_rst,
 			rxphy_locked => rxphy_locked,
 			rst => rst_i,
+			ext_rst => rst,
 			rx_err => rx_err,
 			tsrdy => rdy_i,
 			rdy => rdy
 		);
-		
-	rst <= rst_i;
 				
 -- Rx PHY
 
