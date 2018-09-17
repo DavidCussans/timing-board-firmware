@@ -209,10 +209,11 @@ begin
 			if srst = '1' then
 				sctr <= (others => '0');
 				cctr <= (others => '0');
+				cctr_rnd <= (others => '0');
 			else
 				sctr <= sctr + 1;
 				if sctr = X"ffff" then
-						cctr_rnd <= cctr;
+					cctr_rnd <= cctr;
 					cctr <= (others => '0');
 				elsif t = '1' and td = '0' then
 					cctr <= cctr + 1;

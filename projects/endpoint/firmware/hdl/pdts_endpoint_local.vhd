@@ -251,6 +251,6 @@ begin
 			q => txdi
 		);
 		
-	txd <= txdi when EN_TX else txdi and tx_en;
+	txd <= txdi and not rst_i when EN_TX else txdi and tx_en and not rst_i;
 		
 end rtl;

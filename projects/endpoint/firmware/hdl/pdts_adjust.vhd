@@ -30,6 +30,8 @@ end pdts_adjust;
 architecture rtl of pdts_adjust is
 
 	signal u, ud: std_logic;
+	signal fdel_i: std_logic_vector(3 downto 0);
+	signal ddel_i: std_logic_vector(5 downto 0);	
 
 begin
 
@@ -53,10 +55,12 @@ begin
 				cdel <= (others => '0');
 			else
 				if adj_ack = '1' then
-					fdel <= d(7 downto 4);
-					cdel <= d(13 downto 8);
+					fdel <= fdel_i;
+					cdel <= cdel_i;
 					adj_req <= '0';
 				elsif u = '1' and ud = '0' then
+					fdel_i <= d(7 downto 4);
+					cdel_i <= d(13 downto 8);
 					adj_req <= d(14);
 					tx_en <= d(15);
 				end if;
