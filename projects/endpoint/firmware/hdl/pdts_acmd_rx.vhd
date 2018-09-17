@@ -15,8 +15,8 @@ entity pdts_acmd_rx is
 		clk: in std_logic;
 		rst: in std_logic;
 		a_d: in std_logic_vector(7 downto 0);
-		a_valid: in std_logic;
-		a_last: in std_logic;
+		a_stb: in std_logic;
+		a_first: in std_logic;
 		q: out std_logic_vector(15 downto 0);
 		s: out std_logic
 	);
@@ -36,7 +36,7 @@ begin
 			if rst = '1' then
 				c <= "0000";
 				q <= (others => '0');
-			elsif a_valid = '1' then
+			elsif a_stb = '1' then
 				if a_first = '1' then
 					c <= "0001";
 					q(15 downto 8) <= a_d;
@@ -52,6 +52,6 @@ begin
 	
 	done <= '1' when c = "0001" else '0';
 
-	s <= done and a_valid when rising_edge(clk);
+	s <= done and a_stb when rising_edge(clk);
 	
 end rtl;
