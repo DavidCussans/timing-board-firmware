@@ -40,10 +40,12 @@ begin
 				if a_first = '1' then
 					c <= "0001";
 					q(15 downto 8) <= a_d;
+					s <= '0';
 				else
 					c <= c + 1;
 					if c = "0001" then
 						q(7 downto 0) <= a_d;
+					elsif c = "0011" then
 						s <= '1';
 					end if;
 				end if;
