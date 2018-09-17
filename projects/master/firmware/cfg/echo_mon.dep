@@ -1,4 +1,4 @@
 src echo_mon.vhd
 addrtab echo_mon.xml
 src -c components/pdts pdts_synchro.vhd pdts_defs.vhd
-src -c ipbus-firmware:components/ipbus_slaves ipbus_ctrlreg_v.vhd ipbus_reg_types.vhd
+include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep

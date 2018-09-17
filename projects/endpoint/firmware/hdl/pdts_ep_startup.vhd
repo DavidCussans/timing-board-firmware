@@ -304,8 +304,8 @@ begin
 	with state select stat <=
 		"0000" when W_RST, -- Starting state after reset
 		"0001" when W_LINK, -- Waiting for SFP LOS to go low
-		"0010" when W_FREQ, -- Waiting for CDR lock
-		"0011" when W_ADJUST, -- Waiting for good frequency check
+		"0010" when W_FREQ, -- Waiting for good frequency check
+		"0011" when W_ADJUST, -- Waiting for phase adjustment to complete
 		"0100" when W_ALIGN, -- Waiting for comma alignment, stable 50MHz phase
 		"0101" when W_LOCK, -- Waiting for 8b10 decoder good packet
 		"0110" when W_PHASE, -- Waiting for phase adjustment command
