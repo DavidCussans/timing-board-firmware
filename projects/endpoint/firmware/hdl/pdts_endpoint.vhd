@@ -174,7 +174,7 @@ begin
 		port map(
 			clk => clk_i,
 			rst => rst_i,
-			a_d <= sync,
+			a_d => dr,
 			a_stb => a_stb,
 			a_first => a_first,
 			q => ph_data,
