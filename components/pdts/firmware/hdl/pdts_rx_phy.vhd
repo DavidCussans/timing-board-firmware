@@ -148,14 +148,17 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if done = '1' and (m = '0' or kok = '0') then
-				if dctr = SCLK_RATIO - 1 then
-					dctr <= X"0";
-				else
-					dctr <= dctr + 1;
+			if rxrst = '1' then
+				dctr <= X"0";
+				aligned_i <= '0';
+			elsif done = '1' then
+				if m = '0' or kok = '0' then
+					if dctr = SCLK_RATIO - 1 then
+						dctr <= X"0";
+					else
+						dctr <= dctr + 1;
+					end if;
 				end if;
-			end if;
-			if done = '1' then
 				aligned_i <= m and kok;
 			end if;
 		end if;
