@@ -73,7 +73,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
 	
 begin
 
@@ -122,7 +122,7 @@ begin
 			sfp_los => sfp_los,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => open,
+			d_cdr => d,
 			clk_cdr_p => clk_cdr_p,
 			clk_cdr_n => clk_cdr_n,
 			clk_cdr => open,
@@ -192,7 +192,7 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q,
-			d => '0',
+			d => d,
 			t_d => '0'
 		);
 
