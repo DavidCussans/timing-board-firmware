@@ -31,7 +31,7 @@ architecture rtl of pdts_adjust is
 
 	signal u, ud: std_logic;
 	signal fdel_i: std_logic_vector(3 downto 0);
-	signal ddel_i: std_logic_vector(5 downto 0);	
+	signal cdel_i: std_logic_vector(5 downto 0);	
 
 begin
 
