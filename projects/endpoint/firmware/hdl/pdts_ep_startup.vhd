@@ -34,7 +34,8 @@ entity pdts_ep_startup is
 		clk: in std_logic; -- 50MHz clock input
 		rxphy_rst: out std_logic; -- RX phy reset
 		rxphy_locked: in std_logic; -- RX phy locked
-		rst: out std_logic; -- 50MHz reset
+		rst: out std_logic; -- 50MHz reset for endpoint logic
+		ext_rst: out std_logic; -- 50MHz reset for external logic
 		rx_err: in std_logic_vector(2 downto 0); -- RX decoder error status 
 		tsrdy: in std_logic; -- Timestamp ready
 		rdy: out std_logic -- Output ready signal
@@ -51,7 +52,7 @@ architecture rtl of pdts_ep_startup is
 	signal sctr, cctr, cctr_rnd: unsigned(15 downto 0);
 	signal link_bad, link_ok: std_logic;
 	signal rxphy_aligned_i, rxphy_locked_i, rx_err_f, rx_err_i, tsrdy_i: std_logic;
-	signal rec_rst_i, rxphy_rst_i, rst_i, rst_u: std_logic;
+	signal rec_rst_i, rxphy_rst_i, rst_i, rst_u, ext_rst_i: std_logic;
 
 begin
 
@@ -271,7 +272,8 @@ begin
 
 	rec_rst_i <= '1' when state = W_RST or state = W_LINK or state = W_FREQ or state = W_ADJUST else '0';
 	rxphy_rst_i <= '1' when rec_rst_i = '1' or state = W_ALIGN else '0';
-	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK or state = W_PHASE else '0';
+	rst_i <= '1' when rxphy_rst_i = '1' or state = W_LOCK else '0';
+	ext_rst_i <= '1' when rst_i = '1' or state = W_PHASE else '0';
 	rdy <= '1' when state = RUN else '0';
 
 -- CDC into rec_clk / clk domain
@@ -286,15 +288,17 @@ begin
 		
 	sync_clk: entity work.pdts_synchro
 		generic map(
-			N => 2
+			N => 3
 		)
 		port map(
 			clk => sclk,
 			clks => clk,
 			d(0) => rxphy_rst_i,
 			d(1) => rst_i,
+			d(2) => ext_rst_i,
 			q(0) => rxphy_rst,
-			q(1) => rst_u
+			q(1) => rst_u,
+			q(2) => ext_rst
 		);
 		
 	rst <= rst_u;
