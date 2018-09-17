@@ -49,7 +49,7 @@ architecture rtl of pdts_endpoint is
 	signal stat_i: std_logic_vector(3 downto 0);
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
-	signal stb, k, s_stb, s_first, a_valid, a_last: std_logic;
+	signal stb, k, s_stb, s_first, a_stb, a_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
 	signal ph_data: std_logic_vector(15 downto 0);
@@ -157,8 +157,8 @@ begin
 			q => dr,
 			s_stb => s_stb,
 			s_first => s_first,
-			a_valid => a_valid,
-			a_last => a_last,
+			a_stb => a_stb,
+			a_first => a_first,
 			err => rx_err
 		);
 	
@@ -175,8 +175,8 @@ begin
 			clk => clk_i,
 			rst => rst_i,
 			a_d <= sync,
-			a_valid <= a_valid,
-			a_last <= a_last,
+			a_stb => a_stb,
+			a_first => a_first,
 			q => ph_data,
 			s => ph_update
 		);

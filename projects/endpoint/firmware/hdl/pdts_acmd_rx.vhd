@@ -26,6 +26,7 @@ end pdts_acmd_rx;
 architecture rtl of pdts_acmd_rx is
 
 	signal c: unsigned(3 downto 0);
+	signal done: std_logic;
 
 begin
 
@@ -36,20 +37,21 @@ begin
 				c <= "0000";
 				q <= (others => '0');
 			elsif a_valid = '1' then
-				if a_last = '1' then
-					c <= "0000";
+				if a_first = '1' then
+					c <= "0001";
+					q(15 downto 8) <= a_d;
 				else
 					c <= c + 1;
-					if c = "0000" then
-						q(15 downto 8) <= a_d;
-					elsif c = "0001" then
+					if c = "0001" then
 						q(7 downto 0) <= a_d;
 					end if;
 				end if;
 			end if;
 		end if;
 	end process;
+	
+	done <= '1' when c = "0001" else '0';
 
-	s <= a_valid and a_last when rising_edge(clk);
+	s <= done and a_valid when rising_edge(clk);
 	
 end rtl;
