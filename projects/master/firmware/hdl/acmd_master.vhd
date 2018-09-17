@@ -99,8 +99,8 @@ begin
 	
 	with c select acmd_out_i(1).d <=
 		ctrl(0)(15 downto 8) when "00",
-		ctrl(0)(23 downto 16) when "01",
-		ctrl(0)(31 downto 24) when others;
+		ctrl(0)(31 downto 24) when "01",
+		ctrl(0)(23 downto 16) when others;
 	
 	acmd_out_i(1).last <= '1' when c = "10" else '0';
 	acmd_out_i(1).req <= pend;
