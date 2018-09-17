@@ -37,8 +37,7 @@ entity pdts_endpoint is
 		sync_first: out std_logic; -- Sync command valid flag (clk domain)
 		tstamp: out std_logic_vector(8 * TSTAMP_WDS - 1 downto 0); -- Timestamp out
 		tsync_in: in cmd_w := CMD_W_NULL; -- Tx sync command input
-		tsync_out: out cmd_r; -- Tx sync command handshake
-		debug: out std_logic_vector(11 downto 0)
+		tsync_out: out cmd_r -- Tx sync command handshake
 	);
 
 end pdts_endpoint;
@@ -46,12 +45,15 @@ end pdts_endpoint;
 architecture rtl of pdts_endpoint is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
-	signal stat_i: std_logic_vector(3 downto 0);
 	signal rx_err: std_logic_vector(2 downto 0);
 	signal phase_locked, phase_rst: std_logic;	
-	signal stb, k, s_stb, s_first: std_logic;
+	signal stb, k, s_stb, s_first, a_stb, a_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
+	signal ph_data: std_logic_vector(15 downto 0);
+	signal fdel: std_logic_vector(3 downto 0);
+	signal cdel: std_logic_vector(5 downto 0);
+	signal adj_req, adj_ack, tx_en, ph_update: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
 	signal scmdr_v: cmd_r_array(1 downto 0);
 	signal scmdw, acmdw: cmd_w;
@@ -72,10 +74,12 @@ begin
 		port map(
 			sclk => sclk,
 			srst => srst,
-			stat => stat_i,
+			stat => stat,
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
+			adj_req => adj_req,
+			adj_ack => adj_ack,
 			rec_clk => rec_clk,
 			rec_rst => rec_rst,
 			rxphy_aligned => rxphy_aligned,
@@ -84,12 +88,11 @@ begin
 			rxphy_rst => rxphy_rst,
 			rxphy_locked => rxphy_locked,
 			rst => rst_i,
+			ext_rst => rst,
 			rx_err => rx_err,
 			tsrdy => rdy_i,
 			rdy => rdy
 		);
-
-    stat <= stat_i;
 
 -- Clock divider
 
@@ -102,27 +105,14 @@ begin
 		);
 		
 	clk <= clk_i;
-	rst <= rst_i;
-	
--- Debug
-
-	debug(0) <= phase_locked; -- Unsafe CDC for debugging
-	debug(1) <= phase_rst;
-	debug(2) <= rec_rst;
-	debug(3) <= rxphy_rst;
-	debug(7 downto 4) <= stat_i;
-	debug(8) <= rxphy_aligned;
-	debug(9) <= rxphy_locked;
-	debug(10) <= '0';
-	debug(11) <= '0';
 	
 -- Rx PHY
 
 	rxphy: entity work.pdts_rx_phy
 		port map(
 			fclk => sclk,
-			fdel => "0000",
-			cdel => "00000",
+			fdel => fdel,
+			cdel => cdel,
 			rxclk => rec_clk,
 			rxrst => rec_rst,
 			rxd => rec_d,
@@ -151,17 +141,44 @@ begin
 			q => dr,
 			s_stb => s_stb,
 			s_first => s_first,
-			a_valid => open,
-			a_last => open,
+			a_stb => a_stb,
+			a_first => a_first,
 			err => rx_err
 		);
 	
--- Temporary sync output
+-- Temporary sync and async output
 
 	sync <= dr(SCMD_W - 1 downto 0);
 	sync_first <= s_first and rdy_i;
 	sync_stb <= s_stb and rdy_i;
-	
+		
+-- Async command rx and phase adjust
+
+	acmd_rx: entity work.pdts_acmd_rx
+		port map(
+			clk => clk_i,
+			rst => rst_i,
+			a_d => dr,
+			a_stb => a_stb,
+			a_first => a_first,
+			q => ph_data,
+			s => ph_update
+		);
+		
+	adj: entity work.pdts_adjust
+		port map(
+			sclk => sclk,
+			srst => srst,
+			clk => clk_i,
+			d => ph_data,
+			s => ph_update,
+			fdel => fdel,
+			cdel => cdel,
+			adj_req => adj_req,
+			adj_ack => adj_ack,
+			tx_en => tx_en
+		);
+			
 -- Timestamp / event counter
 
 	ts: entity work.pdts_tstamp
@@ -248,6 +265,6 @@ begin
 		
 -- SFP control
 
-	sfp_tx_dis <= '0' when EN_TX else '1';
+	sfp_tx_dis <= '0' when EN_TX else not tx_en;
 		
 end rtl;

@@ -9,6 +9,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.ipbus.all;
 use work.ipbus_decode_top_sim.all;
@@ -36,7 +37,7 @@ architecture rtl of payload_sim is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rst_io, rsti, clk, rst, locked, d, q: std_logic;
+	signal fmc_clk, rst_io, rsti, clk, rst, locked, d, q, du: std_logic;
 	signal txd: std_logic_vector(N_EP - 1 downto 0);
 		
 begin
@@ -113,16 +114,24 @@ begin
 			spill_start => '0',
 			spill_end => '0',
 			q => q,
-			d => txd(0)
+			d => du,
+			t_d => '0'
 		);
 		
--- The loopback
+-- Master-slave connection
 		
 	d <= q when rising_edge(fmc_clk);
+	du <= or_reduce(txd);
 	
 -- Endpoint wrapper
 
 	egen: for i in N_EP - 1 downto 0 generate
+	
+			signal addri: std_logic_vector(7 downto 0);
+
+	begin
+
+		addri <= std_logic_vector(to_unsigned(i + 8, 8));
 
 		wrapper: entity work.endpoint_wrapper_local
 			generic map(
@@ -133,7 +142,7 @@ begin
 				ipb_rst => ipb_rst,
 				ipb_in => ipbw(i + N_SLV_ENDPOINT0),
 				ipb_out => ipbr(i + N_SLV_ENDPOINT0),
-				addr => X"08",
+				addr => addri,
 				rec_clk => fmc_clk,
 				rec_d => d,
 				clk => clk,

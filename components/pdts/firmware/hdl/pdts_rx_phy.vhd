@@ -24,7 +24,7 @@ entity pdts_rx_phy is
 	port(
 		fclk: in std_logic; -- free-running clock
 		fdel: in std_logic_vector(3 downto 0); -- Fine delay setting (rxclk cycles)
-		cdel: in std_logic_vector(4 downto 0); -- Coarse delay setting (clk cycles)
+		cdel: in std_logic_vector(5 downto 0); -- Coarse delay setting (clk cycles)
 		fdel_out: out std_logic_vector(3 downto 0); -- Actual fine delay (upstream mode)
 		rxclk: in std_logic; -- serial data clock
 		rxrst: in std_logic; -- reset (rxclk domain)
@@ -55,7 +55,7 @@ architecture rtl of pdts_rx_phy is
 	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal ectr, lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
-	signal stbd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
+	signal stbd, stbdd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
 	
 	attribute MARK_DEBUG: string;
 	attribute MARK_DEBUG of w, tr, fr, ctr, stb, kctr, m, done, kok, phase_rst_i, dctr, aligned_i: signal is "TRUE";
@@ -148,14 +148,17 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if done = '1' and (m = '0' or kok = '0') then
-				if dctr = SCLK_RATIO - 1 then
-					dctr <= X"0";
-				else
-					dctr <= dctr + 1;
+			if rxrst = '1' then
+				dctr <= X"0";
+				aligned_i <= '0';
+			elsif done = '1' then
+				if m = '0' or kok = '0' then
+					if dctr = SCLK_RATIO - 1 then
+						dctr <= X"0";
+					else
+						dctr <= dctr + 1;
+					end if;
 				end if;
-			end if;
-			if done = '1' then
 				aligned_i <= m and kok;
 			end if;
 		end if;
@@ -167,14 +170,16 @@ begin
 
 	c_del: entity work.pdts_del
 		generic map(
-			WIDTH => 10,
-			DEL_RADIX => 5
+			WIDTH => 11,
+			DEL_RADIX => 6
 		)
 		port map(
-			clk => rxclk,
+			clk => clk,
 			a => cdel, -- CDC, treat cdel as static signal
-			d => w,
-			q => wd
+			d(10) => stb,
+			d(9 downto 0) => w,
+			q(10) => stbd,
+			q(9 downto 0) => wd
 		);
 	
 -- Decoder
@@ -196,7 +201,7 @@ begin
 	process(clk)
 	begin
 		if rising_edge(clk) then
-			if stbd = '1' then
+			if stbdd = '1' then
 				if ki = '1' or rst = '1' then
 					lctr <= (others => '0');
 				else
@@ -209,7 +214,7 @@ begin
 					ectr <= ectr + 1;
 				end if;
 			end if;
-			stbd <= stb;
+			stbdd <= stbd;
 		end if;
 	end process;
 
@@ -232,6 +237,6 @@ begin
 		end if;
 	end process;
 	
-	stbo <= stbd;
+	stbo <= stbdd and edone and aligned_i;
 
 end rtl;

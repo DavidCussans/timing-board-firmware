@@ -16,6 +16,9 @@ use work.pdts_defs.all;
 use work.master_defs.all;
 
 entity master is
+	generic(
+		SIM: boolean := false
+	);
 	port(
 		ipb_clk: in std_logic; -- IPbus connection
 		ipb_rst: in std_logic;
@@ -27,11 +30,10 @@ entity master is
 		spill_warn: in std_logic;
 		spill_start: in std_logic; -- Spill signals from SPS (async signals)
 		spill_end: in std_logic;
-		q: out std_logic; -- Output (mclk domain)
-		scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
-		scmd_out: out cmd_r;
-		acmd_in: in cmd_w := CMD_W_NULL; -- Async command input, and handshake
-		acmd_out: out cmd_r
+		q: out std_logic; -- Downstream output (mclk domain)
+		d: in std_logic; -- Downstream input (mclk domain)
+		t_scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
+		t_scmd_out: out cmd_r
 	);
 		
 end master;
@@ -47,13 +49,15 @@ architecture rtl of master is
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal scmdw_v: cmd_w_array(N_CHAN + N_PART + 3 downto 0);
 	signal scmdr_v: cmd_r_array(N_CHAN + N_PART + 3 downto 0);
-	signal scmdw, acmdw: cmd_w;
+	signal scmdw, acmdw, rscmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal typ: std_logic_vector(SCMD_W - 1 downto 0);
 	signal tv: std_logic;
 	signal tgrp: std_logic_vector(N_PART - 1 downto 0);
 	signal tx_q: std_logic_vector(7 downto 0);
 	signal tx_err, tx_stb, tx_k: std_logic;
+	signal ep_en, ep_rdy, ep_rst: std_logic;
+	signal ep_stat: std_logic_vector(3 downto 0);
 	
 begin
 
@@ -82,6 +86,9 @@ begin
 			ipb_out => ipbr(N_SLV_GLOBAL),
 			clk => clk,
 			rst => rst,
+			ep_en => ep_en,
+			ep_stat => ep_stat,
+			ep_rdy => ep_rdy,
 			tx_err => tx_err
 		);
 		
@@ -163,8 +170,8 @@ begin
 
 -- Trigger command input
 
-	scmdw_v(2) <= scmd_in;
-	scmd_out <= scmdr_v(2);
+	scmdw_v(2) <= t_scmd_in;
+	t_scmd_out <= scmdr_v(2);
 	
 -- Echo command source
 
@@ -179,7 +186,7 @@ begin
 			tstamp => tstamp,
 			scmd_out => scmdw_v(3),
 			scmd_in => scmdr_v(3),
-			rscmd_in => CMD_W_NULL
+			rscmd_in => rscmdw
 		);
 	
 -- Partitions
@@ -279,5 +286,26 @@ begin
 			txclk => mclk,
 			q => q
 		);
+		
+-- Downstream rx
+
+	ep_rst <= ipb_rst or not ep_en;
+
+	ep: entity work.pdts_endpoint_upstream
+		generic map(
+			SCLK_FREQ => 31.25,
+			SIM => SIM
+		)	
+		port map(
+			sclk => ipb_clk,
+			srst => ep_rst,
+			stat => ep_stat,
+			rec_clk => mclk,
+			rec_d => d,
+			clk => clk,
+			rdy => ep_rdy,
+			scmd => rscmdw,
+			acmd => open
+		);	
 
 end rtl;

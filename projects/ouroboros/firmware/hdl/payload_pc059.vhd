@@ -194,7 +194,8 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q,
-			d => d
+			d => d,
+			t_d => '0'
 		);
 
 -- Endpoint wrapper

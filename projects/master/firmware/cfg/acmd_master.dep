@@ -1,0 +1,4 @@
+src acmd_master.vhd
+addrtab acmd_master.xml
+src -c components/pdts pdts_defs.vhd
+include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep

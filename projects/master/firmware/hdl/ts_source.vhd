@@ -86,8 +86,8 @@ begin
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_TS),
-			ipb_out => ipbr(N_SLV_TS),
+			ipb_in => ipbw(N_SLV_CTR),
+			ipb_out => ipbr(N_SLV_Ctr),
 			clk => clk,
 			rst => rst,
 			inc(0) => '1',

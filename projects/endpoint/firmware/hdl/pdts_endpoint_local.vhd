@@ -15,6 +15,7 @@ use work.pdts_defs.all;
 entity pdts_endpoint_local is
 	generic(
 		SCLK_FREQ: real := 50.0; -- Frequency (MHz) of the supplied sclk
+		EN_TX: boolean := false;
 		SIM: boolean := false
 	);
 	port(
@@ -43,15 +44,19 @@ architecture rtl of pdts_endpoint_local is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
-	signal stb, k, s_stb, s_first: std_logic;
+	signal stb, k, s_stb, s_first, a_stb, a_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
 	signal rdy_i: std_logic;
+	signal ph_data: std_logic_vector(15 downto 0);
+	signal fdel: std_logic_vector(3 downto 0);
+	signal cdel: std_logic_vector(5 downto 0);
+	signal adj_req, adj_ack, tx_en, ph_update: std_logic;
 	signal scmdw_v: cmd_w_array(1 downto 0);
 	signal scmdr_v: cmd_r_array(1 downto 0);
 	signal scmdw, acmdw: cmd_w;
 	signal scmdr, acmdr: cmd_r;
 	signal tx_q: std_logic_vector(7 downto 0);
-	signal tx_err, tx_stb, tx_k: std_logic;
+	signal tx_err, tx_stb, tx_k, txdi: std_logic;
 
 begin
 
@@ -71,6 +76,8 @@ begin
 			sfp_los => '0',
 			cdr_los => '0',
 			cdr_lol => '0',
+			adj_req => adj_req,
+			adj_ack => adj_ack,
 			rec_clk => rec_clk,
 			rec_rst => rec_rst,
 			rxphy_aligned => rxphy_aligned,
@@ -79,12 +86,11 @@ begin
 			rxphy_rst => rxphy_rst,
 			rxphy_locked => rxphy_locked,
 			rst => rst_i,
+			ext_rst => rst,
 			rx_err => rx_err,
 			tsrdy => rdy_i,
 			rdy => rdy
 		);
-		
-	rst <= rst_i;
 				
 -- Rx PHY
 
@@ -94,8 +100,8 @@ begin
 		)
 		port map(
 			fclk => sclk,
-			fdel => "0000",
-			cdel => "00000",
+			fdel => fdel,
+			cdel => cdel,
 			rxclk => rec_clk,
 			rxrst => rec_rst,
 			rxd => rec_d,
@@ -123,8 +129,8 @@ begin
 			q => dr,
 			s_stb => s_stb,
 			s_first => s_first,
-			a_valid => open,
-			a_last => open,
+			a_stb => a_stb,
+			a_first => a_first,
 			err => rx_err
 		);
 	
@@ -134,6 +140,33 @@ begin
 	sync_first <= s_first and rdy_i;
 	sync_stb <= s_stb and rdy_i;
 	
+-- Async command rx and phase adjust
+
+	acmd_rx: entity work.pdts_acmd_rx
+		port map(
+			clk => clk_i,
+			rst => rst_i,
+			a_d => dr,
+			a_stb => a_stb,
+			a_first => a_first,
+			q => ph_data,
+			s => ph_update
+		);
+		
+	adj: entity work.pdts_adjust
+		port map(
+			sclk => sclk,
+			srst => srst,
+			clk => clk_i,
+			d => ph_data,
+			s => ph_update,
+			fdel => fdel,
+			cdel => cdel,
+			adj_req => adj_req,
+			adj_ack => adj_ack,
+			tx_en => tx_en
+		);
+
 -- Timestamp / event counter
 
 	ts: entity work.pdts_tstamp
@@ -215,7 +248,9 @@ begin
 			k => tx_k,
 			stb => tx_stb,
 			txclk => rec_clk,
-			q => txd
+			q => txdi
 		);
+		
+	txd <= txdi and not rst_i when EN_TX else txdi and tx_en and not rst_i;
 		
 end rtl;

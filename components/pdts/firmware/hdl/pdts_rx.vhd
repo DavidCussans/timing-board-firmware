@@ -26,8 +26,8 @@ entity pdts_rx is
 		q: out std_logic_vector(7 downto 0); -- data output
 		s_stb: out std_logic; -- sync cmd strobe
 		s_first: out std_logic;
-		a_valid: out std_logic; -- async cmd strobe
-		a_last: out std_logic; -- packet last word marker
+		a_stb: out std_logic; -- async cmd strobe
+		a_first: out std_logic; -- packet last word marker
 		err: out std_logic_vector(2 downto 0) -- error flag
 	);
 
@@ -123,7 +123,7 @@ begin
 		end if;
 	end process;
 
--- Address match (looks like needs fixing)
+-- Address match
 
 	s_match <= d(4 + to_integer(unsigned(tgrp)));
 
@@ -131,10 +131,10 @@ begin
 	begin
 		if rising_edge(clk) then
 			if ka = '1' then
-				a_match <= '1';
+				a_match <= '0';
 			elsif state = ASYNC and actr < ADDR_WDS and stb = '1' then
 				if d = X"00" or d = addr(8 * (to_integer(actr) + 1) - 1 downto 8 * to_integer(actr)) then
-					a_match <= '0'; -- fancier address sub-field matching here later
+					a_match <= '1'; -- fancier address sub-field matching here later
 				end if;
 			end if;
 		end if;
@@ -205,8 +205,8 @@ begin
 	pend_f <= (pend_f or (valid and first)) and not (issue or rst) when rising_edge(clk);
 	s_stb <= (valid or pend) and issue;
 	s_first <= ((valid and first) or pend_f) and issue;
-	a_valid <= '1' when state = ASYNC and k = '0' and stb = '1' and a_match = '1' and actr >= ADDR_WDS - 1 else '0';
-	a_last <= pkt_end;
+	a_stb <= '1' when state = ASYNC and k = '0' and stb = '1' and a_match = '1' and actr >= ADDR_WDS * 2 else '0';
+	a_first <= '1' when state = ASYNC and k = '0' and stb = '1' and a_match = '1' and actr = ADDR_WDS * 2 else '0';
 	err <= err_c when rising_edge(clk);
 
 end rtl;

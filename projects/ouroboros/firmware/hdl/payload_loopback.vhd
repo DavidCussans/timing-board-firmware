@@ -68,7 +68,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal fmc_clk, rec_clk, rec_d, q, rst_io, rsti, clk, stb, rst, locked: std_logic;
+	signal fmc_clk, rec_clk, rec_d, q, du, rst_io, rsti, clk, stb, rst, locked: std_logic;
 	signal txd: std_logic_vector(N_EP - 1 downto 0);
 		
 begin
@@ -180,9 +180,14 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q,
-			d => txd(0)
+			d => du,
+			t_d => '0'
 		);
 	
+-- -- Master-slave connection
+		
+	du <= or_reduce(txd);
+		
 -- Endpoint wrapper
 
 	egen: for i in N_EP - 1 downto 0 generate

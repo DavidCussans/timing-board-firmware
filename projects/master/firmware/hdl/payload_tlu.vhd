@@ -142,8 +142,9 @@ begin
 			spill_warn => trig_in(5),
 			spill_start => trig_in(4),
 			spill_end => trig_in(3),
-		  d => d,
-			q => q
+			q => q,
+			d => '0',
+		  t_d => d,
 		);
 
 end rtl;
