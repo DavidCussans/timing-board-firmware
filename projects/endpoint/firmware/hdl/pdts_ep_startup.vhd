@@ -129,7 +129,7 @@ begin
 						state <= ERR_P;
 					elsif rx_err_i = '1' then
 						state <= ERR_R;
-					elsif tsrdy_i = '0' then
+					elsif tsrdy_i = '0' and NEED_TSTAMP then
 						state <= ERR_T;
 					elsif adj_req = '1' then
 						state <= W_ADJUST;
