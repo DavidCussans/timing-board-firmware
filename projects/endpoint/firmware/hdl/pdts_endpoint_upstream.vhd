@@ -35,9 +35,8 @@ architecture rtl of pdts_endpoint_upstream is
 
 	signal rec_rst, rxphy_aligned, clk_i, rxphy_rst, rxphy_locked, rst_i: std_logic;
 	signal rx_err: std_logic_vector(2 downto 0);
-	signal stb, k, s_stb, s_first: std_logic;
+	signal stb, k, s_first, a_first: std_logic;
 	signal d, dr: std_logic_vector(7 downto 0);
-	signal a_valid, a_last: std_logic;
 
 begin
 
@@ -111,10 +110,10 @@ begin
 			d => d,
 			k => k,
 			q => dr,
-			s_stb => s_stb,
+			s_stb => open,
 			s_first => s_first,
-			a_valid => a_valid,
-			a_last => a_last,
+			a_stb => open,
+			a_first => a_first,
 			err => rx_err
 		);
 
@@ -123,8 +122,8 @@ begin
 	scmd.last <= '1'; -- Single word commands only on return channel (for now)
 
 	acmd.d <= dr;
-	acmd.req <= a_valid;
-	acmd.last <= a_last;
+	acmd.req <= a_first;
+	acmd.last <= '0'; -- Need to find a better solution for this
 	
 	rdy <= rxphy_locked when rx_err = "000" else '0';
 		
