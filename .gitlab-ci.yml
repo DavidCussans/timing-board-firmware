@@ -283,3 +283,21 @@ build:crt_fmc:
     PROJECT_TOP_DEP: "top.dep"
   dependencies:
     - check:crt_fmc
+
+#--- Endpoint wrapper -------------------------
+# Dep and syntax check
+check:endpoint:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/endpoint"
+    PROJECT_TOP_DEP: "top_a35.dep"
+
+
+# Build 
+build:endpoint:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/endpoint"
+    PROJECT_TOP_DEP: "top_a35.dep"
+  dependencies:
+    - check:endpoint
