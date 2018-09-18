@@ -205,7 +205,7 @@ begin
 			q(0) => rob_en_s
 		);
 		
-	frag_mask <= EVTCTR_MASK & ctrl_frag_mask;
+	frag_mask <= EVTCTR_MASK(15 downto 8) & ctrl_frag_mask;
 	frag <= grab and frag_mask(to_integer(unsigned(typ))); -- Generate a fragment
 
 	rob: entity work.pdts_mon_buf
