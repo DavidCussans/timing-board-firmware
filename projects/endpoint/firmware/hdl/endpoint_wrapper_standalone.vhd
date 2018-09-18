@@ -82,6 +82,7 @@ begin
 			sfp_los => '0',
 			cdr_los => '0',
 			cdr_lol => '0',
+			sfp_tx_dis => open,
 			clk => open,
 			rst => ep_rsto,
 			rdy => ep_rdy,
