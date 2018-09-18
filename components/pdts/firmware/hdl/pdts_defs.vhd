@@ -41,7 +41,6 @@ package pdts_defs is
 	constant TSTAMP_WDS: natural := 8; -- Number of words in timestamp
 	constant EVTCTR_WDS: natural := 4; -- Number of words in event counter
 	constant EVTCTR_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"ff00"; -- Which sync cmds cause evt ctr update
-	constant FRAGMENT_MASK: std_logic_vector(2 ** SCMD_W - 1 downto 0) := X"ff3c"; -- Which sync cmds cause an event fragment
 	
 	constant SCMD_SYNC: std_logic_vector(3 downto 0) := X"0"; -- Set the timestamp
 	constant SCMD_ECHO: std_logic_vector(3 downto 0) := X"1"; -- Echo for loop delay measurement

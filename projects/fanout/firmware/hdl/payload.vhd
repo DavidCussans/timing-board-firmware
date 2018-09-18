@@ -73,7 +73,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, q_r, q_loc, q_ep, q_hdmi, d_hdmi, d_hdmi_r, d_usfp, d_usfp_r, q_usfp: std_logic;
+	signal rst_io, rst, rst_ep, d_usfp, q_usfp, d_master, q_master, d_ep, q_ep, d_cdr, q, tx_dis: std_logic;
 	signal master_src: std_logic_vector(1 downto 0);	
 	
 begin
@@ -120,24 +120,24 @@ begin
 			d => open,
 			q_p => q_p,
 			q_n => q_n,
-			q => q_r,
+			q => q,
 			sfp_los => sfp_los,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => open, -- This will go to phase adjuster and bridge
+			d_cdr => d_cdr,
 			clk_cdr_p => clk_cdr_p,
 			clk_cdr_n => clk_cdr_n,
-			clk_cdr => open, -- This will go to phase measurement
+			clk_cdr => open, -- This will go to phase measurement one day
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
 			inmux => inmux,
 			rstb_i2cmux => rstb_i2cmux,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
-			d_hdmi => d_hdmi,
+			d_hdmi => open,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
-			q_hdmi => '0',
+			q_hdmi => '0', -- Not using HDMI for now
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
 			d_usfp => d_usfp,
@@ -159,18 +159,6 @@ begin
 			gpio_n => gpio_n
 		);
 
--- Clock divider
-
-	clkgen: entity work.pdts_rx_div_mmcm
-		port map(
-			sclk => clk_pll,
-			clk => clk,
-			phase_rst => rst_io,
-			phase_locked => locked
-		);
-
-	rsti <= rst_io or not locked;
-	
 	synchro: entity work.pdts_synchro
 		generic map(
 			N => 1
@@ -178,22 +166,27 @@ begin
 		port map(
 			clk => ipb_clk,
 			clks => clk,
-			d(0) => rsti,
+			d(0) => rst_io,
 			q(0) => rst
 		);
 		
 -- Switchyard
 
-	d_hdmi_r <= d_hdmi when rising_edge(clk_pll); -- pipeline to get across device
-	d_usfp_r <= d_usfp when rising_edge(clk_pll); -- pipeline to get across device
-	with master_src select q <=
-		q_loc when "00",
-		d_hdmi_r when "01",
-		d_usfp_r when "10",
-		'0' when others;
-	q_r <= q when rising_edge(clk_pll);
-	q_hdmi <= q_ep when rising_edge(clk_pll); -- endpoint output goes back to upstream (for now - later need switch with incoming CDR data)
-	q_usfp <= q_ep when rising_edge(clk_pll);
+	sw: entity work.switchyard
+		port map(
+			ipb_clk => ipb_clk,
+			ipb_rst => ipb_rst,
+			ipb_in => ipbw(N_SLV_SWITCH),
+			ipb_out => ipbr(N_SLV_SWITCH),
+			d_us => d_usfp,
+			q_us => q_usfp,
+			d_master => q_master,
+			q_master => d_master,
+			d_ep => q_ep,
+			q_ep => d_ep,
+			d_cdr => d_cdr,
+			q => q
+		);
 	
 -- Master block (should really be master without the trigger stuff)
 
@@ -205,15 +198,15 @@ begin
 			ipb_out => ipbr(N_SLV_MASTER_TOP),
 			mclk => clk_pll,
 			clk => clk,
-			rst => rst,
-			q => q_loc,
-			d => '0',
+			rst => rst_io,
+			q => q_master,
+			d => d_master,
 			t_d => '0'
 		);
 
 -- Endpoint wrapper
 
-	wrapper: entity work.endpoint_wrapper_local
+	wrapper: entity work.endpoint_wrapper
 		port map(
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
@@ -222,7 +215,7 @@ begin
 			addr(2 downto 0) => addr(2 downto 0),
 			addr(7 downto 3) => "11111",
 			rec_clk => clk_pll,
-			rec_d => q_r,
+			rec_d => d_ep,
 			clk => clk,
 			txd => q_ep
 		);

@@ -9,6 +9,7 @@
 				<node id="rate_ctrl_en" mask="0x20"/>
 				<node id="spill_gate_en" mask="0x40"/>
 				<node id="trig_mask" mask="0xff00"/>
+				<node id="frag_mask" mask="0xff0000"/>
 			</node>
 			<node id="stat" address="0x1">
 				<node id="buf_err" mask="0x1"/>
