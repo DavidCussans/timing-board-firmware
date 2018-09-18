@@ -54,7 +54,7 @@ architecture rtl of endpoint_wrapper is
 	signal tsync_out: cmd_r;
 	signal tstamp: std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
-	signal trig, buf_warn, buf_err, in_run, in_spill: std_logic;
+	signal trig, buf_warn, buf_err, in_run, in_spill, sfp_tx_dis_i: std_logic;
 	signal clkdiv: std_logic_vector(0 downto 0);
 	signal ctr_rst: std_logic;
 	signal t: std_logic_vector(SCMD_MAX downto 0);
@@ -111,7 +111,7 @@ begin
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_mask_dis <= ctrl(0)(6);
 	ctrl_addr <= ctrl(0)(15 downto 8);
-	stat(0) <= X"00000" & "0" & sfp_tx_dis & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
+	stat(0) <= X"00000" & "0" & sfp_tx_dis_i & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
 
 -- Sync command tx
 
@@ -154,7 +154,7 @@ begin
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
-			sfp_tx_dis => sfp_tx_dis,
+			sfp_tx_dis => sfp_tx_dis_i,
 			clk => ep_clk,
 			rst => ep_rsto,
 			rdy => ep_rdy,
@@ -164,6 +164,8 @@ begin
 			tsync_in => tsync_in,
 			tsync_out => tsync_out
 		);
+
+		sfp_tx_dis <= sfp_tx_dis_i;
 		
 -- Timestamp
 
