@@ -111,7 +111,7 @@ begin
 	ctrl_tgrp <= ctrl(0)(5 downto 4);
 	ctrl_mask_dis <= ctrl(0)(6);
 	ctrl_addr <= ctrl(0)(15 downto 8);
-	stat(0) <= X"00000" & "00" & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
+	stat(0) <= X"00000" & "0" & sfp_tx_dis & in_run & in_spill & ep_stat & ep_rdy & ep_rsto & buf_warn & buf_err;
 
 -- Sync command tx
 
