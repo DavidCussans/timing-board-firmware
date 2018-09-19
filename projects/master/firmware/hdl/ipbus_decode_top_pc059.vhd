@@ -13,13 +13,13 @@ use ieee.numeric_std.all;
 
 package ipbus_decode_top_pc059 is
 
-  constant IPBUS_SEL_WIDTH: positive := 5; -- Should be enough for now?
+  constant IPBUS_SEL_WIDTH: positive := 2;
   subtype ipbus_sel_t is std_logic_vector(IPBUS_SEL_WIDTH - 1 downto 0);
   function ipbus_sel_top_pc059(addr : in std_logic_vector(31 downto 0)) return ipbus_sel_t;
 
--- START automatically  generated VHDL the Fri Apr 13 10:19:37 2018 
+-- START automatically  generated VHDL the Mon Sep 17 13:38:06 2018 
   constant N_SLV_IO: integer := 0;
-  constant N_SLV_MASTER: integer := 1;
+  constant N_SLV_MASTER_TOP: integer := 1;
   constant N_SLAVES: integer := 2;
 -- END automatically generated VHDL
 
@@ -32,11 +32,11 @@ package body ipbus_decode_top_pc059 is
     variable sel: ipbus_sel_t;
   begin
 
--- START automatically  generated VHDL the Fri Apr 13 10:19:37 2018 
-    if    std_match(addr, "----------------------0---------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000200
-    elsif std_match(addr, "----------------------1---------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER, IPBUS_SEL_WIDTH)); -- master / base 0x00000200 / mask 0x00000200
+-- START automatically  generated VHDL the Mon Sep 17 13:38:06 2018 
+    if    std_match(addr, "---------------------0----------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_IO, IPBUS_SEL_WIDTH)); -- io / base 0x00000000 / mask 0x00000400
+    elsif std_match(addr, "---------------------1----------") then
+      sel := ipbus_sel_t(to_unsigned(N_SLV_MASTER_TOP, IPBUS_SEL_WIDTH)); -- master_top / base 0x00000400 / mask 0x00000400
 -- END automatically generated VHDL
 
     else
