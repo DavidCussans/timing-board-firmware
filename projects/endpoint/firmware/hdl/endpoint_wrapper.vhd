@@ -213,7 +213,7 @@ begin
 		
 -- Buffer
 
-	trig <= ep_v and (FRAGMENT_MASK(to_integer(unsigned(ep_scmd(3 downto 0)))) or ctrl_mask_dis);
+	trig <= ep_v and (EVTCTR_MASK(to_integer(unsigned(ep_scmd(3 downto 0)))) or ctrl_mask_dis);
 
 	rob: entity work.pdts_mon_buf
 		port map(
