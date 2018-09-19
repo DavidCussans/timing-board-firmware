@@ -154,6 +154,7 @@ begin
 			sfp_los => sfp_los,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
+			sfp_tx_dis => sfp_tx_dis,
 			clk => ep_clk,
 			rst => ep_rsto,
 			rdy => ep_rdy,

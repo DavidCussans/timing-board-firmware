@@ -45,7 +45,8 @@ architecture rtl of partition is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_part_en, ctrl_run_req, ctrl_trig_en, ctrl_evtctr_rst, ctrl_trig_ctr_rst, ctrl_buf_en, ctrl_rate_ctrl_en, ctrl_spill_gate_en: std_logic;
-	signal ctrl_trig_mask: std_logic_vector(7 downto 0);
+	signal ctrl_trig_mask, ctrl_frag_mask: std_logic_vector(7 downto 0);
+	signal frag_mask: std_logic_vector(15 downto 0);
 	signal run_int, part_up: std_logic;
 	signal v, grab, trig, frag, trst: std_logic;
 	signal evtctr: std_logic_vector(8 * EVTCTR_WDS - 1 downto 0);
@@ -96,6 +97,7 @@ begin
 	ctrl_rate_ctrl_en <= ctrl(0)(5);
 	ctrl_spill_gate_en <= ctrl(0)(6);
 	ctrl_trig_mask <= ctrl(0)(15 downto 8);
+	ctrl_frag_mask <= ctrl(0)(23 downto 16);
 	stat(0) <= X"000000" & "00" & in_run & in_spill & run_int & part_up & buf_warn & buf_err;
 
 -- Run start / stop
@@ -203,7 +205,8 @@ begin
 			q(0) => rob_en_s
 		);
 		
-	frag <= grab and FRAGMENT_MASK(to_integer(unsigned(typ))); -- Generate a fragment
+	frag_mask <= EVTCTR_MASK & ctrl_frag_mask;
+	frag <= grab and frag_mask(to_integer(unsigned(typ))); -- Generate a fragment
 
 	rob: entity work.pdts_mon_buf
 		port map(

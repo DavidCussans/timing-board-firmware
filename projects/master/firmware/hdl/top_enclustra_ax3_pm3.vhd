@@ -61,6 +61,7 @@ end top;
 architecture rtl of top is
 
 	signal clk_ipb, rst_ipb, nuke, soft_rst, phy_rst_e, userled, clk125: std_logic;
+	signal addr: std_logic_vector(3 downto 0);
 	signal mac_addr: std_logic_vector(47 downto 0);
 	signal ip_addr: std_logic_vector(31 downto 0);
 	signal ipb_out: ipb_wbus;
@@ -95,9 +96,10 @@ begin
 		
 	leds <= not ('0' & userled & inf_leds);
 	phy_rstn <= not phy_rst_e;
-		
-	mac_addr <= X"020ddba1151" & not cfg; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c81" & not cfg; -- 192.168.200.16+n
+
+	addr <= not cfg;
+	mac_addr <= X"020ddba1151" & addr; -- Careful here, arbitrary addresses do not always work
+	ip_addr <= X"c0a8c81" & addr; -- 192.168.200.16+n
 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
@@ -114,7 +116,7 @@ begin
 			nuke => nuke,
 			soft_rst => soft_rst,
 			userled => userled,
-			addr => cfg,
+			addr => addr,
 			clk125 => clk125,
 			fmc_clk_p => fmc_clk_p,
 			fmc_clk_n => fmc_clk_n,
