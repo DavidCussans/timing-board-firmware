@@ -27,6 +27,7 @@ entity master_top is
 		spill_warn: in std_logic := '0';
 		spill_start: in std_logic := '0';
 		spill_end: in std_logic := '0';
+		sync: out std_logic;
 		clk10: in std_logic := '0';
 		irig: in std_logic := '0';
 		q: out std_logic; -- Output (mclk domain)
@@ -77,6 +78,7 @@ begin
 			spill_warn => spill_warn,
 			spill_start => spill_start,
 			spill_end => spill_end,
+			sync => sync,
 			clk10 => clk10,
 			irig => irig,
 			q => q,

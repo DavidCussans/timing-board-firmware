@@ -30,6 +30,7 @@ entity master is
 		spill_warn: in std_logic;
 		spill_start: in std_logic; -- Spill signals from SPS (async signals)
 		spill_end: in std_logic;
+		sync: out std_logic;
 		clk10: in std_logic;
 		irig: in std_logic;
 		q: out std_logic; -- Downstream output (mclk domain)
@@ -165,6 +166,7 @@ begin
 			spill_warn => spill_warn,
 			spill_start => spill_start,
 			spill_end => spill_end,
+			sync => sync,
 			spill => spill,
 			veto => veto,
 			tstamp => tstamp,
