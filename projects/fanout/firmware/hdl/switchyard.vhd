@@ -2,6 +2,12 @@
 --
 -- Handling signal routing in fanout
 --
+-- master_src = 0: upstream master (via USFP) talks to ports and local endpoint ('fanout mode')
+-- master_src = 1: local master talks to ports and local endpoint ('local mode')
+--
+-- ep_src = 0: downstream ports are routed to upstream master and local master ('fanout mode')
+-- ep_src = 1: local endpoint talks back to upstream master and local master ('test mode')
+--
 -- Dave Newbold, February 2018
 
 library IEEE;
@@ -28,7 +34,7 @@ entity switchyard is
 		q: out std_logic; -- To downstream ports
 		tx_dis_in: in std_logic;
 		ep_rdy: in std_logic;
-		tx_dis: out std_logic;
+		tx_dis: out std_logic
 	);
 
 end switchyard;
@@ -36,27 +42,30 @@ end switchyard;
 architecture rtl of switchyard is
 
 	signal ctrl: ipb_reg_v(0 downto 0);
+	signal ctrl_master_src, ctrl_ep_src: std_logic;
 	
 begin
 
-	csr: entity work.ipbus_syncreg_v
+	csr: entity work.ipbus_ctrlreg_v
 		generic map(
 			N_CTRL => 1,
 			N_STAT => 0
 		)
 		port map(
 			clk => ipb_clk,
-			rst => ipb_rst,
-			ipb_in => ipb_in,
-			ipb_out => ipb_out,
-			slv_clk => clk,
+			reset => ipb_rst,
+			ipbus_in => ipb_in,
+			ipbus_out => ipb_out,
 			q => ctrl
 		);
 		
-	q_us <= '0';
-	q_master <= '0';
-	q_ep <= '0';
-	q <= '0';
-	tx_dis <= '1';
+	ctrl_master_src <= ctrl(0)(0);
+	ctrl_ep_src <= ctrl(0)(1);
+		
+	q_us <= d_ep when ctrl_ep_src = '1' else d_cdr; -- A bunch of CDC here, but ctrl is kind of static
+	q_master <= d_ep when ctrl_ep_src = '1' else d_cdr;
+	q_ep <= d_master when ctrl_master_src = '1' else d_us;
+	q <= d_master when ctrl_master_src = '1' else d_us;
+	tx_dis <= tx_dis_in when ctrl_ep_src = '1' else not ep_rdy; 
 
 end rtl;
