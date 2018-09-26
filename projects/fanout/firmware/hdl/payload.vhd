@@ -74,7 +74,7 @@ architecture rtl of payload is
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal clk_pll,clk, rst, rsti, rst_io, locked: std_logic;
-	signal d_hdmi, d_usfp, q_usfp, d_master, q_master, d_ep, q_ep, d_cdr, q, ep_tx_dis, ep_rdy, tx_dis: std_logic;
+	signal cdr_edge, hdmi_edge, d_hdmi, d_usfp, q_usfp, d_master, q_master, d_ep, q_ep, d_cdr, q, ep_tx_dis, ep_rdy, tx_dis: std_logic;
 	signal master_src: std_logic_vector(1 downto 0);	
 	
 begin
@@ -131,8 +131,10 @@ begin
 			clk_cdr => open, -- This will go to phase measurement one day
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
+			cdr_edge => cdr_edge,
 			inmux => inmux,
 			rstb_i2cmux => rstb_i2cmux,
+			hdmi_edge => hdmi_edge,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
 			d_hdmi => d_hdmi,
@@ -219,7 +221,9 @@ begin
 			q => q_master,
 			d => d_master,
 			t_d => d_hdmi,
-			rdy => ep_rdy
+			rdy => ep_rdy,
+			edge => cdr_edge,
+			t_edge => hdmi_edge
 		);
 
 -- Endpoint wrapper

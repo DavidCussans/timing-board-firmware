@@ -50,8 +50,10 @@ entity pdts_pc059_io is
 		clk_cdr: out std_logic;
 		cdr_los: in std_logic; -- CDR LOS
 		cdr_lol: in std_logic; -- CDR LOL
+		cdr_edge: in std_logic; -- CDR sampling edge control
 		inmux: out std_logic_vector(2 downto 0); -- mux control
 		rstb_i2cmux: out std_logic; -- reset for mux
+		hdmi_edge: in std_logic;
 		d_hdmi_p: in std_logic; -- data from upstream HDMI
 		d_hdmi_n: in std_logic;
 		d_hdmi: out std_logic;
@@ -90,7 +92,7 @@ architecture rtl of pdts_pc059_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_rst_lock_mon, ctrl_sfp_edge, ctrl_hdmi_edge: std_logic;
+	signal ctrl_rst_lock_mon, ctrl_sfp_edge: std_logic;
 	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, q_i, q_hdmi_i, q_usfp_i: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
@@ -144,7 +146,6 @@ begin
 	master_src <= ctrl(0)(9 downto 8);
 	inmux <= ctrl(0)(14 downto 12);
 	ctrl_sfp_edge <= ctrl(0)(20);
-	ctrl_hdmi_edge <= ctrl(0)(21);
 	
 	usfp_txdis <= tx_dis; -- Might need to override this with register bit some day
 	ledb <= "111";
@@ -293,7 +294,7 @@ begin
 			s => '0'
 		);
 		
-	d_hdmi <= d_hdmi_r when ctrl_hdmi_edge = '0' else d_hdmi_f;
+	d_hdmi <= d_hdmi_r when hdmi_edge = '0' else d_hdmi_f;
 	
 	ibufds_usfp: IBUFDS
 		port map(

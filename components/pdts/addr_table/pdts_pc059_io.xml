@@ -11,7 +11,6 @@
 					<node id="master_src" mask="0x300"/>
 					<node id="mux" mask="0x7000"/>
 					<node id="sfp_edge" mask="0x100000"/>
-					<node id="hdmi_edge" mask="0x200000"/>
 				</node>
 				<node id="stat" address="0x1">
 					<node id="usfp_los" mask="0x1"/>

@@ -33,7 +33,9 @@ entity master_top is
 		q: out std_logic; -- Output (mclk domain)
 		d: in std_logic; -- Input (mclk domain)
 		t_d: in std_logic; -- Input from trigger
-		rdy: out std_logic -- Ready output from built-in endpoint
+		rdy: out std_logic; -- Ready output from built-in endpoint
+		edge: out std_logic -- Edge control output from built-in endpoint
+		t_edge: out std_logic -- Edge control output from trigger endpoint
 	);
 
 end master_top;
@@ -86,7 +88,8 @@ begin
 			d => d,
 			t_scmd_in => scmd_in,
 			t_scmd_out => scmd_out,
-			rdy => rdy
+			rdy => rdy,
+			edge => edge
 		);
 
 -- Trigger receiver
@@ -103,6 +106,7 @@ begin
 			mclk => mclk,
 			clk => clk,
 			d => t_d,
+			edge => t_edge,
 			scmd_out => scmd_in,
 			scmd_in => scmd_out
 		);
