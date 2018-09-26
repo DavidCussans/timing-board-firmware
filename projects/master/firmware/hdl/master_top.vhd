@@ -34,7 +34,7 @@ entity master_top is
 		d: in std_logic; -- Input (mclk domain)
 		t_d: in std_logic; -- Input from trigger
 		rdy: out std_logic; -- Ready output from built-in endpoint
-		edge: out std_logic -- Edge control output from built-in endpoint
+		edge: out std_logic; -- Edge control output from built-in endpoint
 		t_edge: out std_logic -- Edge control output from trigger endpoint
 	);
 
