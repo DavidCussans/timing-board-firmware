@@ -24,6 +24,7 @@ entity switchyard is
 		ipb_rst: in std_logic;
 		ipb_in: in ipb_wbus;
 		ipb_out: out ipb_rbus;
+		mclk: in std_logic;
 		d_us: in std_logic; -- From upstream port
 		q_us: out std_logic; -- To upstream port
 		d_master: in std_logic; -- From local master
@@ -62,10 +63,26 @@ begin
 	ctrl_master_src <= ctrl(0)(0);
 	ctrl_ep_src <= ctrl(0)(1);
 		
-	q_us <= d_ep when ctrl_ep_src = '1' else d_cdr; -- A bunch of CDC here, but ctrl is kind of static
-	q_master <= d_ep when ctrl_ep_src = '1' else d_cdr;
-	q_ep <= d_master when ctrl_master_src = '1' else d_us;
-	q <= d_master when ctrl_master_src = '1' else d_us;
+	process(mclk) -- lots of CDCs in gere, but ctrl is treated as static
+	begin
+		if rising_edge(mclk) then
+			if ctrl_ep_src = '0' then
+				q_us <= d_cdr;
+				q_master <= d_cdr;
+			else
+				q_us <= d_ep;
+				q_master <= d_ep;
+			end if;
+			if ctrl_master_src = '0' then
+				q_ep <= d_us;
+				q <= d_us;
+			else
+				q_ep <= d_master;
+				q <= d_master;
+			end if;
+		end if;
+	end process;
+
 	tx_dis <= tx_dis_in when ctrl_ep_src = '1' else not ep_rdy; 
 
 end rtl;
