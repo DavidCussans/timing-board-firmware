@@ -28,7 +28,7 @@ entity switchyard is
 		q: out std_logic; -- To downstream ports
 		tx_dis_in: in std_logic;
 		ep_rdy: in std_logic;
-		tx_dis: out std_logic;
+		tx_dis: out std_logic
 	);
 
 end switchyard;
