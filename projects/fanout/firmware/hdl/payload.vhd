@@ -238,7 +238,6 @@ begin
 			addr(7 downto 3) => std_logic_vector'("11111"),
 			rec_clk => clk_pll,
 			rec_d => d_ep,
-			clk => clk,
 			txd => q_ep,
 			sfp_los => usfp_los,
 			cdr_los => ucdr_los,
