@@ -1,0 +1,3 @@
+src switchyard.vhd
+addrtab switchyard.xml
+include -c ipbus-firmware:components/ipbus_slaves syncreg_v.dep

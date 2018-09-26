@@ -12,8 +12,6 @@ use ieee.std_logic_misc.all;
 use work.ipbus.all;
 use work.ipbus_reg_types.all;
 
-use work.pdts_defs.all;
-
 entity switchyard is
 	port(
 		ipb_clk: in std_logic;
@@ -38,7 +36,6 @@ end switchyard;
 architecture rtl of switchyard is
 
 	signal ctrl: ipb_reg_v(0 downto 0);
-	signal stat: ipb_reg_v(4 downto 0);
 	
 begin
 
