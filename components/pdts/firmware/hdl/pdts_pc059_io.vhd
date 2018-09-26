@@ -99,7 +99,7 @@ architecture rtl of pdts_pc059_io is
 	signal sda_o, usfp_sda_o: std_logic;
 	
   attribute IOB: string;
-  attribute IOB of q_i, q_hdmi_i, q_usfp_i, d_usfp: signal is "TRUE";
+  attribute IOB of q_i, q_hdmi_i, q_usfp_i, d_usfp_r: signal is "TRUE";
 
 begin
 
