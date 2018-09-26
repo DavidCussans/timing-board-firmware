@@ -194,6 +194,7 @@ begin
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_SWITCH),
 			ipb_out => ipbr(N_SLV_SWITCH),
+			mclk => clk_pll,
 			d_us => d_usfp,
 			q_us => q_usfp,
 			d_master => q_master,
