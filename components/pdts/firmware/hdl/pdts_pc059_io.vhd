@@ -90,14 +90,14 @@ architecture rtl of pdts_pc059_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal ctrl_rst_lock_mon, ctrl_cdr_edge, ctrl_sfp_edge, ctrl_hdmi_edge, ctrl_usfp_edge: std_logic;
-	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, d_usfp_f, q_i, q_hdmi_i, q_usfp_i: std_logic;
+	signal ctrl_rst_lock_mon, ctrl_sfp_edge, ctrl_hdmi_edge: std_logic;
+	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, q_i, q_hdmi_i, q_usfp_i: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal sda_o, usfp_sda_o: std_logic;
 	
   attribute IOB: string;
-  attribute IOB of q_i, q_hdmi_i, q_usfp_i: signal is "TRUE";
+  attribute IOB of q_i, q_hdmi_i, q_usfp_i, d_usfp: signal is "TRUE";
 
 begin
 
@@ -143,10 +143,8 @@ begin
 	ctrl_rst_lock_mon <= ctrl(0)(6);
 	master_src <= ctrl(0)(9 downto 8);
 	inmux <= ctrl(0)(14 downto 12);
-	ctrl_cdr_edge <= ctrl(0)(20);
-	ctrl_sfp_edge <= ctrl(0)(21);
-	ctrl_hdmi_edge <= ctrl(0)(22);
-	ctrl_usfp_edge <= ctrl(0)(23);
+	ctrl_sfp_edge <= ctrl(0)(20);
+	ctrl_hdmi_edge <= ctrl(0)(21);
 	
 	usfp_txdis <= tx_dis; -- Might need to override this with register bit some day
 	ledb <= "111";
@@ -241,7 +239,7 @@ begin
 			s => '0'
 		);
 		
-	d_cdr <= d_cdr_r when ctrl_cdr_edge = '0' else d_cdr_f;
+	d_cdr <= d_cdr_r when cdr_edge = '0' else d_cdr_f;
 	
 	d_g: for i in 7 downto 0 generate
 	
@@ -303,22 +301,9 @@ begin
 			ib => d_usfp_n,
 			o => d_usfp_i
 		);
-		
-	iddr_usfp: IDDR
-		generic map(
-			DDR_CLK_EDGE => "SAME_EDGE"
-		)
-		port map(
-			q1 => d_usfp_r,
-			q2 => d_usfp_f,
-			c => clk_i,
-			ce => '1',
-			d => d_usfp_i,
-			r => '0',
-			s => '0'
-		);
-		
-	d_usfp <= d_usfp_r when ctrl_usfp_edge = '0' else d_usfp_f;
+
+	d_usfp_r <= d_usfp_i when falling_edge(clk_i);
+	d_usfp <= d_usfp_r when rising_edge(clk_i);
 	
 -- Data outputs
 
