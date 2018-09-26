@@ -152,6 +152,7 @@ begin
 			usfp_scl => usfp_scl,
 			ucdr_los => ucdr_los,
 			ucdr_lol => ucdr_lol,
+			tx_dis => '1',
 			ledb => ledb,
 			scl => scl,
 			sda => sda,
