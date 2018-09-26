@@ -32,7 +32,8 @@ entity master_top is
 		irig: in std_logic := '0';
 		q: out std_logic; -- Output (mclk domain)
 		d: in std_logic; -- Input (mclk domain)
-		t_d: in std_logic -- Input from trigger
+		t_d: in std_logic; -- Input from trigger
+		rdy: out std_logic -- Ready output from built-in endpoint
 	);
 
 end master_top;
@@ -84,7 +85,8 @@ begin
 			q => q,
 			d => d,
 			t_scmd_in => scmd_in,
-			t_scmd_out => scmd_out
+			t_scmd_out => scmd_out,
+			rdy => rdy
 		);
 
 -- Trigger receiver

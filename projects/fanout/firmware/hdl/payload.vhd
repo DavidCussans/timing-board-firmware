@@ -73,7 +73,8 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal rst_io, rst, rst_ep, d_usfp, q_usfp, d_master, q_master, d_ep, q_ep, d_cdr, q, tx_dis: std_logic;
+	signal clk_pll,clk, rsti, rst_io: std_logic;
+	signal d_hdmi, d_usfp, q_usfp, d_master, q_master, d_ep, q_ep, d_cdr, q, ep_tx_dis, ep_rdy, tx_dis: std_logic;
 	signal master_src: std_logic_vector(1 downto 0);	
 	
 begin
@@ -108,7 +109,7 @@ begin
 			soft_rst => soft_rst,
 			nuke => nuke,
 			rst => rst_io,
-			locked => locked,
+			locked => '1',
 			master_src => master_src,
 			clk_p => clk_p,
 			clk_n => clk_n,
@@ -134,10 +135,10 @@ begin
 			rstb_i2cmux => rstb_i2cmux,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
-			d_hdmi => open,
+			d_hdmi => d_hdmi,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
-			q_hdmi => '0', -- Not using HDMI for now
+			q_hdmi => q_master, -- Not using HDMI for now
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
 			d_usfp => d_usfp,
@@ -146,6 +147,7 @@ begin
 			q_usfp => q_usfp,
 			usfp_fault => usfp_fault,
 			usfp_los => usfp_los,
+			tx_dis => tx_dis,
 			usfp_txdis => usfp_txdis,
 			usfp_sda => usfp_sda,
 			usfp_scl => usfp_scl,
@@ -158,7 +160,19 @@ begin
 			gpio_p => gpio_p,
 			gpio_n => gpio_n
 		);
+		
+-- Clock divider
 
+	clkgen: entity work.pdts_rx_div_mmcm
+		port map(
+			sclk => clk_pll,
+			clk => clk,
+			phase_rst => rst_io,
+			phase_locked => locked
+		);
+
+	rsti <= rst_io or not locked;
+	
 	synchro: entity work.pdts_synchro
 		generic map(
 			N => 1
@@ -166,7 +180,7 @@ begin
 		port map(
 			clk => ipb_clk,
 			clks => clk,
-			d(0) => rst_io,
+			d(0) => rsti,
 			q(0) => rst
 		);
 		
@@ -185,7 +199,10 @@ begin
 			d_ep => q_ep,
 			q_ep => d_ep,
 			d_cdr => d_cdr,
-			q => q
+			q => q,
+			tx_dis_in => ep_tx_dis,
+			ep_rdy => ep_rdy,
+			tx_dis => tx_dis
 		);
 	
 -- Master block (should really be master without the trigger stuff)
@@ -201,7 +218,8 @@ begin
 			rst => rst_io,
 			q => q_master,
 			d => d_master,
-			t_d => '0'
+			t_d => d_hdmi,
+			rdy => ep_rdy
 		);
 
 -- Endpoint wrapper
@@ -217,7 +235,11 @@ begin
 			rec_clk => clk_pll,
 			rec_d => d_ep,
 			clk => clk,
-			txd => q_ep
+			txd => q_ep,
+			sfp_los => usfp_los,
+			cdr_los => ucdr_los,
+			cdr_lol => ucdr_lol,
+			sfp_tx_dis => ep_tx_dis
 		);
 
 end rtl;

@@ -27,7 +27,10 @@ entity switchyard is
 		d_ep: in std_logic; -- From local endpoint
 		q_ep: out std_logic; -- To local endpoint
 		d_cdr: in std_logic; -- From downstream ports via CDR
-		q: out std_logic -- To downstream ports
+		q: out std_logic; -- To downstream ports
+		tx_dis_in: in std_logic;
+		ep_rdy: in std_logic;
+		tx_dis: out std_logic;
 	);
 
 end switchyard;
@@ -53,6 +56,10 @@ begin
 			q => ctrl
 		);
 		
-	
+	q_us <= '0';
+	q_master <= '0';
+	q_ep <= '0';
+	q <= '0';
+	tx_dis <= '1';
 
 end rtl;

@@ -36,7 +36,8 @@ entity master is
 		q: out std_logic; -- Downstream output (mclk domain)
 		d: in std_logic; -- Downstream input (mclk domain)
 		t_scmd_in: in cmd_w := CMD_W_NULL; -- Sync command input from trigger, and handshake
-		t_scmd_out: out cmd_r
+		t_scmd_out: out cmd_r;
+		rdy: out std_logic
 	);
 		
 end master;
@@ -312,6 +313,8 @@ begin
 			rdy => ep_rdy,
 			scmd => rscmdw,
 			acmd => open
-		);	
+		);
+		
+	rdy <= ep_rdy;
 
 end rtl;

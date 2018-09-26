@@ -66,6 +66,7 @@ entity pdts_pc059_io is
 		q_usfp: in std_logic;
 		usfp_fault: in std_logic; -- upstream SFP fault
 		usfp_los: in std_logic; -- upstream SFP LOS
+		tx_dis: in std_logic;
 		usfp_txdis: out std_logic; -- upstream SFP tx_dis
 		usfp_sda: inout std_logic; -- upstream SFP I2C
 		usfp_scl: out std_logic;
@@ -147,7 +148,7 @@ begin
 	ctrl_hdmi_edge <= ctrl(0)(22);
 	ctrl_usfp_edge <= ctrl(0)(23);
 	
-	usfp_txdis <= '0';
+	usfp_txdis <= tx_dis; -- Might need to override this with register bit some day
 	ledb <= "111";
 	
 -- Config info
