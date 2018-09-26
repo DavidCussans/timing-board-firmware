@@ -43,7 +43,10 @@ setup_build_area:
   script:
     - ipbb init build_area
     - cd build_area
-    - ipbb add git https://github.com/ipbus/ipbus-firmware -b enhancement/64
+    - ipbb add git https://github.com/ipbus/ipbus-firmware
+    # Checkout ipbus revision with R/W ipbus counter for setting TS.
+    - ipbb srcs -p ipbus-firmware -- git checkout 8cb2435
+    #-----
     - ln -s ${CI_PROJECT_DIR} src/timing-board-firmware
     - env | grep -v PASSWORD | grep -v TOKEN | sort
   artifacts:
