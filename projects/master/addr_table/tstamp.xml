@@ -8,5 +8,8 @@
 				<node id="irigb_lock" mask="0x1"/>
 			</node>
 		</node>
-		<node id="ctr" address="0x2" mode="block" size="0x2" fwinfo="endpoint;width=1"/>		
+    <node id="ctr" address="0x4" fwinfo="endpoint;width=2">
+      <node id="set" address="0x0" mode="block" size="0x2"/>    
+      <node id="val" address="0x2" mode="block" size="0x2"/>    
+    </node>
 </node>
