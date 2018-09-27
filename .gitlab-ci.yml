@@ -9,7 +9,8 @@ variables:
   OUTPUT_ROOT_DIR: "/eos/user/p/pdtsbot/ci"
 
 .job_template: &template_job_base
-  image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
+  # image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
+  image: ${IPBB_DOKER_REGISTRY}:master__ipbb_v0.3.5
   tags:
     - docker
     - xilinx-tools
