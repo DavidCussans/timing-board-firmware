@@ -67,6 +67,7 @@ setup_build_area:
     - ipbb vivado make-project
     - ipbb vivado check-syntax
   artifacts:
+    when: on_success
     paths: 
       - build_area
     expire_in: 1 day
@@ -88,7 +89,7 @@ setup_build_area:
     - ipbb vivado -q synth -j3 
     - ipbb vivado -q impl 
     - ipbb vivado bitfile
-    - ipbb vivado package --tag ${CI_COMMIT_TAG:-${CI_COMMIT_SHA}}
+    - ipbb vivado package --tag ${CI_COMMIT_REF_SLUG:-${CI_COMMIT_SHA:0:8}}
     - mkdir ${CI_PROJECT_DIR}/package
     - cp -r package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
