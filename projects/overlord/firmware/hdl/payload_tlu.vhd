@@ -61,7 +61,7 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal mclk, rst_io, rsti, clk, clk10, stb, rst, locked, q, d, d_trig: std_logic;
+	signal mclk, rst_io, rsti, clk, clk10, stb, rst, locked, q, d, d_trig, sync: std_logic;
 	signal trig_in: std_logic_vector(5 downto 0);
 	
 begin
@@ -110,9 +110,10 @@ begin
 			q_hdmi_clk_1 => q_hdmi_clk_1,
 			q_hdmi_clk_2 => q_hdmi_clk_2,
 			q_hdmi_clk_3 => q_hdmi_clk_3,
-			q_hdmi => q,
+			sync => sync,
 			q_hdmi_0 => q_hdmi_0,
 			q_hdmi_1 => q_hdmi_1,
+			q_hdmi => q,
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
 			d_hdmi_2 => d_hdmi_2,
@@ -171,6 +172,7 @@ begin
 			spill_warn => trig_in(5),
 			spill_start => trig_in(4),
 			spill_end => trig_in(3),
+			sync => sync,
 			clk10 => clk10,
 			irig => trig_in(0),
 			q => q,

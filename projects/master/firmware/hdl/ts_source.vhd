@@ -83,7 +83,8 @@ begin
 	ctr: entity work.ipbus_ctrs_v
 		generic map(
 			N_CTRS => 1,
-			CTR_WDS => TSTAMP_WDS / 4
+			CTR_WDS => TSTAMP_WDS / 4,
+			READ_ONLY => false
 		)
 		port map(
 			ipb_clk => ipb_clk,

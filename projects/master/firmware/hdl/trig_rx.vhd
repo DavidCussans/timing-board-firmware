@@ -26,6 +26,7 @@ entity trig_rx is
 		mclk: in std_logic; -- The serial IO clock
 		clk: in std_logic; -- The system clock
 		d: in std_logic; -- Input from trigger
+		edge: out std_logic;
 		scmd_out: out cmd_w;
 		scmd_in: in cmd_r
 	);
@@ -98,6 +99,7 @@ begin
 			rec_d => d,
 			clk => clk,
 			rdy => ep_rdy,
+			edge => edge,
 			scmd => scmd,
 			acmd => open
 		);

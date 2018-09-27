@@ -27,11 +27,15 @@ entity master_top is
 		spill_warn: in std_logic := '0';
 		spill_start: in std_logic := '0';
 		spill_end: in std_logic := '0';
+		sync: out std_logic;
 		clk10: in std_logic := '0';
 		irig: in std_logic := '0';
 		q: out std_logic; -- Output (mclk domain)
 		d: in std_logic; -- Input (mclk domain)
-		t_d: in std_logic -- Input from trigger
+		t_d: in std_logic; -- Input from trigger
+		rdy: out std_logic; -- Ready output from built-in endpoint
+		edge: out std_logic; -- Edge control output from built-in endpoint
+		t_edge: out std_logic -- Edge control output from trigger endpoint
 	);
 
 end master_top;
@@ -77,12 +81,15 @@ begin
 			spill_warn => spill_warn,
 			spill_start => spill_start,
 			spill_end => spill_end,
+			sync => sync,
 			clk10 => clk10,
 			irig => irig,
 			q => q,
 			d => d,
 			t_scmd_in => scmd_in,
-			t_scmd_out => scmd_out
+			t_scmd_out => scmd_out,
+			rdy => rdy,
+			edge => edge
 		);
 
 -- Trigger receiver
@@ -99,6 +106,7 @@ begin
 			mclk => mclk,
 			clk => clk,
 			d => t_d,
+			edge => t_edge,
 			scmd_out => scmd_in,
 			scmd_in => scmd_out
 		);

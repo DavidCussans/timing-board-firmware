@@ -28,6 +28,7 @@ entity spill_gate is
 		spill_warn: in std_logic;
 		spill_start: in std_logic;
 		spill_end: in std_logic;
+		sync: out std_logic;
 		spill: out std_logic;
 		veto: out std_logic;
 		tstamp: in std_logic_vector(8 * TSTAMP_WDS - 1 downto 0);
@@ -51,6 +52,7 @@ architecture rtl of spill_gate is
 	signal veto_f, veto_i, spill_i, spill_f, spill_r, spill_e, ss, se, sw, ss_d, se_d, sw_d, ss_i, se_i, sw_i, trst, sinc: std_logic;
 	signal start_ts, end_ts, warn_ts: std_logic_vector(63 downto 0);
 	signal d: std_logic_vector(191 downto 0);
+	signal sctr: unsigned(3 downto 0);
 	
 begin
 
@@ -122,6 +124,21 @@ begin
 	
 	spill_e <= (spill_e or ss_i) and not (se_i or rst) when rising_edge(clk);
 	veto_i <= (veto_i or sw_i) and not (ss_i or rst) when rising_edge(clk);
+
+-- Stretched sync pulse for BI
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				sctr <= (others => '0');
+			elsif sctr /= "0000" or ss_i = '1' then
+				sctr <= sctr + 1;
+			end if;
+		end if;
+	end process;
+	
+	sync <= or_reduce(std_logic_vector(sctr));
 
 -- Fake generator
 

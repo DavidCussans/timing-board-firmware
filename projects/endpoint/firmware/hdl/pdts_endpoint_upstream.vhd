@@ -25,6 +25,7 @@ entity pdts_endpoint_upstream is
 		rec_d: in std_logic; -- CDR recovered data from timing link (rec_clk domain)
 		clk: in std_logic; -- 50MHz clock input
 		rdy: out std_logic; -- Ready flag
+		edge: out std_logic;
 		scmd: out cmd_w; -- Sync command out
 		acmd: out cmd_w -- Async command out
 	);
@@ -126,5 +127,6 @@ begin
 	acmd.last <= '0'; -- Need to find a better solution for this
 	
 	rdy <= rxphy_locked when rx_err = "000" else '0';
+	edge <= '0';
 		
 end rtl;
