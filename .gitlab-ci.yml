@@ -303,4 +303,4 @@ build:endpoint_fmc:
     PROJECT_DIR_PATH: "projects/endpoint"
     PROJECT_TOP_DEP: "top_a35.dep"
   dependencies:
-    - check:endpoint
+    - check:endpoint_fmc
