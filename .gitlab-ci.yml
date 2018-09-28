@@ -289,7 +289,7 @@ build:crt_fmc:
 
 #--- Endpoint wrapper -------------------------
 # Dep and syntax check
-check:endpoint:
+check:endpoint_fmc:
   <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/endpoint"
@@ -297,7 +297,7 @@ check:endpoint:
 
 
 # Build 
-build:endpoint:
+build:endpoint_fmc:
   <<: *template_job_vivado_build
   variables:
     PROJECT_DIR_PATH: "projects/endpoint"
