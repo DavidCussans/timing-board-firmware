@@ -130,6 +130,5 @@ begin
 	acmd.last <= '0'; -- Need to find a better solution for this
 	
 	rdy <= rxphy_locked when rx_err = "000" else '0';
-	edge <= '0';
 		
 end rtl;
