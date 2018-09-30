@@ -67,7 +67,8 @@ begin
 	startup: entity work.pdts_ep_startup
 		generic map(
 			SCLK_FREQ => SCLK_FREQ,
-			SIM => SIM
+			SIM => SIM,
+			NEED_ADJUST => false
 		)
 		port map(
 			sclk => sclk,
