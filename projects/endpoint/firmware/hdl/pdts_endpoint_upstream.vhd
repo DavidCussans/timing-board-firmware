@@ -25,6 +25,7 @@ entity pdts_endpoint_upstream is
 		rec_d: in std_logic; -- CDR recovered data from timing link (rec_clk domain)
 		clk: in std_logic; -- 50MHz clock input
 		rdy: out std_logic; -- Ready flag
+		fdel: out std_logic_vector(3 downto 0);
 		edge: out std_logic;
 		scmd: out cmd_w; -- Sync command out
 		acmd: out cmd_w -- Async command out
@@ -83,6 +84,8 @@ begin
 			fclk => sclk,
 			fdel => "0000",
 			cdel => "000000",
+			fdel_out => fdel,
+			edge => edge,
 			rxclk => rec_clk,
 			rxrst => rec_rst,
 			rxd => rec_d,

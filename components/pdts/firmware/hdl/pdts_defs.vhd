@@ -23,12 +23,12 @@ package pdts_defs is
 	constant CCHAR_PD: std_logic_vector(9 downto 0) := "1010000011"; -- K28.5 encoded RD = +1, 0x283
 	constant CCHAR_ND: std_logic_vector(9 downto 0) := "0101111100"; -- K28.5 encoded RD = -1, 0x17c
 	constant SCHAR: std_logic_vector(7 downto 0) := X"3c"; -- Sync pkt marker: K28.1
+	constant KCTR_REQ: integer := 8; -- Number of commas required for alignment lock
 
 -- L2	constants (protocol layer)
 	
 	constant GRP_W: positive := 2; -- Bitwidth of group ID
 	constant ADDR_WDS: positive := 1; -- Number of address words	
---	constant ADDR_FLD_W: natural := 8; -- Add fancier address matching later
 	constant SCMD_W: positive := 4; -- Bitwidth of sync cmd
 	constant CSUM_WDS : positive := 2; -- Number of checksum words (CRC16)
 	constant ACMD_LEN_MIN: natural := ADDR_WDS * 2 + 1 + CSUM_WDS;

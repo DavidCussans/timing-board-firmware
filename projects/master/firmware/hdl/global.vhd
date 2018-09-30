@@ -26,6 +26,8 @@ entity global is
 		ep_en: out std_logic;
 		ep_stat: in std_logic_vector(3 downto 0);
 		ep_rdy: in std_logic;
+		ep_edge: in std_logic;
+		ep_fdel: in std_logic_vector(3 downto 0);
 		tx_err: in std_logic
 	);
 		
@@ -97,6 +99,6 @@ begin
 		);
 
 		ep_en <= ctrl(0)(0);
-		stat(0) <= X"000000" & "00" & tx_err & ep_rdy & ep_stat;
+		stat(0) <= X"0000" & "000" & ep_edge & ep_fdel & "00" & tx_err & ep_rdy & ep_stat; -- CDC
 
 end rtl;

@@ -7,6 +7,8 @@
 			<node id="stat" address="0x1">
 			    <node id="ep_stat" mask="0xf"/>
 			    <node id="ep_rdy" mask="0x10"/>
+				<node id="ep_fdel" mask="0xf00"/>
+				<node id="ep_edge" mask="0x1000"/>			    
 			</node>
 		</node>
 		<node id="ctrs" address="0x10" mode="block" size="0x10" fwinfo="endpoint;width=4"/>

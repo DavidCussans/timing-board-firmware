@@ -61,8 +61,8 @@ architecture rtl of master is
 	signal tgrp: std_logic_vector(N_PART - 1 downto 0);
 	signal tx_q: std_logic_vector(7 downto 0);
 	signal tx_err, tx_stb, tx_k: std_logic;
-	signal ep_en, ep_rdy, ep_rst: std_logic;
-	signal ep_stat: std_logic_vector(3 downto 0);
+	signal ep_en, ep_rdy, ep_rst, ep_edge: std_logic;
+	signal ep_stat, ep_fdel: std_logic_vector(3 downto 0);
 	
 begin
 
@@ -94,6 +94,8 @@ begin
 			ep_en => ep_en,
 			ep_stat => ep_stat,
 			ep_rdy => ep_rdy,
+			ep_edge => ep_edge,
+			ep_fdel => ep_fdel,
 			tx_err => tx_err
 		);
 		
@@ -312,11 +314,13 @@ begin
 			rec_d => d,
 			clk => clk,
 			rdy => ep_rdy,
-			edge => edge,
+			fdel => ep_fdel,
+			edge => ep_edge,
 			scmd => rscmdw,
 			acmd => open
 		);
 		
 	rdy <= ep_rdy;
+	edge <= ep_edge;
 
 end rtl;

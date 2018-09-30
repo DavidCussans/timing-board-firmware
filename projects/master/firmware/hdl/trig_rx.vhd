@@ -40,8 +40,8 @@ architecture rtl of trig_rx is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_ep_en, ctrl_ext_trig_en: std_logic;
-	signal ep_stat: std_logic_vector(3 downto 0);
-	signal ep_rst, ep_rdy: std_logic;
+	signal ep_stat, ep_fdel: std_logic_vector(3 downto 0);
+	signal ep_rst, ep_rdy, ep_edge: std_logic;
 	signal scmd: cmd_w;
 	signal t: std_logic_vector(SCMD_MAX downto 0);
 	
@@ -80,7 +80,7 @@ begin
 		
 	ctrl_ep_en <= ctrl(0)(0);
 	ctrl_ext_trig_en <= ctrl(0)(1);
-	stat(0) <= X"000000" & "000" & ep_rdy & ep_stat; -- CDC on ep_rdy, don't care (pseudo static level)
+	stat(0) <= X"0000" & "000" & ep_edge & ep_fdel & "000" & ep_rdy & ep_stat; -- CDC, don't care (pseudo static levels)
 
 -- The rx endpoint
 
@@ -99,10 +99,13 @@ begin
 			rec_d => d,
 			clk => clk,
 			rdy => ep_rdy,
-			edge => edge,
+			fdel => ep_fdel,
+			edge => ep_edge,
 			scmd => scmd,
 			acmd => open
 		);
+		
+	edge <= ep_edge;
 
 -- Trigger counters
 

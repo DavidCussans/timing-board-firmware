@@ -26,6 +26,7 @@ entity pdts_rx_phy is
 		fdel: in std_logic_vector(3 downto 0); -- Fine delay setting (rxclk cycles)
 		cdel: in std_logic_vector(5 downto 0); -- Coarse delay setting (clk cycles)
 		fdel_out: out std_logic_vector(3 downto 0); -- Actual fine delay (upstream mode)
+		edge: out std_logic; -- Sample edge (upstream mode)
 		rxclk: in std_logic; -- serial data clock
 		rxrst: in std_logic; -- reset (rxclk domain)
 		rxd: in std_logic; -- serial data (rxclk domain)
@@ -44,15 +45,14 @@ end pdts_rx_phy;
 
 architecture rtl of pdts_rx_phy is
 
-	constant KCTR_REQ: integer := 8;
-
 	signal rxdd, c: std_logic;
 	signal fdel_i: std_logic_vector(3 downto 0);
 	signal wa, w, wd, t: std_logic_vector(9 downto 0) := "0000000000";
 	signal tr, f, fr, done, m, stb, aligned_i, kok, phase_rst_i: std_logic;
 	signal ctr: unsigned(7 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
-	signal fctr, dctr, kctr: unsigned(3 downto 0) := X"0";
+	signal fctr, kctr: unsigned(3 downto 0) := X"0";
+	signal dctr: unsigned(4 downto 0) := X"0";
 	signal di: std_logic_vector(7 downto 0);
 	signal ectr, lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, stbdd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
@@ -65,8 +65,9 @@ begin
 
 -- Fine delay and shift register
 
-	fdel_i <= std_logic_vector(dctr) when UPSTREAM_MODE else fdel;
+	fdel_i <= std_logic_vector(dctr(4 downto 1)) when UPSTREAM_MODE else fdel;
 	fdel_out <= fdel_i;
+	edge <= dctr(0);
 	
 	f_del: entity work.pdts_del
 		generic map(
@@ -149,12 +150,12 @@ begin
 	begin
 		if rising_edge(clk) then
 			if rxrst = '1' then
-				dctr <= X"0";
+				dctr <= (others => '0');
 				aligned_i <= '0';
 			elsif done = '1' then
 				if m = '0' or kok = '0' then
-					if dctr = SCLK_RATIO - 1 then
-						dctr <= X"0";
+					if dctr = to_unsigned(SCLK_RATIO - 1, 4) & '1' then
+						dctr <= (others => '0');
 					else
 						dctr <= dctr + 1;
 					end if;
