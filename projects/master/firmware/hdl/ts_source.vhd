@@ -90,7 +90,7 @@ begin
 			ipb_clk => ipb_clk,
 			ipb_rst => ipb_rst,
 			ipb_in => ipbw(N_SLV_CTR),
-			ipb_out => ipbr(N_SLV_Ctr),
+			ipb_out => ipbr(N_SLV_CTR),
 			clk => clk,
 			rst => rst,
 			inc(0) => '1',

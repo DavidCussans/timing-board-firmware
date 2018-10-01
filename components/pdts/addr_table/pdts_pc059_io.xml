@@ -32,7 +32,9 @@
 		    <node id="carrier_type" mask="0xff00"/>
 		    <node id="design_type" mask="0xff"/>
 		</node>
-		<node id="i2c" address="0x08" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="FMC_UID_PROM=0x57;AX3_Switch=0x21;SI5345=0x68;SFPExpander=0x75"/>
-		<node id="usfp_i2c" address="0x10" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="eeprom=0x50"/>
+		<node id="i2c" address="0x08" module="file://opencores_i2c.xml" class="I2CMasterNode" 
+			parameters="FMC_UID_PROM=0x57;AX3_Switch=0x21;SI5345=0x68;SFPExpander=0x75;SFP_Switch=0x73;SFP_EEProm=0x50;SFP_Diag=0x51"
+		/>
+		<node id="usfp_i2c" address="0x10" module="file://opencores_i2c.xml" class="I2CMasterNode" parameters="eeprom=0x50;diag=0x51"/>
 		<node id="freq" address="0x20" module="file://freq_ctr.xml"/>
 </node>

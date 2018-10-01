@@ -9,7 +9,8 @@ variables:
   OUTPUT_ROOT_DIR: "/eos/user/p/pdtsbot/ci"
 
 .job_template: &template_job_base
-  image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
+  # image: ${IPBB_DOKER_REGISTRY}:2018-09-05__ipbb_v0.3.4
+  image: ${IPBB_DOKER_REGISTRY}:master__ipbb_v0.3.5
   tags:
     - docker
     - xilinx-tools
@@ -67,6 +68,7 @@ setup_build_area:
     - ipbb vivado make-project
     - ipbb vivado check-syntax
   artifacts:
+    when: on_success
     paths: 
       - build_area
     expire_in: 1 day
@@ -84,13 +86,11 @@ setup_build_area:
     - mkdir -p ${HOME}/.Xilinx/Vivado
     - echo 'puts {Setting maximum number of threads to 2}' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
     - echo 'set_param general.maxThreads 2' >> ${HOME}/.Xilinx/Vivado/Vivado_init.tcl
-    # - ipbb proj create vivado ${CI_JOB_NAME#build:} timing-board-firmware:${PROJECT_DIR_PATH} -t ${PROJECT_TOP_DEP}
     - cd proj/${CI_JOB_NAME#build:}
-    # - ipbb vivado make-project
     - ipbb vivado -q synth -j3 
     - ipbb vivado -q impl 
-    - ipbb vivado bitfile package
-    - ipbb vivado addrtab
+    - ipbb vivado bitfile
+    - ipbb vivado package --tag ${CI_COMMIT_REF_SLUG:-${CI_COMMIT_SHA:0:8}}
     - mkdir ${CI_PROJECT_DIR}/package
     - cp -r package/*.tgz ${CI_PROJECT_DIR}/package
   artifacts:
@@ -289,7 +289,7 @@ build:crt_fmc:
 
 #--- Endpoint wrapper -------------------------
 # Dep and syntax check
-check:endpoint:
+check:endpoint_fmc:
   <<: *template_job_vivado_check
   variables:
     PROJECT_DIR_PATH: "projects/endpoint"
@@ -297,10 +297,10 @@ check:endpoint:
 
 
 # Build 
-build:endpoint:
+build:endpoint_fmc:
   <<: *template_job_vivado_build
   variables:
     PROJECT_DIR_PATH: "projects/endpoint"
     PROJECT_TOP_DEP: "top_a35.dep"
   dependencies:
-    - check:endpoint
+    - check:endpoint_fmc
