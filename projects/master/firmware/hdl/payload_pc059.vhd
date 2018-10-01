@@ -146,7 +146,6 @@ begin
 			q_usfp => '0',
 			usfp_fault => usfp_fault,
 			usfp_los => usfp_los,
-			tx_dis => '1',
 			usfp_txdis => usfp_txdis,
 			usfp_sda => usfp_sda,
 			usfp_scl => usfp_scl,
