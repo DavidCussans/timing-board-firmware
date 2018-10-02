@@ -52,7 +52,7 @@ architecture rtl of pdts_rx_phy is
 	signal ctr: unsigned(7 downto 0) := (others => '0');
 	signal sctr: unsigned(3 downto 0);
 	signal fctr, kctr: unsigned(3 downto 0) := X"0";
-	signal dctr: unsigned(4 downto 0) := X"0";
+	signal dctr: unsigned(4 downto 0);
 	signal di: std_logic_vector(7 downto 0);
 	signal ectr, lctr: unsigned(COMMA_TIMEOUT_W - 1 downto 0);
 	signal stbd, stbdd, ki, lock, ldone, edone, kerr, cerr, derr: std_logic;
