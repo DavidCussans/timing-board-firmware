@@ -74,8 +74,9 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d, d_hdmi. du: std_logic;
 	signal txd: std_logic_vector(N_EP - 1 downto 0);
+	signal cdr_edge, hdmi_edge: std_logic;
 		
 begin
 
@@ -124,22 +125,22 @@ begin
 			sfp_los => sfp_los,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
-			d_cdr => open,
+			d_cdr => d,
 			clk_cdr_p => clk_cdr_p,
 			clk_cdr_n => clk_cdr_n,
 			clk_cdr => open,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
-			cdr_edge => '0',
+			cdr_edge => cdr_edge,
 			inmux => inmux,
 			rstb_i2cmux => rstb_i2cmux,
-			hdmi_edge => '0',
+			hdmi_edge => hdmi_edge,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
-			d_hdmi => d,
+			d_hdmi => d_hdmi,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
-			q_hdmi => '0',
+			q_hdmi => q,
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
 			d_usfp => open,
@@ -197,10 +198,16 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q,
-			d => d,
-			t_d => '0'
+			d => du,
+			t_d => d_hdmi,
+			edge => cdr_edge,
+			t_edge => hdmi_edge
 		);
 
+-- Master-slave connection
+		
+	du <= or_reduce(txd);		
+		
 -- Endpoint wrapper
 
 	egen: for i in N_EP - 1 downto 0 generate

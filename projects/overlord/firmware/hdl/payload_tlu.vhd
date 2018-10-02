@@ -63,7 +63,8 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal mclk, rst_io, rsti, clk, clk10, stb, rst, locked, q, d, d_trig, sync: std_logic;
 	signal trig_in: std_logic_vector(5 downto 0);
-	
+	signal cdr_edge, hdmi_edge: std_logic;
+
 begin
 
 -- ipbus address decode
@@ -118,12 +119,14 @@ begin
 			q_hdmi_3 => q_hdmi_3,
 			d_hdmi_2 => d_hdmi_2,
 			d_hdmi => d_trig,
+			hdmi_edge => hdmi_edge,
 			q_sfp => q,
 			q_sfp_p => q_sfp_p,
 			q_sfp_n => q_sfp_n,
 			d_cdr_p => d_cdr_p,
 			d_cdr_n => d_cdr_n,
 			d_cdr => d,
+			cdr_edge => cdr_edge,
 			sfp_los => sfp_los,
 			sfp_fault => sfp_fault,
 			sfp_tx_dis => sfp_tx_dis,
@@ -177,7 +180,9 @@ begin
 			irig => trig_in(0),
 			q => q,
 			d => d,
-		  t_d => d_trig
+		  t_d => d_trig,
+			edge => cdr_edge,
+			t_edge => hdmi_edge
 		);
 		
 -- Endpoint wrapper

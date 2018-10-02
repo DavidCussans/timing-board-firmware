@@ -60,7 +60,7 @@ architecture rtl of pdts_endpoint is
 	signal scmdr, acmdr: cmd_r;
 	signal tp, tp_d: std_logic;
 	signal tx_q: std_logic_vector(7 downto 0);
-	signal tx_err, tx_stb, tx_k: std_logic;
+	signal tx_err, tx_stb, tx_k, txdi: std_logic;
 
 begin
 
@@ -260,11 +260,12 @@ begin
 			k => tx_k,
 			stb => tx_stb,
 			txclk => rec_clk,
-			q => txd
+			q => txdi
 		);
 		
 -- SFP control
 
 	sfp_tx_dis <= '0' when EN_TX else not tx_en;
+	txd <= txdi and not rst_i when EN_TX else txdi and tx_en and not rst_i;
 		
 end rtl;

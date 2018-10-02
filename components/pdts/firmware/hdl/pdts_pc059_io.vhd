@@ -18,7 +18,8 @@ use unisim.VComponents.all;
 entity pdts_pc059_io is
 	generic(
 		CARRIER_TYPE: std_logic_vector(7 downto 0);
-		DESIGN_TYPE: std_logic_vector(7 downto 0)
+		DESIGN_TYPE: std_logic_vector(7 downto 0);
+		USE_CDR_CLK: boolean := false -- Selects CDR or PLL clock for sampling of CDR data input
 	);
 	port(
 		ipb_clk: in std_logic;
@@ -93,7 +94,7 @@ architecture rtl of pdts_pc059_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon, ctrl_sfp_edge: std_logic;
-	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, q_i, q_hdmi_i, q_usfp_i: std_logic;
+	signal clk_i, clk_u, clk_cdr_i, clk_cdr_u, clk_cdr_s, d_cdr_i, d_cdr_r, d_cdr_f, d_hdmi_i, d_hdmi_r, d_hdmi_f, d_usfp_i, d_usfp_r, q_i, q_hdmi_i, q_usfp_i: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal sda_o, usfp_sda_o: std_logic;
@@ -226,6 +227,8 @@ begin
 			o => d_cdr_i
 		);
 		
+	clk_cdr_s <= clk_cdr_i when USE_CDR_CLK else clk_i;
+		
 	iddr_cdr: IDDR
 		generic map(
 			DDR_CLK_EDGE => "SAME_EDGE"
@@ -233,7 +236,7 @@ begin
 		port map(
 			q1 => d_cdr_r,
 			q2 => d_cdr_f,
-			c => clk_cdr_i,
+			c => clk_cdr_s,
 			ce => '1',
 			d => d_cdr_i,
 			r => '0',

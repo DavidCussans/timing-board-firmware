@@ -19,7 +19,8 @@ entity pdts_fmc_io is
 	generic(
 		CARRIER_TYPE: std_logic_vector(7 downto 0);
 		DESIGN_TYPE: std_logic_vector(7 downto 0);
-		LOOPBACK: boolean := false
+		LOOPBACK: boolean := false;
+		USE_CDR_CLK: boolean := false
 	);
 	port(
 		ipb_clk: in std_logic;
@@ -83,8 +84,8 @@ architecture rtl of pdts_fmc_io is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
-	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r: std_logic;
-	signal gpin, rj45_din_u, rec_d_u, rec_d_i, rec_d_il, rj45_din_i, rj45_din_il: std_logic;
+	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, cdr_clk_s, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r: std_logic;
+	signal gpin, rj45_din_u, rec_d_u, cdr_d, rj45_din_i, rj45_din_il: std_logic;
 	signal mmcm_bad, mmcm_ok, mmcm_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
@@ -279,10 +280,11 @@ begin
 			ib => rec_d_n,
 			o => rec_d_u
 		);
-		
-	rec_d_i <= rec_d_u when rising_edge(rec_clk_i); -- Register CDR data on CDR recovered clock
-	rec_d_il <= sfp_dout when rising_edge(fmc_clk_i);
-	rec_d <= rec_d_i when not LOOPBACK else rec_d_il;
+
+	cdr_clk_s <= rec_clk_i when USE_CDR_CLK and not LOOPBACK else fmc_clk_i;
+	cdr_d <= rec_d_u when not LOOPBACK else sfp_dout;	
+
+	rec_d <= cdr_d when rising_edge(cdr_clk_s);
 	
 	ibufds_rj45: IBUFDS
 		port map(

@@ -51,12 +51,14 @@ entity pdts_tlu_io is
 		q_hdmi_3: out std_logic; -- output to HDMI 3
 		d_hdmi_2: in std_logic;
 		d_hdmi: out std_logic;
+		hdmi_edge: in std_logic;
 		q_sfp: in std_logic;
 		q_sfp_p: out std_logic;
 		q_sfp_n: out std_logic;
 		d_cdr_p: in std_logic;
 		d_cdr_n: in std_logic;
 		d_cdr: out std_logic;
+		cdr_edge: in std_logic; -- CDR sampling edge control
 		sfp_los: in std_logic;
 		sfp_fault: in std_logic;
 		sfp_tx_dis: out std_logic;
@@ -79,7 +81,6 @@ architecture rtl of pdts_tlu_io is
 	signal stat: ipb_reg_v(0 downto 0);
 	signal ctrl_rst_lock_mon: std_logic;
 	signal rst_i, clk_i, clk_u, mclk_i, mclk_u: std_logic;
-	signal ctrl_hdmi_edge, ctrl_cdr_edge: std_logic;
 	signal mmcm_bad, mmcm_ok, pll_bad, pll_ok, mmcm_lm, pll_lm: std_logic;
 	signal d_hdmi_2_r, d_hdmi_2_f: std_logic;
 	signal d_cdr_i, d_cdr_r, d_cdr_f, q_sfp_r, q_sfp_i: std_logic;
@@ -130,8 +131,6 @@ begin
 	rstb_clk <= not ctrl(0)(3);
 	rstb_i2c <= not ctrl(0)(5);
 	ctrl_rst_lock_mon <= ctrl(0)(6);
-	ctrl_hdmi_edge <= ctrl(0)(8);
-	ctrl_cdr_edge <= ctrl(0)(9);
 	
 	rst <= rst_i;
 	
@@ -225,7 +224,7 @@ begin
 			s => '0'
 		);
 		
-	d_cdr <= d_cdr_r when ctrl_cdr_edge = '0' else d_cdr_f;
+	d_cdr <= d_cdr_r when cdr_edge = '0' else d_cdr_f;
 
 	iddr_hdmi: IDDR
 		generic map(
@@ -241,7 +240,7 @@ begin
 			s => '0'
 		);
 		
-	d_hdmi <= d_hdmi_2_r when ctrl_hdmi_edge = '0' else d_hdmi_2_f;
+	d_hdmi <= d_hdmi_2_r when hdmi_edge = '0' else d_hdmi_2_f;
 
 -- Data outputs
 	

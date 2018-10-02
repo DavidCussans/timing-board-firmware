@@ -208,7 +208,7 @@ begin
 			tx_dis => tx_dis
 		);
 	
--- Master block (should really be master without the trigger stuff)
+-- Master block
 
 	master: entity work.master_top
 		port map(

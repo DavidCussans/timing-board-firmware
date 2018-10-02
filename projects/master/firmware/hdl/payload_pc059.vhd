@@ -73,7 +73,8 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d: std_logic;
+	signal clk_pll, rst_io, rsti, clk, stb, rst, locked, q, d, d_hdmi: std_logic;
+	signal cdr_edge, hdmi_edge: std_logic;
 	
 begin
 
@@ -128,16 +129,16 @@ begin
 			clk_cdr => open,
 			cdr_los => cdr_los,
 			cdr_lol => cdr_lol,
-			cdr_edge => '0',
+			cdr_edge => cdr_edge,
 			inmux => inmux,
 			rstb_i2cmux => rstb_i2cmux,
-			hdmi_edge => '0',
+			hdmi_edge => hdmi_edge,
 			d_hdmi_p => d_hdmi_p,
 			d_hdmi_n => d_hdmi_n,
-			d_hdmi => open,
+			d_hdmi => d_hdmi,
 			q_hdmi_p => q_hdmi_p,
 			q_hdmi_n => q_hdmi_n,
-			q_hdmi => '0',
+			q_hdmi => q,
 			d_usfp_p => d_usfp_p,
 			d_usfp_n => d_usfp_n,
 			d_usfp => open,
@@ -196,7 +197,9 @@ begin
 			rst => rst,
 			q => q,
 			d => d,
-			t_d => '0'
+			t_d => d_hdmi,
+			edge => cdr_edge,
+			t_edge => hdmi_edge
 		);
 
 end rtl;
