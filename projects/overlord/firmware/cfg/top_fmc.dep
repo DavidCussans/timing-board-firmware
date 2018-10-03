@@ -1,5 +1,5 @@
 # Top level dep file for overlord on FMC / Enclustra
 
-setup -c projects/master build_settings_a35.tcl
+setup -c components/pdts build_settings_a35.tcl
 include -c projects/master enclustra_ax3_pm3_a35.dep
 include payload_fmc.dep
