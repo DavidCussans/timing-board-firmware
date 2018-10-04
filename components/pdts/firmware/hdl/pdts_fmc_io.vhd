@@ -47,8 +47,10 @@ entity pdts_fmc_io is
 		rec_d_p: in std_logic;
 		rec_d_n: in std_logic;
 		rec_d: out std_logic;
+		cdr_edge: in std_logic;
 		clk_out_p: out std_logic;
 		clk_out_n: out std_logic;
+		rj45_edge: in std_logic;
 		rj45_din_p: in std_logic;
 		rj45_din_n: in std_logic;
 		rj45_din: out std_logic;
@@ -85,13 +87,13 @@ architecture rtl of pdts_fmc_io is
 	signal ctrl: ipb_reg_v(0 downto 0);
 	signal stat: ipb_reg_v(0 downto 0);
 	signal fmc_clk_i, fmc_clk_u, rec_clk_i, rec_clk_u, cdr_clk_s, clkout, gp0out, gp1out, sfp_dout_r, rj45_dout_r: std_logic;
-	signal gpin, rj45_din_u, rec_d_u, cdr_d, rj45_din_i, rj45_din_il: std_logic;
+	signal gpin, rj45_din_u, rec_d_u, rec_d_i, rec_d_r, rec_d_f, cdr_d, rj45_din_i, rj45_din_r, rj45_din_f, rj45_din_il: std_logic;
 	signal mmcm_bad, mmcm_ok, mmcm_lm: std_logic;
 	signal clkdiv: std_logic_vector(1 downto 0);
 	signal uid_sda_o, pll_sda_o, sfp_sda_o: std_logic;
 	
 	attribute IOB: string;
-	attribute IOB of sfp_dout_r, rj45_dout_r, rec_d_u, rj45_din_u: signal is "TRUE";
+	attribute IOB of sfp_dout_r, rj45_dout_r, rj45_din_u: signal is "TRUE";
 
 begin
 
@@ -282,7 +284,23 @@ begin
 		);
 
 	cdr_clk_s <= rec_clk_i when USE_CDR_CLK and not LOOPBACK else fmc_clk_i;
-	cdr_d <= rec_d_u when not LOOPBACK else sfp_dout;	
+	
+	iddr_cdr: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => rec_d_r,
+			q2 => rec_d_f,
+			c => mclk,
+			ce => '1',
+			d => rec_d_u,
+			r => '0',
+			s => '0'
+		);
+	
+	rec_d_i <= rec_d_r when cdr_edge = '0' else rec_d_f;
+	cdr_d <= rec_d_i when not LOOPBACK else sfp_dout;	
 
 	rec_d <= cdr_d when rising_edge(cdr_clk_s);
 	
@@ -293,7 +311,21 @@ begin
 			o => rj45_din_u
 		);
 		
-	rj45_din_i <= rj45_din_u when falling_edge(fmc_clk_i); -- Register RJ45 data on tx clock
+	iddr_rj45: IDDR
+		generic map(
+			DDR_CLK_EDGE => "SAME_EDGE"
+		)
+		port map(
+			q1 => rj45_din_r,
+			q2 => rj45_din_f,
+			c => mclk,
+			ce => '1',
+			d => rj45_din_u,
+			r => '0',
+			s => '0'
+		);
+		
+	rj45_din_i <= rj45_din_r when rj45_edge = '0' else rj45_din_f;
 	rj45_din_il <= rj45_dout when falling_edge(fmc_clk_i);
 	rj45_din <= rj45_din_i when not LOOPBACK else rj45_din_il;
 
