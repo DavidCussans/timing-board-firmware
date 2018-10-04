@@ -1,5 +1,5 @@
 # Top level dep file for overload on TLU
 
-setup -c projects/master build_settings_a35.tcl
+setup -c components/pdts build_settings_a35.tcl
 include -c projects/overlord enclustra_ax3_pm3_a35_tlu.dep
 include payload_tlu.dep

@@ -163,9 +163,6 @@ check:ouroboros_fmc:
 # Build
 build:ouroboros_fmc:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35.dep"
   dependencies:
     - check:ouroboros_fmc
 
@@ -180,9 +177,6 @@ check:ouroloop_fmc:
 # Build
 build:ouroloop_fmc:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_loopback.dep"
   dependencies:
     - check:ouroloop_fmc
 
@@ -197,9 +191,6 @@ check:ouroboros_pc059:
 # Build
 build:ouroboros_pc059:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/ouroboros"
-    PROJECT_TOP_DEP: "top_a35_pc059.dep"
   dependencies:
     - check:ouroboros_pc059
 
@@ -214,11 +205,22 @@ check:overlord_tlu:
 # Build 
 build:overlord_tlu:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/overlord"
-    PROJECT_TOP_DEP: "top_tlu.dep"
   dependencies:
     - check:overlord_tlu
+
+
+# Dep and syntax check
+check:overlord_fmc:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_fmc.dep"
+
+# Build 
+build:overlord_fmc:
+  <<: *template_job_vivado_build
+  dependencies:
+    - check:overlord_fmc
 
 #--- Fanout -------------------------
 # Dep and syntax check
@@ -231,9 +233,6 @@ check:fanout_0_pc059:
 # Build 
 build:fanout_0_pc059:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/fanout"
-    PROJECT_TOP_DEP: "top_ip65.dep"
   dependencies:
     - check:fanout_0_pc059
 
@@ -247,9 +246,6 @@ check:fanout_1_pc059:
 # Build 
 build:fanout_1_pc059:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/fanout"
-    PROJECT_TOP_DEP: "top_ip66.dep"
   dependencies:
     - check:fanout_1_pc059
 
@@ -263,9 +259,6 @@ check:fanout_2_pc059:
 # Build 
 build:fanout_2_pc059:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/fanout"
-    PROJECT_TOP_DEP: "top_ip67.dep"
   dependencies:
     - check:fanout_2_pc059
 
@@ -281,9 +274,6 @@ check:crt_fmc:
 # Build 
 build:crt_fmc:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/crt"
-    PROJECT_TOP_DEP: "top.dep"
   dependencies:
     - check:crt_fmc
 
@@ -299,8 +289,5 @@ check:endpoint_fmc:
 # Build 
 build:endpoint_fmc:
   <<: *template_job_vivado_build
-  variables:
-    PROJECT_DIR_PATH: "projects/endpoint"
-    PROJECT_TOP_DEP: "top_a35.dep"
   dependencies:
     - check:endpoint_fmc
