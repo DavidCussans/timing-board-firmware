@@ -111,7 +111,7 @@ begin
 			userled => userled,
 			fmc_clk_p => fmc_clk_p,
 			fmc_clk_n => fmc_clk_n,
-			fmc_clk => clk,
+			fmc_clk => mclk,
 			rec_clk_p => rec_clk_p,
 			rec_clk_n => rec_clk_n,
 			rec_clk => open,
@@ -148,10 +148,10 @@ begin
 
 -- Clock divider
 
-	clkgen: entity work.pdts_rx_mul_mmcm
+	clkgen: entity work.pdts_rx_div_mmcm
 		port map(
-			clk => clk,
 			sclk => mclk,
+			clk => clk,
 			phase_rst => rst_io,
 			phase_locked => locked
 		);
