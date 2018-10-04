@@ -71,6 +71,7 @@ architecture rtl of payload is
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
 	signal fmc_clk, rec_clk, rec_d, q, du, rst_io, rsti, clk, stb, rst, locked: std_logic;
 	signal txd: std_logic_vector(N_EP - 1 downto 0);
+	signal rj45_edge: std_logic;
 		
 begin
 
@@ -121,8 +122,10 @@ begin
 			rec_d_p => rec_d_p,
 			rec_d_n => rec_d_n,
 			rec_d => rec_d,
+			cdr_edge => '0',
 			clk_out_p => clk_out_p,
 			clk_out_n => clk_out_n,
+			rj45_edge => rj45_edge,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
 			rj45_dout => q,
@@ -182,7 +185,8 @@ begin
 			rst => rst,
 			q => q,
 			d => du,
-			t_d => '0'
+			t_d => '0',
+			edge => rj45_edge
 		);
 	
 -- -- Master-slave connection
