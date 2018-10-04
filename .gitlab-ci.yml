@@ -220,6 +220,23 @@ build:overlord_tlu:
   dependencies:
     - check:overlord_tlu
 
+
+# Dep and syntax check
+check:overlord_fmc:
+  <<: *template_job_vivado_check
+  variables:
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_tlu.dep"
+
+# Build 
+build:overlord_fmc:
+  <<: *template_job_vivado_build
+  variables:
+    PROJECT_DIR_PATH: "projects/overlord"
+    PROJECT_TOP_DEP: "top_fmc.dep"
+  dependencies:
+    - check:overlord_fmc
+
 #--- Fanout -------------------------
 # Dep and syntax check
 check:fanout_0_pc059:
