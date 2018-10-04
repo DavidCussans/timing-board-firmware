@@ -67,7 +67,8 @@ architecture rtl of payload is
 
 	signal ipbw: ipb_wbus_array(N_SLAVES - 1 downto 0);
 	signal ipbr: ipb_rbus_array(N_SLAVES - 1 downto 0);
-	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d_trig: std_logic;
+	signal mclk, rst_io, rsti, clk, stb, rst, locked, q, d, d_trig: std_logic;
+	signal cdr_edge, rj45_edge: std_logic;
 
 begin
 
@@ -116,12 +117,14 @@ begin
 			rec_clk => open,
 			rec_d_p => rec_d_p,
 			rec_d_n => rec_d_n,
-			rec_d => open,
+			rec_d => d,
+			cdr_edge => cdr_edge,
 			clk_out_p => clk_out_p,
 			clk_out_n => clk_out_n,
 			rj45_din_p => rj45_din_p,
 			rj45_din_n => rj45_din_n,
 			rj45_din => d_trig,
+			rj45_edge => rj45_edge,
 			rj45_dout => q,
 			rj45_dout_p => rj45_dout_p,
 			rj45_dout_n => rj45_dout_n,
@@ -178,8 +181,10 @@ begin
 			clk => clk,
 			rst => rst,
 			q => q,
-			d => '0',
+			d => d,
 		  t_d => d_trig,
+			edge => cdr_edge,
+			t_edge => rj45_edge
 		);
 		
 -- Endpoint wrapper

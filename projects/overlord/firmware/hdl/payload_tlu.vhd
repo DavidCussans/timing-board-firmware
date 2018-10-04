@@ -34,8 +34,10 @@ entity payload is
 		q_hdmi_clk_1: out std_logic;
 		q_hdmi_clk_2: out std_logic;
 		q_hdmi_clk_3: out std_logic;
-		q_hdmi_0: out std_logic; -- output to HDMI 0
-		q_hdmi_1: out std_logic; -- output to HDMI 1
+		q_hdmi_0: out std_logic; -- output to HDMI 0 (BUSY)
+		q_hdmi_0b: out std_logic; -- output to HDMI 0 (CONT)
+		q_hdmi_1: out std_logic; -- output to HDMI 1 (BUSY)
+		q_hdmi_1b: out std_logic; -- output to HDMI 1 (CONT)
 		q_hdmi_2: out std_logic; -- output to HDMI 2
 		q_hdmi_3: out std_logic; -- output to HDMI 3
 		d_hdmi_2: in std_logic; -- input from HDMI 3
@@ -113,7 +115,9 @@ begin
 			q_hdmi_clk_3 => q_hdmi_clk_3,
 			sync => sync,
 			q_hdmi_0 => q_hdmi_0,
+			q_hdmi_0b => q_hdmi_0b,
 			q_hdmi_1 => q_hdmi_1,
+			q_hdmi_1b => q_hdmi_1b,
 			q_hdmi => q,
 			q_hdmi_2 => q_hdmi_2,
 			q_hdmi_3 => q_hdmi_3,
