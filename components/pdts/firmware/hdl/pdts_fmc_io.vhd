@@ -292,7 +292,7 @@ begin
 		port map(
 			q1 => rec_d_r,
 			q2 => rec_d_f,
-			c => mclk,
+			c => cdr_clk_s,
 			ce => '1',
 			d => rec_d_u,
 			r => '0',
@@ -318,7 +318,7 @@ begin
 		port map(
 			q1 => rj45_din_r,
 			q2 => rj45_din_f,
-			c => mclk,
+			c => fmc_clk_i,
 			ce => '1',
 			d => rj45_din_u,
 			r => '0',
