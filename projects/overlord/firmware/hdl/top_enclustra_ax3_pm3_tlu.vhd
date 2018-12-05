@@ -92,9 +92,11 @@ begin
 	leds <= not ('0' & userled & inf_leds);
 	phy_rstn <= not phy_rst_e;
 		
-	mac_addr <= X"020ddba11640"; -- Careful here, arbitrary addresses do not always work
-	ip_addr <= X"c0a8c840"; -- 192.168.200.64
-
+	--mac_addr <= X"020ddba11640"; -- Careful here, arbitrary addresses do not always work
+	--ip_addr <= X"c0a8c840"; -- 192.168.200.64
+    mac_addr <= X"000a35030812"; -- Copied from Xilinx Dev board, so should be unique (outside UoB ... )
+    ip_addr <= X"c0a8790a"; -- 192.168.121.10
+ 
 -- ipbus slaves live in the entity below, and can expose top-level ports
 -- The ipbus fabric is instantiated within.
 

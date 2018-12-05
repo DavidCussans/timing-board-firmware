@@ -64,6 +64,10 @@ architecture rtl of master is
 	signal ep_en, ep_rdy, ep_rst, ep_edge: std_logic;
 	signal ep_stat, ep_fdel: std_logic_vector(3 downto 0);
 	
+	-- Mark nets for debug:
+	attribute mark_debug: string;
+	attribute mark_debug of scmdw,scmdr, tx_q,tx_k,tx_stb,stb: signal is "true";
+	
 begin
 
 -- ipbus address decode
