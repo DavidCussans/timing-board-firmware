@@ -8,3 +8,4 @@ include -c components/pdts scmd_gen.dep pdts_tx.dep
 src -c components/pdts pdts_idle_gen.vhd pdts_prio_enc.vhd pdts_scmd_merge.vhd pdts_defs.vhd
 include -c projects/endpoint pdts_endpoint_upstream.dep
 src -c ipbus-firmware:components/ipbus_slaves ipbus_reg_types.vhd
+src nim_to_trig_cmd.vhd

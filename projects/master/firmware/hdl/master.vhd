@@ -160,32 +160,40 @@ begin
 			scmd_out => scmdw_v(0),
 			scmd_in => scmdr_v(0)
 		);
-		
--- Spill gate
 
-	sgate: entity work.spill_gate
+      -- Spill gate
+
+        sgate: entity work.spill_gate
+                port map(
+                        ipb_clk => ipb_clk,
+                        ipb_rst => ipb_rst,
+                        ipb_in => ipbw(N_SLV_SPILL),
+                        ipb_out => ipbr(N_SLV_SPILL),
+                        clk => clk,
+                        rst => rst,
+                        spill_warn => spill_warn,
+                        spill_start => spill_start,
+                        spill_end => spill_end,
+                        sync => sync,
+                        spill => spill,
+                        veto => veto,
+                        tstamp => tstamp,
+                        scmd_out => scmdw_v(1),
+                        scmd_in => scmdr_v(1)
+                );
+
+  
+-- Generate trigger commands from NIM input
+-- ( Replace trigger input from Penn Trigger board with a simple NIM-->CMD block
+	trigGen: entity work.nim_to_trig_cmd
 		port map(
-			ipb_clk => ipb_clk,
-			ipb_rst => ipb_rst,
-			ipb_in => ipbw(N_SLV_SPILL),
-			ipb_out => ipbr(N_SLV_SPILL),
 			clk => clk,
 			rst => rst,
-			spill_warn => spill_warn,
-			spill_start => spill_start,
-			spill_end => spill_end,
-			sync => sync,
-			spill => spill,
-			veto => veto,
-			tstamp => tstamp,
-			scmd_out => scmdw_v(1),
-			scmd_in => scmdr_v(1)
+			nim_trig_signal => spill_warn,
+			scmd_out => scmdw_v(2),
+			scmd_in => scmdr_v(2)
 		);
 
--- Trigger command input
-
-	scmdw_v(2) <= t_scmd_in;
-	t_scmd_out <= scmdr_v(2);
 	
 -- Echo command source
 
